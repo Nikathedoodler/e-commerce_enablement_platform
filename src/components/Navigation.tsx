@@ -4,11 +4,12 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import Image from "next/image";
 import * as motion from "motion/react-client";
-import SignIn from "./Sign-in";
+import { useRouter } from "next/navigation";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const router = useRouter();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -57,8 +58,8 @@ const Navigation = () => {
           Admin
         </a>
         <a
-          href="dashboard"
           className="hover:text-black transition hover:scale-120"
+          onClick={() => router.push("/login")}
         >
           Dashboard
         </a>
@@ -80,7 +81,6 @@ const Navigation = () => {
         >
           Contact
         </a>
-        <SignIn />
       </div>
       {/* Right: Language, Login */}
       <div className="flex space-x-4">
@@ -135,8 +135,8 @@ const Navigation = () => {
                   height={8}
                 />
                 <a
-                  href="#dashboard"
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={() => router.push("/login")}
                 >
                   Dashboard
                 </a>
@@ -184,21 +184,6 @@ const Navigation = () => {
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Contact
-                </a>
-              </div>
-              <div className="flex items-center hover:bg-gray-100">
-                <Image
-                  src="/images/contact.png"
-                  alt="pricing"
-                  className="h-7 w-auto"
-                  width={24}
-                  height={8}
-                />
-                <a
-                  href="#contact"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                >
-                  Sign In
                 </a>
               </div>
             </div>

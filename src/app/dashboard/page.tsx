@@ -17,12 +17,18 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import React, { useState } from "react";
+// import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-export default function Page() {
+export default async function Page() {
   const [selected, setSelected] = useState<{ main: string; sub?: string }>({
     main: "Models",
     sub: "Gemini",
   });
+  // const session = await getServerSession();
+  // if (!session) {
+  //   redirect("/login");
+  // }
 
   return (
     <SidebarProvider>

@@ -3,5 +3,5 @@
 import { signIn } from "./auth";
 
 export default async function signInWithGoogle() {
-  await signIn("google");
+  await signIn("google", { callbackUrl: "/dashboard" });
 }
