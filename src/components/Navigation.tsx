@@ -5,7 +5,7 @@ export default async function Navigation() {
   const session = await auth(); // Fetch the session
 
   return (
-    <nav>
+    <nav className="mb-20">
       <NavigationClient session={session} />
     </nav>
   );

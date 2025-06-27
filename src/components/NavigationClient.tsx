@@ -61,7 +61,7 @@ const NavigationClient = ({ session }: NavigationClientProps) => {
 
       {/* Center: Links */}
       <div className="hidden md:flex items-center space-x-8 text-gray-700 font-small lg:font-medium">
-        {/* <a href="#top" className="hidden lg:flex items-center space-x-2">
+        <a href="#top" className="hidden lg:flex items-center space-x-2">
           <Image
             src="/images/logo.png"
             alt="Cuckoo Logo"
@@ -69,12 +69,12 @@ const NavigationClient = ({ session }: NavigationClientProps) => {
             height={32}
           />
           <span className="font-bold text-lg"></span>
-        </a> */}
+        </a>
         <a href="admin" className="hover:text-black transition hover:scale-120">
           Admin
         </a>
         <a
-          className="hover:text-black transition hover:scale-120"
+          className="hover:text-black transition hover:scale-120 cursor-pointer"
           onClick={() => router.push("/login")}
         >
           Dashboard
