@@ -6,9 +6,9 @@ const Footer = () => {
   return (
     <footer
       id="contact"
-      className="w-full min-h-[80vh] bg-[#2d2d2d] flex items-center justify-center p-6"
+      className="w-full min-h-[100vh] bg-[#2d2d2d] flex items-center justify-center p-6"
     >
-      <div className="w-full lg:max-w-[75%] bg-white rounded-4xl md:rounded-[2.5rem] min-h-[70vh] flex flex-col items-center justify-evenly md:items-stretch md:justify-between relative p-8 md:p-16">
+      <div className="w-full xl:max-w-7xl bg-white rounded-4xl md:rounded-[2.5rem] min-h-[40vh] xl:min-h-[60vh] flex flex-col items-center justify-evenly md:items-stretch md:justify-between relative px-8  md:p-16">
         {/* Top Row */}
         <motion.div
           initial={{ scale: 0 }}
@@ -16,7 +16,7 @@ const Footer = () => {
           transition={{ duration: 0.8, type: "string", stiffness: 100 }}
           className="w-full flex justify-center items-center gap-6"
         >
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <Image
               src="/images/logo.png"
               alt="Cuckoo Logo"
@@ -24,9 +24,9 @@ const Footer = () => {
               width={32}
               height={16}
             />
-          </div>
+          </div> */}
           <span className="font-semibold text-sm md:text-xl text-gray-800">
-            AI-Enabled Privacy Compliance
+            3PL Fulfillment Made Simple & Profitable
           </span>
         </motion.div>
         {/* Email Subscribe Input */}

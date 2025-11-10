@@ -56,25 +56,25 @@ const Hero = () => {
   return (
     <div
       id="#top"
-      className="w-full lg:w-3/4 mx-auto flex flex-col justify-center items-center space-y-6 py-10 px-12 scroll-mt-10"
+      className="max-w-7xl mx-auto flex flex-col justify-center items-center space-y-6 py-10 px-12 scroll-mt-10"
     >
       <motion.h1
         initial={{ scale: 0 }}
         whileInView={{ scale: 1 }}
         transition={{ duration: 0.8, type: "string", stiffness: 100 }}
-        className="text-3xl md:text-4xl lg:text-5xl 2xl:text-6xl xl:w-3/4 font-bold text-gray-900 leading-tight text-center"
+        className="w-full text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight text-center"
       >
-        AI-Enabled Privacy <br />
-        Compliance, Simplified
+        Scale E-Commerce <br />
+        With 60% Lower Fulfillment Costs
       </motion.h1>
       <motion.p
         initial={{ y: -20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="text-xs lg:text-sm w-[80%] md:w-[60%] xl:w-[40%] text-center text-gray-500"
+        className="text-md xl:text-xl w-full text-center text-gray-500"
       >
-        Empower your organization with an all-in-one platform for automated
-        privacy compliance, secure data handling, and seamless AI integrations.
+        Powering modern brands with frictionless EU fulfillment—cut costs and
+        ship faster with our all-in-one logistics platform.
       </motion.p>
       <div className="flex space-x-4">
         <motion.button
@@ -94,7 +94,7 @@ const Hero = () => {
             width={64}
             height={32}
           />
-          Book a 15 Minute Call
+          Request a Quote
           <span className="transition-transform duration-200 group-hover:translate-x-1">
             →
           </span>

@@ -6,7 +6,7 @@ const Features = () => {
   return (
     <div
       id="features"
-      className="w-full mx-auto text-gray-900 flex flex-col space-y-10 xl:w-3/4 py-10 px-12 scroll-mt-40"
+      className="max-w-7xl mx-auto text-gray-900 flex flex-col space-y-10 py-10 px-12 scroll-mt-40"
     >
       <motion.div
         // initial={{ y: 30, opacity: 0 }}
@@ -16,15 +16,16 @@ const Features = () => {
       >
         <div className="sm:w-3/4 lg:w-1/2 space-y-4">
           <h1 className="text-2xl sm:text-lg lg:text-xl sm:text-start font-bold mb-2">
-            AI-Powered Compliance Tools
+            Platform-Powered Fulfillment Tools
           </h1>
           <p className="sm:w-3/4 lg:w-full text-sm lg:text-md sm:text-start text-gray-500">
-            Leverage advanced AI to automate compliance checks, ensuring your
-            data always meet the latest privacy standards.
+            Leverage automation, real-time insights, and seamless integrations
+            to optimize every order and deliver remarkable fulfillment
+            experiences across Europe
           </p>
         </div>
-        <button className="w-full sm:w-auto min-w-[120px] max-w-[150px] mx-auto sm:mx-0 px-4 py-2 bg-black text-white rounded-full font-semibold shadow-md shadow-black/80 hover:shadow-md hover:shadow-green-400 transition-all duration-200 hover:scale-110 group cursor-pointer">
-          Watch a Demo
+        <button className="w-full sm:w-auto mx-auto sm:mx-0 px-4 py-2 bg-black text-white rounded-full font-semibold shadow-md shadow-black/80 hover:shadow-md hover:shadow-green-400 transition-all duration-200 hover:scale-110 group cursor-pointer">
+          Explore Our Fulfillment Tools
         </button>
       </motion.div>
       {/* New Section: Cutting-edge AI models */}
@@ -37,16 +38,16 @@ const Features = () => {
         {/* Left: Title and Buttons */}
         <div className="flex-1 flex flex-col gap-3 sm:gap-4 text-white text-center md:text-left">
           <h2 className="text-start text-xl sm:text-2xl md:text-2xl lg:text-lg xl:text-xl font-bold">
-            Stay ahead of evolving regulations with our AI models
+            Grow Beyond Borders With Advanced Fulfillment
           </h2>
           <p className="text-sm text-start sm:text-base md:text-base lg:text-sm xl:text-sm opacity-80">
-            Built for security, ease of use, and rapid deployment, our solution
-            combines AI-driven tools, user-friendly dashboards, and robust
-            compliance features-all in one place.
+            Our unified platform brings together live order tracking, inventory
+            intelligence, fast EU shipping, and cost-saving automations—all in
+            one place.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2 justify-center md:justify-start">
             <button className="bg-white text-[#1e1a5a] font-semibold px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition w-full sm:w-auto cursor-pointer">
-              Browse AI Models
+              See Fulfillment in Action
             </button>
           </div>
         </div>
@@ -63,9 +64,10 @@ const Features = () => {
                   height={32}
                 />
               </div>
-              <div className="font-semibold">Google AI</div>
+              <div className="font-semibold">Shopify Integration</div>
               <div className="text-xs opacity-80">
-                Build your own AI project.
+                Seamlessly sync your store for automatic order flow and status
+                updates.
               </div>
             </div>
           </div>
@@ -80,9 +82,10 @@ const Features = () => {
                   height={32}
                 />
               </div>
-              <div className="font-semibold">Anthropic</div>
+              <div className="font-semibold">DHL/Carrier Network</div>
               <div className="text-xs opacity-80">
-                Custom assistance at scale.
+                Access express shipping across Europe through established
+                carrier partnerships.
               </div>
             </div>
           </div>
@@ -97,8 +100,11 @@ const Features = () => {
                   height={32}
                 />
               </div>
-              <div className="font-semibold">Perplexity</div>
-              <div className="text-xs opacity-80">Effective LLM queries.</div>
+              <div className="font-semibold">Multi-Warehouse Management</div>
+              <div className="text-xs opacity-80">
+                Distribute stock and manage fulfillment from multiple strategic
+                EU locations.
+              </div>
             </div>
           </div>
         </div>
@@ -117,122 +123,129 @@ const Features = () => {
           <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
-              src="/images/secure-dash.png"
+              src="/images/tracking.png"
               className="h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
             <h1 className="text-md font-semibold text-center lg:text-start">
-              Secure User Dashboard
+              Real-time order tracking
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
-              Central hub for monitoring privacy management activities
+              Instant updates on your order’s status and location, giving full
+              transparency through every step of fulfillment.
             </p>
           </div>
           <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
-              src="/images/documents.svg"
+              src="/images/warehouse_inventory.png"
               className="h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
             <h1 className="text-md font-semibold text-center lg:text-start">
-              Document & Template Library
+              Warehouse inventory dashboard
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
-              Ready-to-use privacy policy documents and templates for compliance
+              Live overview of stock levels and product movement to prevent
+              shortages and streamline restocking.
             </p>
           </div>
           <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
-              src="/images/form-data.png"
+              src="/images/fast-delivery-icon.webp"
               className="h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
             <h1 className="text-md font-semibold text-center lg:text-start">
-              Form Tools & Data Export
+              Fast EU delivery
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
-              Dynamic form builders with options to exporting user data
+              Reliable 2-3 day shipping across Europe, optimized for speed and
+              cost-efficiency from tax-advantaged warehouses.
             </p>
           </div>
           <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
-              src="/images/admin.png"
+              src="/images/ai-prediction.png"
               className="h-10 lg:h-8 w-auto"
               width={32}
               height={16}
             />
             <h1 className="text-md font-semibold text-center lg:text-start">
-              Admin Panel
+              AI-based cost prediction
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
-              Control panel for managing user data, compliance settings, and
-              more
+              Smart forecasts of fulfillment expenses based on historical data
+              help you optimize operations and pricing.
             </p>
           </div>
           <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
-              src="/images/security.png"
+              src="/images/routing.jpg"
               className="h-10 lg:h-8 w-auto"
               width={32}
               height={16}
             />
             <h1 className="text-md font-semibold text-center lg:text-start">
-              End-to-End Security
+              Automated Order Routing
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
-              Continues security measures covering all platform operations
+              Instantly direct each order to the optimal warehouse and carrier
+              for the fastest, lowest-cost delivery
             </p>
           </div>
           <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
-              src="/images/payment.png"
+              src="/images/return_management.png"
               className="h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
             <h1 className="text-md font-semibold text-center lg:text-start">
-              Booking & Payments
+              Returns Management
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
-              System for scheduling consultainons and processing payments
+              Streamlined process for handling EU returns, including automated
+              labels and real-time status tracking
             </p>
           </div>
           <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
-              src="/images/certification.svg"
+              src="/images/inventory_alert.png"
               className="h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
             <h1 className="text-md font-semibold text-center lg:text-start">
-              Training & Certification
+              Real-Time Inventory Alerts
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
-              Educational Resources & Privacy Complinace Certification
+              Proactive notifications and restock recommendations to prevent
+              out-of-stock situations and improve sales velocity
             </p>
           </div>
           <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
-              src="/images/encryption.png"
+              src="/images/package.png"
               className="h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
             <h1 className="text-md font-semibold text-center lg:text-start">
-              End-to-End Encryption
+              Custom Packing Solutions
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
-              Continues security measures covering all platform operations
+              Choose branded, sustainable, or protective packaging for your
+              products, tailored per SKU and order type
             </p>
           </div>
         </div>
