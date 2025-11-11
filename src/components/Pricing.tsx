@@ -164,7 +164,7 @@ const Pricing = () => {
             className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 text-white font-semibold hover:bg-white/10 transition cursor-pointer"
             onClick={() => setIsTableOpen(!isTableOpen)}
           >
-            Compare All Features
+            {isTableOpen ? "Hide All Features" : "Compare All Features"}
           </a>
         </div>
       </div>
