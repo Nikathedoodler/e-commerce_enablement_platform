@@ -1,11 +1,6 @@
 import { useState, FormEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
-import type {
-  CodeComponent,
-  LiComponent,
-  PreComponent,
-} from "react-markdown/lib/ast-to-react";
 
 const TextGenerator = () => {
   const [prompt, setPrompt] = useState<string>("");
@@ -34,7 +29,7 @@ const TextGenerator = () => {
       const data = await res.json();
       setPrompt("");
       setResponse(data.result || "No response from AI.");
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       setError("Failed to connect to AI service.");
     } finally {
       setLoading(false);
@@ -70,12 +65,18 @@ const TextGenerator = () => {
     setError("");
   };
 
-  const CodeRenderer: CodeComponent = ({
+  type CodeProps = React.ComponentPropsWithoutRef<"code"> & {
+    inline?: boolean;
+  };
+  type PreProps = React.ComponentPropsWithoutRef<"pre">;
+  type ListItemProps = React.ComponentPropsWithoutRef<"li">;
+
+  const CodeRenderer = ({
     inline,
     className,
     children,
     ...rest
-  }) => (
+  }: CodeProps) => (
     <code
       className={
         "bg-[#232a41] rounded px-1 py-0.5 text-[#B9FF66] text-base" +
@@ -88,13 +89,13 @@ const TextGenerator = () => {
     </code>
   );
 
-  const PreRenderer: PreComponent = ({ children, ...rest }) => (
+  const PreRenderer = ({ children, ...rest }: PreProps) => (
     <pre className="bg-[#232a41] rounded-xl p-3 my-2 overflow-x-auto" {...rest}>
       {children}
     </pre>
   );
 
-  const ListItemRenderer: LiComponent = ({ children, ...rest }) => (
+  const ListItemRenderer = ({ children, ...rest }: ListItemProps) => (
     <li className="ml-4 list-disc" {...rest}>
       {children}
     </li>
