@@ -4,7 +4,6 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import Image from "next/image";
 import * as motion from "motion/react-client";
-import SignIn from "./Sign-in";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +27,7 @@ const Navigation = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  });
+  }, []);
 
   return (
     <motion.nav
@@ -37,9 +36,9 @@ const Navigation = () => {
       transition={{ duration: 0.6, delay: 0.8 }}
       className={`${
         isScrolled
-          ? "opacity-80 left-1/2 -translate-x-1/2 fixed top-6 transition-opacity duration-100"
-          : " mt-6"
-      } max-w-5xl flex items-center justify-between xl:mx-auto py-2 px-6 mx-6 bg-white/80 backdrop-blur-md border border-gray-200 rounded-full shadow-sm z-50`}
+          ? "bg-white/90 border border-gray-200 shadow-lg backdrop-blur-md"
+          : "bg-white/70 border border-transparent shadow-sm"
+      } sticky top-6 mt-6 max-w-5xl flex items-center justify-between xl:mx-auto py-2 px-6 mx-6 rounded-full transition-all duration-200 z-50`}
     >
       {/* Left: Logo */}
       <a href="#top" className="flex items-center space-x-2">
@@ -90,7 +89,7 @@ const Navigation = () => {
         >
           Calculate Savings
         </a>
-        <div className="reletaive">
+        <div className="relative">
           <button
             className="lg:hidden cursor-pointer ml-2 pt-1"
             onClick={toggleMenu}

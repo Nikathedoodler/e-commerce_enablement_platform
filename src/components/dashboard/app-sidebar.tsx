@@ -157,10 +157,10 @@ const data = {
 };
 
 export function AppSidebar({
-  onSelect,
+  onNavSelect,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
-  onSelect?: (main: string, sub?: string) => void;
+  onNavSelect?: (main: string, sub?: string) => void;
 }) {
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -168,7 +168,7 @@ export function AppSidebar({
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} onSelect={onSelect} />
+        <NavMain items={data.navMain} onSelect={onNavSelect} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>

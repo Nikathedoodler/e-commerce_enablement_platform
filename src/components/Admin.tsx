@@ -5,14 +5,25 @@ import { useState } from "react";
 const Admin = () => {
   const [activeSection, setActiveSection] = React.useState("users");
 
+  type User = {
+    id: number;
+    name: string;
+    email: string;
+    role: "Admin" | "User";
+  };
+
   // Mock user data
-  const [users, setUsers] = useState([
+  const [users, setUsers] = useState<User[]>([
     { id: 1, name: "Alice Smith", email: "alice@example.com", role: "Admin" },
     { id: 2, name: "Bob Johnson", email: "bob@example.com", role: "User" },
   ]);
   const [showModal, setShowModal] = useState(false);
-  const [editingUser, setEditingUser] = useState<any | null>(null);
-  const [form, setForm] = useState({ name: "", email: "", role: "User" });
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [form, setForm] = useState<Omit<User, "id">>({
+    name: "",
+    email: "",
+    role: "User",
+  });
 
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
@@ -24,7 +35,7 @@ const Admin = () => {
     setForm({ name: "", email: "", role: "User" });
     setShowModal(true);
   };
-  const openEditModal = (user: any) => {
+  const openEditModal = (user: User) => {
     setEditingUser(user);
     setForm({ name: user.name, email: user.email, role: user.role });
     setShowModal(true);

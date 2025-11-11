@@ -1,6 +1,11 @@
-import React, { useState, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
+import type {
+  CodeComponent,
+  LiComponent,
+  PreComponent,
+} from "react-markdown/lib/ast-to-react";
 
 const TextGenerator = () => {
   const [prompt, setPrompt] = useState<string>("");
@@ -8,7 +13,6 @@ const TextGenerator = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [copied, setCopied] = useState(false);
-  const [downloaded, setDownloaded] = useState(false);
 
   const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -22,15 +26,15 @@ const TextGenerator = () => {
         body: JSON.stringify({ prompt }),
       });
       if (!res.ok) {
-        const err = await res.json();
-        setError(err.error || "Something went wrong.");
+        const apiError = await res.json();
+        setError(apiError.error || "Something went wrong.");
         setLoading(false);
         return;
       }
       const data = await res.json();
       setPrompt("");
       setResponse(data.result || "No response from AI.");
-    } catch (err) {
+    } catch (fetchError: unknown) {
       setError("Failed to connect to AI service.");
     } finally {
       setLoading(false);
@@ -59,8 +63,6 @@ const TextGenerator = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    setDownloaded(true);
-    setTimeout(() => setDownloaded(false), 1500);
   };
 
   const handleClear = () => {
@@ -68,43 +70,40 @@ const TextGenerator = () => {
     setError("");
   };
 
+  const CodeRenderer: CodeComponent = ({
+    inline,
+    className,
+    children,
+    ...rest
+  }) => (
+    <code
+      className={
+        "bg-[#232a41] rounded px-1 py-0.5 text-[#B9FF66] text-base" +
+        (className ? ` ${className}` : "") +
+        (inline ? "" : " block my-2 p-2 overflow-x-auto")
+      }
+      {...rest}
+    >
+      {children}
+    </code>
+  );
+
+  const PreRenderer: PreComponent = ({ children, ...rest }) => (
+    <pre className="bg-[#232a41] rounded-xl p-3 my-2 overflow-x-auto" {...rest}>
+      {children}
+    </pre>
+  );
+
+  const ListItemRenderer: LiComponent = ({ children, ...rest }) => (
+    <li className="ml-4 list-disc" {...rest}>
+      {children}
+    </li>
+  );
+
   const markdownComponents: Components = {
-    code(props) {
-      const { children, className, ...rest } = props;
-      // react-markdown v8+ passes 'inline' as a boolean prop
-      // @ts-ignore
-      const inline = props.inline;
-      return (
-        <code
-          className={
-            "bg-[#232a41] rounded px-1 py-0.5 text-[#B9FF66] text-base" +
-            (inline ? "" : " block my-2 p-2 overflow-x-auto")
-          }
-          {...rest}
-        >
-          {children}
-        </code>
-      );
-    },
-    pre(props) {
-      const { children, ...rest } = props;
-      return (
-        <pre
-          className="bg-[#232a41] rounded-xl p-3 my-2 overflow-x-auto"
-          {...rest}
-        >
-          {children}
-        </pre>
-      );
-    },
-    li(props) {
-      const { children, ...rest } = props;
-      return (
-        <li className="ml-4 list-disc" {...rest}>
-          {children}
-        </li>
-      );
-    },
+    code: CodeRenderer,
+    pre: PreRenderer,
+    li: ListItemRenderer,
   };
 
   return (

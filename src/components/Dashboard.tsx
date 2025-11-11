@@ -1,7 +1,6 @@
 "use client";
 
-import React, { act } from "react";
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import TextGenerator from "./TextGenerator";
 
 const Dashboard = () => {

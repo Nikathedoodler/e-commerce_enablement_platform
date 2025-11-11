@@ -24,10 +24,9 @@ export async function POST(req: NextRequest) {
       max_tokens: 512,
     });
 
-    const aiText = completion.choices[0]?.message?.content || "";
+    const aiText = completion.choices[0]?.message?.content?.trim() || "";
 
-    // const aiText = `This is a mock AI response to your prompt: "${prompt}"`;
-    // return NextResponse.json({ result: aiText });
+    return NextResponse.json({ result: aiText });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
