@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import TextGenerator from "./TextGenerator";
 
 const Dashboard = () => {
@@ -200,10 +201,12 @@ const Dashboard = () => {
             <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#232a41]" />
           </button>
           <button className="w-12 h-12 flex items-center justify-center rounded-full bg-[#232a41] hover:bg-[#2c3450] transition overflow-hidden">
-            <img
+            <Image
               src="/images/face-2.jpg"
               alt="Profile"
               className="w-10 h-10 rounded-full object-cover cursor-pointer"
+              width={40}
+              height={40}
             />
           </button>
         </div>
