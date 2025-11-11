@@ -29,7 +29,7 @@ const TextGenerator = () => {
       const data = await res.json();
       setPrompt("");
       setResponse(data.result || "No response from AI.");
-    } catch (_error: unknown) {
+    } catch {
       setError("Failed to connect to AI service.");
     } finally {
       setLoading(false);
