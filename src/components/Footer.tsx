@@ -1,8 +1,52 @@
+"use client";
+
 import React from "react";
-import Image from "next/image";
+import { useForm, SubmitHandler } from "react-hook-form";
 import * as motion from "motion/react-client";
+import { EmailLogo } from "../../public/svg/EmailLogo";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "sonner";
+
+const emailSchema = z.string().email({ message: "invalid email format" });
 
 const Footer = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ email: string }>({
+    resolver: zodResolver(
+      z.object({
+        email: emailSchema,
+      })
+    ),
+  });
+
+  const onSubmit: SubmitHandler<{ email: string }> = async (data) => {
+    const toastId = toast.loading("Registering");
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      toast.dismiss(toastId);
+
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.dismiss(toastId);
+      toast.error("Something went wrong");
+    }
+    console.log("data", data);
+  };
   return (
     <footer
       id="contact"
@@ -29,36 +73,6 @@ const Footer = () => {
             3PL Fulfillment Made Simple & Profitable
           </span>
         </motion.div>
-        {/* Email Subscribe Input */}
-        {/* <form className="relative flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden w-full max-w-md mb-10 shadow-sm mx-auto">
-          <span className="pl-4 pr-2 text-gray-400">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm0 0v4a4 4 0 01-8 0v-4"
-              />
-            </svg>
-          </span>
-          <input
-            type="email"
-            placeholder="Enter your email..."
-            className="flex-1 py-3 bg-transparent outline-none text-gray-700 placeholder-gray-400 text-base pr-32"
-          />
-          <button
-            type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#23262F] text-white px-5 py-2 font-semibold rounded-xl hover:bg-black transition-all text-sm shadow"
-          >
-            Subscribe
-          </button>
-        </form> */}
         {/* Main Content */}
         <div>
           <div className="flex flex-col md:flex-row w-full flex-1">
@@ -82,28 +96,17 @@ const Footer = () => {
                 <br />
                 TOGETHER
               </motion.h1>
-              {/* <a
-                href="#"
-                className="flex items-center text-2xl md:text-4xl text-gray-700 font-semibold border-b border-gray-400 w-fit hover:text-black transition hover:scale-120"
-              >
-                Contact us
-                <span className="ml-2 text-2xl font-normal">↗</span>
-              </a> */}
               <motion.form
                 initial={{ y: -20, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 1 }}
+                onSubmit={handleSubmit(onSubmit)}
                 className="relative flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden w-full max-w-md mb-10 shadow-sm"
               >
-                <Image
-                  src="/images/email-2.png"
-                  alt="email"
-                  width={32}
-                  height={16}
-                  className="h4 w-auto px-4"
-                />
+                <EmailLogo />
                 <input
                   type="email"
+                  {...register("email")}
                   placeholder="Enter your email..."
                   className="flex-1 py-3 bg-transparent outline-none text-gray-700 placeholder-gray-400 text-base pr-32"
                 />
