@@ -182,24 +182,35 @@ const Hero = () => {
         initial={{ y: 30, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, delay: 1 }}
-        className="relative overflow-hidden h-full lg:h-full xl:h-full w-full md:w-3/4 xl:mb-12"
+        className="relative w-full xl:mb-12"
       >
-        <Image
-          src="/images/dashboard-4.png"
-          alt="dashboard"
-          className="w-full h-auto object-cover rounded-xl"
-          width={480}
-          height={160}
-        />
-        {/* Bottom blur overlay */}
+        {/* Outer white glow to blend with page background */}
         <div
-          className="pointer-events-none absolute left-0 bottom-0 w-full h-16 md:h-24 rounded-b-xl"
-          style={{
-            background:
-              "linear-gradient(to top, rgba(255,255,255,0.8) 70%, transparent 100%)",
-            filter: "blur(4px)",
-          }}
+          className="pointer-events-none absolute -inset-8 rounded-[40px] bg-white/60 blur-3xl"
+          aria-hidden="true"
         />
+        {/* Video container */}
+        <div className="relative overflow-hidden rounded-xl">
+          <video
+            className="w-full h-auto object-cover rounded-xl"
+            src="/videos/white-map.mov"
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster="/images/map-poster.jpg"
+          ></video>
+          {/* Soft white edge blend on all sides */}
+          <div
+            className="pointer-events-none absolute inset-0 rounded-xl"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 16%, rgba(255,255,255,0) 84%, rgba(255,255,255,0.85) 100%), linear-gradient(0deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 16%, rgba(255,255,255,0) 84%, rgba(255,255,255,0.85) 100%)",
+              mixBlendMode: "screen",
+            }}
+            aria-hidden="true"
+          />
+        </div>
       </motion.div>
     </div>
   );
