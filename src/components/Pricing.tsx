@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import * as motion from "motion/react-client";
+import { trackPricingInteraction } from "@/lib/analytics";
 
 const plans = [
   {
@@ -126,7 +127,21 @@ const Pricing = () => {
             key={plan.name}
             initial={{ y: 20, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
+            onViewportEnter={() => {
+              // Track when plan card comes into view
+              trackPricingInteraction("view_plan", plan.name, {
+                monthly_fee: plan.monthlyFee,
+                order_volume: plan.orderVolume,
+              });
+            }}
             transition={{ duration: 0.4, delay: 0.1 }}
+            onClick={() => {
+              // Track when user clicks on plan card
+              trackPricingInteraction("click_plan", plan.name, {
+                monthly_fee: plan.monthlyFee,
+                order_volume: plan.orderVolume,
+              });
+            }}
             className="bg-white/10 border border-white/10 rounded-3xl p-6 flex flex-col gap-4 cursor-pointer hover:scale-105 transition duration-200"
           >
             <div>

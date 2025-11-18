@@ -7,6 +7,7 @@ import { EmailLogo } from "../../public/svg/EmailLogo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { trackFormSubmit } from "@/lib/analytics";
 
 const emailSchema = z.string().email({ message: "invalid email format" });
 
@@ -26,6 +27,12 @@ const Footer = () => {
 
   const onSubmit: SubmitHandler<{ email: string }> = async (data) => {
     const toastId = toast.loading("Registering");
+
+    // Track form submission attempt
+    trackFormSubmit("email_signup", "footer", {
+      email_domain: data.email.split("@")[1], // Track domain (e.g., "gmail.com")
+    });
+
     try {
       const response = await fetch("/api/leads", {
         method: "POST",
@@ -38,12 +45,29 @@ const Footer = () => {
       toast.dismiss(toastId);
 
       if (result.success) {
+        // Track successful submission
+        trackFormSubmit("email_signup", "footer", {
+          status: "success",
+          email_domain: data.email.split("@")[1],
+        });
         toast.success(result.message);
         reset();
       } else {
+        // Track failed submission
+        trackFormSubmit("email_signup", "footer", {
+          status: "error",
+          error_message: result.error,
+          email_domain: data.email.split("@")[1],
+        });
         toast.error(result.error);
       }
     } catch (error) {
+      // Track network/exception error
+      trackFormSubmit("email_signup", "footer", {
+        status: "error",
+        error_message: "network_error",
+        email_domain: data.email.split("@")[1],
+      });
       toast.dismiss(toastId);
       toast.error("Something went wrong");
     }
