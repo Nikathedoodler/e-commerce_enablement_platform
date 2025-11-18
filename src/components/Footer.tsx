@@ -14,6 +14,7 @@ const Footer = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<{ email: string }>({
     resolver: zodResolver(
@@ -26,18 +27,19 @@ const Footer = () => {
   const onSubmit: SubmitHandler<{ email: string }> = async (data) => {
     const toastId = toast.loading("Registering");
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("/api/leads", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, source: "footer" }),
       });
       const result = await response.json();
       toast.dismiss(toastId);
 
       if (result.success) {
         toast.success(result.message);
+        reset();
       } else {
         toast.error(result.error);
       }
@@ -45,7 +47,6 @@ const Footer = () => {
       toast.dismiss(toastId);
       toast.error("Something went wrong");
     }
-    console.log("data", data);
   };
   return (
     <footer
@@ -101,7 +102,7 @@ const Footer = () => {
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 1 }}
                 onSubmit={handleSubmit(onSubmit)}
-                className="relative flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden w-full max-w-md mb-10 shadow-sm"
+                className="relative flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden w-full max-w-md  shadow-sm"
               >
                 <EmailLogo />
                 <input

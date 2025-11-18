@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import * as motion from "motion/react-client";
-import { Presence } from "motion/react-client";
 
 const plans = [
   {
