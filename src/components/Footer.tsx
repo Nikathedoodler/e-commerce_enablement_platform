@@ -56,7 +56,7 @@ const Footer = () => {
         });
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch {
       // Track network/exception error
       trackFormSubmit("email_signup", "footer", {
         status: "error",
