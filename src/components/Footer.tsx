@@ -12,12 +12,7 @@ import { trackFormSubmit } from "@/lib/analytics";
 const emailSchema = z.string().email({ message: "invalid email format" });
 
 const Footer = () => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<{ email: string }>({
+  const { register, handleSubmit, reset } = useForm<{ email: string }>({
     resolver: zodResolver(
       z.object({
         email: emailSchema,

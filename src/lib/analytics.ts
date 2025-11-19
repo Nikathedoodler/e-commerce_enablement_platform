@@ -14,14 +14,16 @@
  */
 
 // Declare gtag function for TypeScript
+type GAEventParams = Record<string, unknown>;
+
 declare global {
   interface Window {
     gtag?: (
       command: "config" | "event" | "js" | "set",
       targetId: string | Date,
-      config?: Record<string, any>
+      config?: GAEventParams
     ) => void;
-    dataLayer?: any[];
+    dataLayer?: GAEventParams[];
   }
 }
 
@@ -38,10 +40,7 @@ declare global {
  *   value: 0
  * });
  */
-export const trackEvent = (
-  eventName: string,
-  eventParams?: Record<string, any>
-) => {
+export const trackEvent = (eventName: string, eventParams?: GAEventParams) => {
   // Only run in browser (not during server-side rendering)
   if (typeof window !== "undefined" && window.gtag) {
     window.gtag("event", eventName, eventParams || {});
@@ -57,7 +56,7 @@ export const trackEvent = (
 export const trackFormSubmit = (
   formName: string,
   formLocation: string,
-  additionalData?: Record<string, any>
+  additionalData?: GAEventParams
 ) => {
   trackEvent("form_submit", {
     form_name: formName,
@@ -70,7 +69,7 @@ export const trackFormSubmit = (
 export const trackButtonClick = (
   buttonName: string,
   buttonLocation: string,
-  additionalData?: Record<string, any>
+  additionalData?: GAEventParams
 ) => {
   trackEvent("button_click", {
     button_name: buttonName,
@@ -96,7 +95,7 @@ export const trackLinkClick = (
 export const trackPricingInteraction = (
   action: string, // "view_plan", "compare_features", "calculate_savings"
   planName?: string,
-  additionalData?: Record<string, any>
+  additionalData?: GAEventParams
 ) => {
   trackEvent("pricing_interaction", {
     action,
