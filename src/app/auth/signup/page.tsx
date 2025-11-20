@@ -20,10 +20,11 @@ export default function SignupPage() {
 
     if (password !== confirmPassword) {
       toast.error("Password do no match");
+      setLoading(false);
       return;
     }
 
-    const { error, data } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -31,15 +32,14 @@ export default function SignupPage() {
       },
     });
 
-    setLoading(false);
-
     if (error) {
       toast.error(error.message);
       return;
     }
 
     toast.success("Check your email to confirm.");
-    router.push("/login");
+    setLoading(false);
+    router.push("/auth/login");
   };
 
   return (
