@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,7 +19,9 @@ type SignUpFormType = Omit<React.ComponentProps<typeof Card>, "onSubmit"> & {
   onSubmit?: (
     email: string,
     password: string,
-    confirmPassword: string
+    confirmPassword: string,
+    fullName: string,
+    companyName?: string
   ) => void | Promise<void>;
   loading: boolean;
   errorMessage?: string;
@@ -29,9 +32,9 @@ export function SignupForm({ onSubmit, loading }: SignUpFormType) {
     <Card>
       <CardHeader>
         <CardTitle>Create an account</CardTitle>
-        <CardDescription>
+        {/* <CardDescription>
           Enter your information below to create your account
-        </CardDescription>
+        </CardDescription> */}
       </CardHeader>
       <CardContent>
         <form
@@ -41,7 +44,9 @@ export function SignupForm({ onSubmit, loading }: SignUpFormType) {
             onSubmit?.(
               formData.get("email") as string,
               formData.get("password") as string,
-              formData.get("confirm-password") as string
+              formData.get("confirm-password") as string,
+              formData.get("fullName") as string,
+              (formData.get("companyName") as string) || undefined
             );
           }}
         >
@@ -65,17 +70,25 @@ export function SignupForm({ onSubmit, loading }: SignUpFormType) {
                 placeholder="m@example.com"
                 required
               />
-              <FieldDescription>
-                We&apos;ll use this to contact you. We will not share your email
-                with anyone else.
-              </FieldDescription>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="companyName">
+                Company Name (Optional)
+              </FieldLabel>
+              <Input
+                id="companyName"
+                type="text"
+                name="companyName"
+                placeholder="Acme Inc."
+              />
+              <FieldDescription>Your company name (optional)</FieldDescription>
             </Field>
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input id="password" type="password" name="password" required />
-              <FieldDescription>
+              {/* <FieldDescription>
                 Must be at least 8 characters long.
-              </FieldDescription>
+              </FieldDescription> */}
             </Field>
             <Field>
               <FieldLabel htmlFor="confirm-password">
@@ -98,7 +111,10 @@ export function SignupForm({ onSubmit, loading }: SignUpFormType) {
                   Sign up with Google
                 </Button>
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href="#">Sign in</a>
+                  Already have an account?{" "}
+                  <Link href="/auth/login" className="underline">
+                    Sign in
+                  </Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

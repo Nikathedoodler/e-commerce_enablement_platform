@@ -14,32 +14,45 @@ export default function SignupPage() {
   const handleSignUp = async (
     email: string,
     password: string,
-    confirmPassword?: string
+    confirmPassword: string,
+    fullName: string,
+    companyName?: string
   ) => {
     setLoading(true);
 
     if (password !== confirmPassword) {
-      toast.error("Password do no match");
+      toast.error("Passwords do not match");
       setLoading(false);
       return;
     }
 
+    // Step 1: Create the user account
+    // Pass full_name and company_name in metadata so trigger can use them
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: "",
+        emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        data: {
+          full_name: fullName,
+          company_name: companyName || null,
+        },
       },
     });
 
     if (error) {
       toast.error(error.message);
+      setLoading(false);
       return;
     }
 
-    toast.success("Check your email to confirm.");
+    // Step 2: Profile is automatically created by trigger with full_name and company_name
+    // from user metadata (passed in signup options above)
+    // No manual update needed!
+
+    toast.success("Check your email to confirm your account.");
     setLoading(false);
-    router.push("/auth/login");
+    router.push("/auth/check-email");
   };
 
   return (
