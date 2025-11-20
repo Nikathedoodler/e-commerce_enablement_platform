@@ -45,7 +45,7 @@ export default function ConfirmPage() {
         // Redirect to the next URL or dashboard
         const redirectTo = next ? decodeURIComponent(next) : "/dashboard";
         router.push(redirectTo);
-      } catch (err) {
+      } catch {
         toast.error("Failed to confirm email");
         setStatus("error");
         router.push("/auth/login");
