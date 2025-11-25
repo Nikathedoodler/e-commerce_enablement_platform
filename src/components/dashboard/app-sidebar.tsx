@@ -3,15 +3,15 @@
 import * as React from "react";
 import {
   AudioWaveform,
-  BookOpen,
-  Bot,
+  ArrowDownToLine,
+  Warehouse,
   Command,
   Frame,
   GalleryVerticalEnd,
   Map,
   PieChart,
   Settings2,
-  SquareTerminal,
+  Package,
 } from "lucide-react";
 
 import { NavMain } from "@/components/dashboard/nav-main";
@@ -26,7 +26,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
 const data = {
   user: {
     name: "shadcn",
@@ -52,66 +51,48 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Orders",
       url: "#",
-      icon: SquareTerminal,
+      icon: Package,
       isActive: true,
       items: [
         {
-          title: "History",
+          title: "All Orders",
           url: "#",
         },
         {
-          title: "Starred",
+          title: "Pending",
           url: "#",
         },
         {
-          title: "Settings",
+          title: "Fulfilled",
           url: "#",
         },
       ],
     },
     {
-      title: "Models",
+      title: "Inventory",
       url: "#",
-      icon: Bot,
+      icon: Warehouse,
       items: [
         {
-          title: "Gemini",
+          title: "All Items",
           url: "#",
         },
         {
-          title: "Explorer",
+          title: "Low Stock",
           url: "#",
         },
         {
-          title: "Quantum",
+          title: "Add New",
           url: "#",
         },
       ],
     },
     {
-      title: "Documentation",
+      title: "Receiving",
       url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+      icon: ArrowDownToLine,
     },
     {
       title: "Settings",
@@ -119,19 +100,15 @@ const data = {
       icon: Settings2,
       items: [
         {
-          title: "General",
+          title: "Profile",
           url: "#",
         },
         {
-          title: "Team",
+          title: "Integrations",
           url: "#",
         },
         {
           title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
           url: "#",
         },
       ],
