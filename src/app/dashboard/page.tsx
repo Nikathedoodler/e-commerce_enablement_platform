@@ -1,58 +1,34 @@
-"use client";
-
-import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import TextGenerator from "@/components/TextGenerator";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import React, { useState } from "react";
-
-export default function Page() {
-  const [selected, setSelected] = useState<{ main: string; sub?: string }>({
-    main: "Models",
-    sub: "Gemini",
-  });
-
+export default function DashboardPage() {
   return (
-    <SidebarProvider>
-      <AppSidebar
-        onNavSelect={(main: string, sub?: string) => setSelected({ main, sub })}
-      />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">{selected.main}</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{selected.sub}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        {/* Main content switching logic */}
-        {selected.main === "Models" && selected.sub === "Gemini" && (
-          <TextGenerator />
-        )}
-        {/* Add more conditional renders for other tools/pages as needed */}
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Welcome to your fulfillment dashboard
+        </p>
+      </div>
+
+      {/* Placeholder stats cards - you'll replace these with real data later */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-lg border bg-card p-6">
+          <h3 className="text-sm font-medium text-muted-foreground">
+            Orders Today
+          </h3>
+          <p className="text-2xl font-bold">0</p>
+        </div>
+        <div className="rounded-lg border bg-card p-6">
+          <h3 className="text-sm font-medium text-muted-foreground">
+            Pending Shipments
+          </h3>
+          <p className="text-2xl font-bold">0</p>
+        </div>
+        <div className="rounded-lg border bg-card p-6">
+          <h3 className="text-sm font-medium text-muted-foreground">
+            Low Stock Items
+          </h3>
+          <p className="text-2xl font-bold">0</p>
+        </div>
+      </div>
+    </div>
   );
 }

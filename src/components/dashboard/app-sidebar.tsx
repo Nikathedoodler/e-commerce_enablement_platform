@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  AudioWaveform,
   ArrowDownToLine,
   Warehouse,
   Command,
@@ -37,11 +36,6 @@ const data = {
       name: "Acme Inc",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
     },
     {
       name: "Evil Corp.",
@@ -135,9 +129,13 @@ const data = {
 
 export function AppSidebar({
   onNavSelect,
+  profile,
+  user,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   onNavSelect?: (main: string, sub?: string) => void;
+  profile?: any;
+  user?: any;
 }) {
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -149,7 +147,7 @@ export function AppSidebar({
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={data.user} profile={profile} authUser={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
