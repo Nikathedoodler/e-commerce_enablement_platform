@@ -17,6 +17,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { useRouter } from "next/navigation";
 
 export function NavMain({
   items,
@@ -34,6 +35,13 @@ export function NavMain({
   }[];
   onSelect?: (main: string, sub?: string) => void;
 }) {
+  const router = useRouter();
+  const slugify = (value: string) =>
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -62,6 +70,9 @@ export function NavMain({
                         onClick={(e) => {
                           e.preventDefault();
                           onSelect?.(item.title, subItem.title);
+                          const mainSlug = slugify(item.title);
+                          const subSlug = slugify(subItem.title);
+                          router.push(`/dashboard/${mainSlug}/${subSlug}`);
                         }}
                       >
                         <a href={subItem.url}>
