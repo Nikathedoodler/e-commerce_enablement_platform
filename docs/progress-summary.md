@@ -17,6 +17,8 @@
 
 ### Phase 2 (Weeks 3-5): Authentication & Dashboard MVP - IN PROGRESS
 
+**Status:** Authentication ✅ | Dashboard Shell ✅ | Orders MVP ⏳
+
 #### ✅ Authentication System - COMPLETE
 
 - ✅ Removed NextAuth (was using Google OAuth only)
@@ -55,12 +57,35 @@
   - `docs/migrations/002_add_full_name_to_profiles.sql` (if needed)
   - `docs/migrations/003_update_trigger_read_metadata.sql`
 
-#### ⏳ Dashboard Shell - NOT STARTED
+#### ✅ Dashboard Shell - COMPLETE
 
-- ⏳ Protected routes with middleware
-- ⏳ Dashboard layout with sidebar
-- ⏳ Responsive design
-- ⏳ Placeholder widgets
+- ✅ Updated middleware to only protect `/dashboard/*` routes (marketing pages are public)
+- ✅ Created protected dashboard layout (`src/app/dashboard/layout.tsx`)
+  - Fetches user and profile data from Supabase
+  - Redirects unauthenticated users to login
+- ✅ Created dashboard shell component (`src/app/dashboard/dashboard-shell.tsx`)
+  - Client component that renders sidebar + content
+  - Handles sidebar state and navigation
+- ✅ Updated sidebar navigation (`src/components/dashboard/app-sidebar.tsx`)
+  - Real navigation items: Orders, Inventory, Receiving, Settings
+  - Passes user/profile data to child components
+  - Removed Projects section (not needed for e-commerce)
+- ✅ Updated TeamSwitcher to show company name from profile
+- ✅ Updated NavUser component
+  - Displays real user data (name, email from profile/auth)
+  - Implemented logout functionality with Supabase signOut
+  - Generates avatar initials from user name
+- ✅ Implemented routing with slugification
+  - Navigation items route to proper URLs (e.g., `/dashboard/orders/all-orders`)
+  - Top-level items (no sub-items) are clickable
+  - Parent items with sub-items only expand/collapse
+- ✅ Created all route pages (10 pages):
+  - `/dashboard/orders/all-orders`, `/pending`, `/fulfilled`
+  - `/dashboard/inventory/all-items`, `/low-stock`, `/add-new`
+  - `/dashboard/receiving`
+  - `/dashboard/settings/profile`, `/integrations`, `/billing`
+- ✅ Responsive design with collapsible sidebar
+- ✅ Placeholder content on dashboard home page
 
 #### ⏳ Orders MVP - NOT STARTED
 
@@ -100,6 +125,21 @@
 
 - `src/lib/actions/profile.ts` - Profile update action (created, not actively used yet)
 
+### Dashboard Components
+
+- `src/app/dashboard/layout.tsx` - Protected dashboard layout (server component)
+- `src/app/dashboard/dashboard-shell.tsx` - Dashboard shell wrapper (client component)
+- `src/app/dashboard/page.tsx` - Dashboard home page with placeholder stats
+- `src/components/dashboard/app-sidebar.tsx` - Main sidebar component
+- `src/components/dashboard/nav-main.tsx` - Navigation menu with routing
+- `src/components/dashboard/nav-user.tsx` - User menu with logout
+- `src/components/dashboard/team-switcher.tsx` - Company name display
+- Route pages:
+  - `src/app/dashboard/orders/*` - Orders pages (all-orders, pending, fulfilled)
+  - `src/app/dashboard/inventory/*` - Inventory pages (all-items, low-stock, add-new)
+  - `src/app/dashboard/receiving/page.tsx` - Receiving page
+  - `src/app/dashboard/settings/*` - Settings pages (profile, integrations, billing)
+
 ---
 
 ## 🔧 Current Configuration
@@ -120,38 +160,27 @@
 
 ### Middleware Configuration
 
-- Currently redirects all unauthenticated users to `/auth/login`
-- Should be updated to only protect `/dashboard/*` routes (marketing pages should be public)
+- ✅ Only protects `/dashboard/*` routes
+- ✅ Marketing pages (`/`, `/pricing`, etc.) are publicly accessible
+- ✅ Redirects authenticated users away from auth pages to dashboard
+- ✅ Redirects unauthenticated users trying to access dashboard to `/auth/login`
 
 ---
 
 ## 🎯 Next Steps (Priority Order)
 
-### 1. Update Middleware Matcher (Quick Fix)
+### 1. Orders MVP (Phase 2 Continuation) - NEXT UP
 
-- Update `middleware.ts` config to only protect `/dashboard/*` routes
-- Allow public access to marketing pages (`/`, `/pricing`, etc.)
+- ⏳ Create `orders` table schema (see technical plan line 62)
+- ⏳ Create `inventory` table schema (see technical plan line 63)
+- ⏳ Set up RLS policies for both tables
+- ⏳ Install and configure TanStack Query
+- ⏳ Build orders list page with table
+- ⏳ Add sorting, filtering, pagination
+- ⏳ Create order detail modal/page
+- ⏳ Implement CRUD operations
 
-### 2. Dashboard Shell (Phase 2 Continuation)
-
-- Create protected dashboard layout
-- Implement sidebar navigation (you already have `src/components/dashboard/app-sidebar.tsx`)
-- Add top bar with user info
-- Create placeholder widgets/sections
-- Ensure responsive design
-
-### 3. Orders MVP (Phase 2 Continuation)
-
-- Create `orders` table schema (see technical plan line 62)
-- Create `inventory` table schema (see technical plan line 63)
-- Set up RLS policies for both tables
-- Install and configure TanStack Query
-- Build orders list page with table
-- Add sorting, filtering, pagination
-- Create order detail modal/page
-- Implement CRUD operations
-
-### 4. Future Phases (Phase 3+)
+### 2. Future Phases (Phase 3+)
 
 - Shopify OAuth integration
 - Webhook handlers for order ingestion
@@ -170,9 +199,8 @@
 
 ## 🐛 Known Issues / Notes
 
-- Middleware currently protects all routes - needs to be scoped to `/dashboard/*` only
 - Profile server action created but not used (trigger handles it automatically)
-- Dashboard shell exists but needs to be integrated with auth protection
+- Route pages are placeholders - need to be built out with real functionality
 
 ---
 
@@ -183,7 +211,11 @@
 - Profile data is passed via user metadata during signup, trigger reads it
 - RLS policies ensure users can only access their own data
 - Email confirmation required before users can access dashboard
+- Dashboard layout fetches user/profile data server-side and passes to client components
+- Navigation uses slugification to convert menu titles to URL-friendly paths
+- Sidebar is collapsible and responsive (icon-only mode on mobile)
+- Logout uses Supabase client-side signOut and Next.js router for navigation
 
 ---
 
-**Ready to continue with Dashboard Shell and Orders MVP!**
+**Ready to start Orders MVP!**
