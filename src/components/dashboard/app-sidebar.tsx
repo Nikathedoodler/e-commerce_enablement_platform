@@ -1,20 +1,9 @@
 "use client";
 
 import * as React from "react";
-import {
-  ArrowDownToLine,
-  Warehouse,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  Package,
-} from "lucide-react";
+import { ArrowDownToLine, Warehouse, Settings2, Package } from "lucide-react";
 
 import { NavMain } from "@/components/dashboard/nav-main";
-import { NavProjects } from "@/components/dashboard/nav-projects";
 import { NavUser } from "@/components/dashboard/nav-user";
 import { TeamSwitcher } from "@/components/dashboard/team-switcher";
 import {
@@ -26,23 +15,6 @@ import {
 } from "@/components/ui/sidebar";
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
     {
       title: "Orders",
@@ -108,23 +80,6 @@ const data = {
       ],
     },
   ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
 };
 
 export function AppSidebar({
@@ -140,14 +95,21 @@ export function AppSidebar({
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher companyName={profile?.company_name} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} onSelect={onNavSelect} />
-        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} profile={profile} authUser={user} />
+        <NavUser
+          user={{
+            name: profile?.full_name ?? "User",
+            email: user?.email ?? "",
+            avatar: "",
+          }}
+          profile={profile}
+          authUser={user}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
