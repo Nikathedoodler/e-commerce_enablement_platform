@@ -35,7 +35,6 @@ export function NavMain({
   }[];
   onSelect?: (main: string, sub?: string) => void;
 }) {
-  console.log("items", items);
   const router = useRouter();
   const slugify = (value: string) =>
     value
@@ -88,18 +87,20 @@ export function NavMain({
               </SidebarMenuItem>
             </Collapsible>
           ) : (
-            <SidebarMenuButton
-              tooltip={item.title}
-              key={item.title}
-              onClick={(e) => {
-                e.preventDefault();
-                const mainSlug = slugify(item.title);
-                router.push(`/dashboard/${mainSlug}`);
-              }}
-            >
-              {item.icon && <item.icon />}
-              <span>{item.title}</span>
-            </SidebarMenuButton>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip={item.title}
+                key={item.title}
+                onClick={(e) => {
+                  e.preventDefault();
+                  const mainSlug = slugify(item.title);
+                  router.push(`/dashboard/${mainSlug}`);
+                }}
+              >
+                {item.icon && <item.icon />}
+                <span>{item.title}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           )
         )}
       </SidebarMenu>
