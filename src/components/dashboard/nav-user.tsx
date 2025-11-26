@@ -60,7 +60,7 @@ export function NavUser({
   const displayName =
     profile?.full_name ?? authUser?.email?.split("@")[0] ?? "User";
   const displayEmail = authUser?.email ?? user.email;
-  const avatarName = displayName[0];
+  const avatarName = displayName[0].toUpperCase() ?? "U";
 
   return (
     <SidebarMenu>
