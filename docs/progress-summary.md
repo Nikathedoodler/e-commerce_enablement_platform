@@ -3,6 +3,20 @@
 **Last Updated:** Current Session
 **Project:** E-Commerce Enablement Platform (3PL Fulfillment Platform)
 
+## 🎓 Development Approach
+
+This project follows a **collaborative, learning-focused development methodology**:
+
+- **AI Assistant Role:** Provides guidance, code reviews, architectural recommendations, and answers questions
+- **Developer Role:** Implements features, writes code, and makes implementation decisions
+- **Benefits:**
+  - Developer gains hands-on experience and deep understanding of the codebase
+  - Code ownership and maintainability
+  - Learning through implementation rather than copy-paste
+  - AI assists with navigation, best practices, and problem-solving
+
+**Note:** The AI may occasionally write code for repetitive tasks (like creating placeholder route pages) to save time, but the core feature implementation is done by the developer with AI guidance.
+
 ---
 
 ## ✅ Completed: Phase 1 & Phase 2 (Auth Foundation)
@@ -193,6 +207,7 @@
 ## 📚 Reference Documents
 
 - `docs/technical-plan.md` - Full technical plan with all phases
+- `docs/orders-mvp-plan.md` - Detailed implementation plan for Orders MVP
 - `docs/migrations/` - Database migration files
 
 ---
