@@ -8,7 +8,7 @@ import {
   getOrders,
   updateOrder,
 } from "@/lib/supabase/queries/orders";
-import type { Order, OrderInput, OrderUpdate } from "@/types/orders";
+import type { OrderInput, OrderUpdate } from "@/types/orders";
 
 type OrdersFilters = {
   status?: string;
