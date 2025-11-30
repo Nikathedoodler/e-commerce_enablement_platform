@@ -3,11 +3,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Order, OrderInput, OrderUpdate } from "@/types/orders";
 
-/*
- * Fetch all orders for the authenticated user
- * Optional filters: status, search term
- */
-
 export async function getOrders(filters?: {
   status?: string;
   search?: string;
@@ -105,6 +100,52 @@ export async function createOrder(orderData: OrderInput) {
       detailes: error.message,
       data: null,
     };
+
+  return { data: data as Order, error: null };
+}
+
+export async function updateOrder(id: string, updates: OrderUpdate) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) return { error: "Not Authenticated", data: null };
+
+  const { data, error } = await supabase
+    .from("orders")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error)
+    return { error: "Failed To Update", details: error.message, data: null };
+
+  return { data: data as Order, error: null };
+}
+
+export async function deleteOrder(id: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) return { error: "Not authenticated", data: null };
+
+  const { data, error } = await supabase
+    .from("orders")
+    .delete()
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error)
+    return { error: "Failed To Delete", details: error.message, data: null };
 
   return { data: data as Order, error: null };
 }
