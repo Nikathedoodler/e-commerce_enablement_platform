@@ -14,6 +14,21 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { OrdersTableSkeleton } from "./orders-table-skeleton";
 
+function getStatusColor(status: string) {
+  switch (status) {
+    case "pending":
+      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
+    case "processing":
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
+    case "fulfilled":
+      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+    case "cancelled":
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
+    default:
+      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
+  }
+}
+
 export function OrdersTable() {
   const [search, setSearch] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
@@ -25,28 +40,27 @@ export function OrdersTable() {
 
   const { data: orders, isLoading, error } = useOrders(filters);
 
-  // Helper function for status colors
-  function getStatusColor(status: string) {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-      case "processing":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-      case "fulfilled":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-      case "cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
-    }
-  }
-
   if (isLoading) {
     return <OrdersTableSkeleton />;
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <p className="text-lg font-medium text-destructive">
+          Failed to load orders
+        </p>
+        <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-4"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </Button>
+      </div>
+    );
   }
 
   if (!orders?.length) {
@@ -69,7 +83,7 @@ export function OrdersTable() {
   }
 
   return (
-    <div>
+    <div className="space-y-4">
       <div className="flex gap-4 items-center">
         <Input
           placeholder="Search orders or email..."
@@ -123,7 +137,14 @@ export function OrdersTable() {
                 })}
               </TableCell>
               <TableCell>
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    // TODO: Open order detail modal/page (Step 8)
+                    console.log("View order:", order.id);
+                  }}
+                >
                   View
                 </Button>
               </TableCell>
