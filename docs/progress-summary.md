@@ -31,7 +31,7 @@ This project follows a **collaborative, learning-focused development methodology
 
 ### Phase 2 (Weeks 3-5): Authentication & Dashboard MVP - IN PROGRESS
 
-**Status:** Authentication ✅ | Dashboard Shell ✅ | Orders MVP ⏳
+**Status:** Authentication ✅ | Dashboard Shell ✅ | Orders MVP 🟡 (Core Complete, UI Integration Remaining)
 
 #### ✅ Authentication System - COMPLETE
 
@@ -101,13 +101,66 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ Responsive design with collapsible sidebar
 - ✅ Placeholder content on dashboard home page
 
-#### ⏳ Orders MVP - NOT STARTED
+#### ✅ Orders MVP - IN PROGRESS
 
-- ⏳ Supabase schema for `orders` and `inventory` tables
-- ⏳ TanStack Query setup
-- ⏳ Orders table with sorting/filtering/pagination
-- ⏳ Order detail modal
-- ⏳ CRUD mutations
+**Status:** Database ✅ | Query Layer ✅ | UI Components ✅ | Order Detail Dialog ✅
+
+- ✅ Supabase schema for `orders` and `inventory` tables
+  - Created `docs/migrations/005_create_orders_table.sql`
+  - Created `docs/migrations/006_create_inventory_table.sql`
+  - RLS policies implemented for both tables
+- ✅ TanStack Query setup
+  - Installed `@tanstack/react-query` and devtools
+  - Created `src/lib/providers/query-provider.tsx`
+  - Wrapped dashboard layout with QueryProvider
+- ✅ TypeScript types
+  - Created `types/orders.ts` with Order, OrderStatus, OrderItem, ShippingAddress types
+  - Created `types/inventory.ts` with InventoryItem types
+- ✅ Supabase query helpers
+  - Created `src/lib/supabase/queries/orders.ts`:
+    - `getOrders()` - fetch with filters (status, search)
+    - `getOrderById()` - single order
+    - `createOrder()` - insert new order
+    - `updateOrder()` - update order
+    - `deleteOrder()` - delete order
+  - Created `src/lib/supabase/queries/inventory.ts`:
+    - Similar CRUD operations for inventory
+- ✅ TanStack Query hooks
+  - Created `src/hooks/use-orders.ts`:
+    - `useOrders()` - list with filters
+    - `useOrder()` - single order
+    - `useCreateOrder()` - mutation
+    - `useUpdateOrder()` - mutation
+    - `useOrderDelete()` - mutation
+  - Created `src/hooks/use-inventory.ts`:
+    - Similar hooks for inventory operations
+- ✅ Orders table component
+  - Created `src/components/dashboard/orders-table.tsx`
+  - Features:
+    - Search by order number or customer email
+    - Filter by status (pending, processing, fulfilled, cancelled)
+    - Status badges with color coding
+    - Loading skeleton component
+    - Error and empty states
+    - Formatted currency and dates
+  - Created `src/components/dashboard/orders-table-skeleton.tsx`
+- ✅ Order detail dialog
+  - Created `src/components/dashboard/order-detail-dialog.tsx`
+  - Features:
+    - Displays all order information
+    - Customer information section
+    - Order items table with SKU, name, quantity, price, total
+    - Shipping address display
+    - Order summary (subtotal, total)
+    - Tracking number display (if available)
+    - Status update functionality with dropdown
+    - Toast notifications for updates
+    - Color-coded status badges (order status + financial status)
+- ⏳ CRUD operations - Partially complete
+  - ✅ Read (list + detail)
+  - ✅ Update (status update in dialog)
+  - ⏳ Create (form not yet built)
+  - ⏳ Delete (functionality exists, UI not yet added)
 
 ---
 
@@ -134,10 +187,21 @@ This project follows a **collaborative, learning-focused development methodology
 - `docs/migrations/001_create_profiles_table.sql` - Main profiles table migration
 - `docs/migrations/002_add_full_name_to_profiles.sql` - Add full_name column (if needed)
 - `docs/migrations/003_update_trigger_read_metadata.sql` - Update trigger to read metadata
+- `docs/migrations/005_create_orders_table.sql` - Orders table with RLS policies
+- `docs/migrations/006_create_inventory_table.sql` - Inventory table with RLS policies
 
 ### Server Actions
 
 - `src/lib/actions/profile.ts` - Profile update action (created, not actively used yet)
+
+### Data Layer (Orders & Inventory)
+
+- `src/lib/supabase/queries/orders.ts` - Order query helpers (Server Actions)
+- `src/lib/supabase/queries/inventory.ts` - Inventory query helpers (Server Actions)
+- `src/hooks/use-orders.ts` - TanStack Query hooks for orders
+- `src/hooks/use-inventory.ts` - TanStack Query hooks for inventory
+- `types/orders.ts` - Order TypeScript types
+- `types/inventory.ts` - Inventory TypeScript types
 
 ### Dashboard Components
 
@@ -148,6 +212,10 @@ This project follows a **collaborative, learning-focused development methodology
 - `src/components/dashboard/nav-main.tsx` - Navigation menu with routing
 - `src/components/dashboard/nav-user.tsx` - User menu with logout
 - `src/components/dashboard/team-switcher.tsx` - Company name display
+- Orders components:
+  - `src/components/dashboard/orders-table.tsx` - Orders list table with filtering
+  - `src/components/dashboard/orders-table-skeleton.tsx` - Loading skeleton
+  - `src/components/dashboard/order-detail-dialog.tsx` - Order detail modal
 - Route pages:
   - `src/app/dashboard/orders/*` - Orders pages (all-orders, pending, fulfilled)
   - `src/app/dashboard/inventory/*` - Inventory pages (all-items, low-stock, add-new)
@@ -183,16 +251,23 @@ This project follows a **collaborative, learning-focused development methodology
 
 ## 🎯 Next Steps (Priority Order)
 
-### 1. Orders MVP (Phase 2 Continuation) - NEXT UP
+### 1. Orders MVP (Phase 2 Continuation) - IN PROGRESS
 
-- ⏳ Create `orders` table schema (see technical plan line 62)
-- ⏳ Create `inventory` table schema (see technical plan line 63)
-- ⏳ Set up RLS policies for both tables
-- ⏳ Install and configure TanStack Query
-- ⏳ Build orders list page with table
-- ⏳ Add sorting, filtering, pagination
-- ⏳ Create order detail modal/page
-- ⏳ Implement CRUD operations
+**Completed:**
+- ✅ Database schema and migrations
+- ✅ RLS policies
+- ✅ TanStack Query setup
+- ✅ TypeScript types
+- ✅ Query helpers and hooks
+- ✅ Orders table with filtering
+- ✅ Order detail dialog with status update
+
+**Remaining:**
+- ⏳ Create order form/UI (backend ready, need UI)
+- ⏳ Delete order UI (functionality exists, need button/modal)
+- ⏳ Pagination (optional - currently shows all orders)
+- ⏳ Sorting (optional - currently sorted by created_at DESC)
+- ⏳ Integrate orders table into all-orders page (component ready)
 
 ### 2. Future Phases (Phase 3+)
 
@@ -215,7 +290,10 @@ This project follows a **collaborative, learning-focused development methodology
 ## 🐛 Known Issues / Notes
 
 - Profile server action created but not used (trigger handles it automatically)
-- Route pages are placeholders - need to be built out with real functionality
+- Orders table component created but not yet integrated into `/dashboard/orders/all-orders` page
+- Create order form not yet built (backend ready)
+- Delete order UI not yet added (functionality exists in hooks)
+- Test orders can be inserted via Supabase SQL Editor for development
 
 ---
 
@@ -230,7 +308,12 @@ This project follows a **collaborative, learning-focused development methodology
 - Navigation uses slugification to convert menu titles to URL-friendly paths
 - Sidebar is collapsible and responsive (icon-only mode on mobile)
 - Logout uses Supabase client-side signOut and Next.js router for navigation
+- Orders MVP data layer complete: database, queries, hooks all implemented
+- Orders table component ready with filtering, search, status badges
+- Order detail dialog complete with full order info and status update functionality
+- TanStack Query handles caching, loading states, and error handling
+- All order operations use Server Actions with RLS policy enforcement
 
 ---
 
-**Ready to start Orders MVP!**
+**Orders MVP Status: Core functionality complete, UI integration and create/delete forms remaining**

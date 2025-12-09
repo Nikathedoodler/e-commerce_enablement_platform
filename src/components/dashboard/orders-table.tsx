@@ -13,6 +13,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { OrdersTableSkeleton } from "./orders-table-skeleton";
+import { OrderDetailDialog } from "./order-detail-dialog";
+import { Order } from "@/types/orders";
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -32,6 +34,8 @@ function getStatusColor(status: string) {
 export function OrdersTable() {
   const [search, setSearch] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [isViewOpen, setIsViewOpen] = useState<boolean>(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const filters = {
     search: search || undefined,
@@ -81,6 +85,8 @@ export function OrdersTable() {
       </div>
     );
   }
+
+  //   const handleOrderView = () => {};
 
   return (
     <div className="space-y-4">
@@ -141,8 +147,9 @@ export function OrdersTable() {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    // TODO: Open order detail modal/page (Step 8)
-                    console.log("View order:", order.id);
+                    console.log("View order:", order);
+                    setSelectedOrder(order);
+                    setIsViewOpen(true);
                   }}
                 >
                   View
@@ -152,6 +159,12 @@ export function OrdersTable() {
           ))}
         </TableBody>
       </Table>
+      <OrderDetailDialog
+        orderItem={selectedOrder}
+        open={isViewOpen}
+        onOpenChange={setIsViewOpen}
+        statusColor={getStatusColor}
+      />
     </div>
   );
 }
