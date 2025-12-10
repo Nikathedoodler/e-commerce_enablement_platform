@@ -12,10 +12,12 @@ import {
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 import { OrdersTableSkeleton } from "./orders-table-skeleton";
 import { OrderDetailDialog } from "./order-detail-dialog";
 import { Order } from "@/types/orders";
 import { useDebounce } from "@/hooks/use-debounce";
+import { usePathname } from "next/navigation";
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -32,9 +34,16 @@ function getStatusColor(status: string) {
   }
 }
 
-export function OrdersTable() {
+interface OrdersTableProps {
+  defaultStatus: string;
+}
+
+export function OrdersTable({ defaultStatus }: OrdersTableProps) {
+  const pathname = usePathname();
+  const isAllOrdersPage = pathname?.includes("/all-orders");
+
   const [search, setSearch] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>(defaultStatus);
   const [isViewOpen, setIsViewOpen] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
@@ -56,17 +65,19 @@ export function OrdersTable() {
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
         />
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="h-9 rounded-md border border-input bg-transparent px-3"
-        >
-          <option value="">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="processing">Processing</option>
-          <option value="fulfilled">Fulfilled</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+        {isAllOrdersPage && (
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="h-9 rounded-md border border-input bg-transparent px-3"
+          >
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="fulfilled">Fulfilled</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        )}
       </div>
       {isLoading ? (
         <OrdersTableSkeleton />
@@ -145,6 +156,11 @@ export function OrdersTable() {
                     }}
                   >
                     View
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button variant={"destructive"} size="icon">
+                    <Trash2 />
                   </Button>
                 </TableCell>
               </TableRow>

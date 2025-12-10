@@ -8,7 +8,7 @@ export default function AllOrdersPage() {
         <p className="text-muted-foreground">View and manage all your orders</p>
       </div>
       <div className="rounded-lg border bg-card p-6">
-        <OrdersTable />
+        <OrdersTable defaultStatus="" />
       </div>
     </div>
   );
