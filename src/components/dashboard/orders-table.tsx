@@ -67,27 +67,6 @@ export function OrdersTable() {
     );
   }
 
-  if (!orders?.length) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-lg font-medium text-muted-foreground">
-          No orders found
-        </p>
-        {search || statusFilter ? (
-          <p className="text-sm text-muted-foreground mt-2">
-            Try adjusting your filters
-          </p>
-        ) : (
-          <p className="text-sm text-muted-foreground mt-2">
-            Get started by creating your first order
-          </p>
-        )}
-      </div>
-    );
-  }
-
-  //   const handleOrderView = () => {};
-
   return (
     <div className="space-y-4">
       <div className="flex gap-4 items-center">
@@ -109,19 +88,37 @@ export function OrdersTable() {
           <option value="cancelled">Cancelled</option>
         </select>
       </div>
+      {!orders?.length && (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <p className="text-lg font-medium text-muted-foreground">
+            No orders found
+          </p>
+          {search || statusFilter ? (
+            <p className="text-sm text-muted-foreground mt-2">
+              Try adjusting your filters
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground mt-2">
+              Get started by creating your first order
+            </p>
+          )}
+        </div>
+      )}
       <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Order #</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Total</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
+        {orders && orders.length > 0 && (
+          <TableHeader>
+            <TableRow>
+              <TableHead>Order #</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Total</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+        )}
         <TableBody>
-          {orders.map((order) => (
+          {orders?.map((order) => (
             <TableRow key={order.id}>
               <TableCell>{order.order_number}</TableCell>
               <TableCell>{order.customer_email}</TableCell>

@@ -87,10 +87,9 @@ export function NavMain({
               </SidebarMenuItem>
             </Collapsible>
           ) : (
-            <SidebarMenuItem>
+            <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 tooltip={item.title}
-                key={item.title}
                 onClick={(e) => {
                   e.preventDefault();
                   const mainSlug = slugify(item.title);
