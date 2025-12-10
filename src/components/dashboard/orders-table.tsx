@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { OrdersTableSkeleton } from "./orders-table-skeleton";
 import { OrderDetailDialog } from "./order-detail-dialog";
 import { Order } from "@/types/orders";
+import { useDebounce } from "@/hooks/use-debounce";
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -37,35 +38,14 @@ export function OrdersTable() {
   const [isViewOpen, setIsViewOpen] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
+  const debouncedSearch = useDebounce(search, 300);
+
   const filters = {
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     status: statusFilter || undefined,
   };
 
   const { data: orders, isLoading, error } = useOrders(filters);
-
-  if (isLoading) {
-    return <OrdersTableSkeleton />;
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-lg font-medium text-destructive">
-          Failed to load orders
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-4"
-          onClick={() => window.location.reload()}
-        >
-          Retry
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -88,12 +68,29 @@ export function OrdersTable() {
           <option value="cancelled">Cancelled</option>
         </select>
       </div>
-      {!orders?.length && (
+      {isLoading ? (
+        <OrdersTableSkeleton />
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <p className="text-lg font-medium text-destructive">
+            Failed to load orders
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4"
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </Button>
+        </div>
+      ) : !orders?.length ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <p className="text-lg font-medium text-muted-foreground">
             No orders found
           </p>
-          {search || statusFilter ? (
+          {debouncedSearch || statusFilter ? (
             <p className="text-sm text-muted-foreground mt-2">
               Try adjusting your filters
             </p>
@@ -103,9 +100,8 @@ export function OrdersTable() {
             </p>
           )}
         </div>
-      )}
-      <Table>
-        {orders && orders.length > 0 && (
+      ) : (
+        <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Order #</TableHead>
@@ -116,46 +112,46 @@ export function OrdersTable() {
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
-        )}
-        <TableBody>
-          {orders?.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell>{order.order_number}</TableCell>
-              <TableCell>{order.customer_email}</TableCell>
-              <TableCell>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                    order.status
-                  )}`}
-                >
-                  {order.status}
-                </span>
-              </TableCell>
-              <TableCell>${order.total.toFixed(2)}</TableCell>
-              <TableCell>
-                {new Date(order.created_at).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    console.log("View order:", order);
-                    setSelectedOrder(order);
-                    setIsViewOpen(true);
-                  }}
-                >
-                  View
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          <TableBody>
+            {orders.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell>{order.order_number}</TableCell>
+                <TableCell>{order.customer_email}</TableCell>
+                <TableCell>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                      order.status
+                    )}`}
+                  >
+                    {order.status}
+                  </span>
+                </TableCell>
+                <TableCell>${order.total.toFixed(2)}</TableCell>
+                <TableCell>
+                  {new Date(order.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      console.log("View order:", order);
+                      setSelectedOrder(order);
+                      setIsViewOpen(true);
+                    }}
+                  >
+                    View
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
       <OrderDetailDialog
         orderItem={selectedOrder}
         open={isViewOpen}
