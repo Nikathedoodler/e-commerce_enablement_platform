@@ -1,6 +1,6 @@
 "use client";
 
-import { useOrders } from "@/hooks/use-orders";
+import { useOrderDelete, useOrders } from "@/hooks/use-orders";
 import {
   Table,
   TableBody,
@@ -18,6 +18,7 @@ import { OrderDetailDialog } from "./order-detail-dialog";
 import { Order } from "@/types/orders";
 import { useDebounce } from "@/hooks/use-debounce";
 import { usePathname } from "next/navigation";
+import { OrderDeleteDialog } from "./order-delete-dialog";
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -44,7 +45,8 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
 
   const [search, setSearch] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>(defaultStatus);
-  const [isViewOpen, setIsViewOpen] = useState<boolean>(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState<boolean>(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const debouncedSearch = useDebounce(search, 300);
@@ -152,14 +154,21 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
                     onClick={() => {
                       console.log("View order:", order);
                       setSelectedOrder(order);
-                      setIsViewOpen(true);
+                      setIsViewDialogOpen(true);
                     }}
                   >
                     View
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <Button variant={"destructive"} size="icon">
+                  <Button
+                    variant={"destructive"}
+                    size="icon"
+                    onClick={() => {
+                      setSelectedOrder(order);
+                      setIsDeleteDialogOpen(true);
+                    }}
+                  >
                     <Trash2 />
                   </Button>
                 </TableCell>
@@ -170,9 +179,17 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
       )}
       <OrderDetailDialog
         orderItem={selectedOrder}
-        open={isViewOpen}
-        onOpenChange={setIsViewOpen}
+        open={isViewDialogOpen}
+        onOpenChange={setIsViewDialogOpen}
         statusColor={getStatusColor}
+      />
+      <OrderDeleteDialog
+        id={selectedOrder?.id}
+        orderNumber={selectedOrder?.order_number}
+        customerEmail={selectedOrder?.customer_email}
+        total={selectedOrder?.total}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
       />
     </div>
   );
