@@ -1,6 +1,6 @@
 "use client";
 
-import { useOrderDelete, useOrders } from "@/hooks/use-orders";
+import { useOrders } from "@/hooks/use-orders";
 import {
   Table,
   TableBody,
@@ -19,6 +19,7 @@ import { Order } from "@/types/orders";
 import { useDebounce } from "@/hooks/use-debounce";
 import { usePathname } from "next/navigation";
 import { OrderDeleteDialog } from "./order-delete-dialog";
+import { useRouter } from "next/navigation";
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -51,6 +52,8 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
 
   const debouncedSearch = useDebounce(search, 300);
 
+  const router = useRouter();
+
   const filters = {
     search: debouncedSearch || undefined,
     status: statusFilter || undefined,
@@ -60,26 +63,34 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4 items-center">
-        <Input
-          placeholder="Search orders or email..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
-        />
-        {isAllOrdersPage && (
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-9 rounded-md border border-input bg-transparent px-3"
-          >
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="fulfilled">Fulfilled</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        )}
+      <div className="flex items-center justify-between ">
+        <div className="flex gap-4 items-center">
+          <Input
+            placeholder="Search orders or email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-sm"
+          />
+          {isAllOrdersPage && (
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="h-9 rounded-md border border-input bg-transparent px-3"
+            >
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="fulfilled">Fulfilled</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          )}
+        </div>
+        <Button
+          className="cursor-pointer"
+          onClick={() => router.push("/dashboard/orders/create-order")}
+        >
+          Create Order
+        </Button>
       </div>
       {isLoading ? (
         <OrdersTableSkeleton />
