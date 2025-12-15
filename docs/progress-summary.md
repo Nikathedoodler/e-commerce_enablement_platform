@@ -31,7 +31,7 @@ This project follows a **collaborative, learning-focused development methodology
 
 ### Phase 2 (Weeks 3-5): Authentication & Dashboard MVP - IN PROGRESS
 
-**Status:** Authentication ✅ | Dashboard Shell ✅ | Orders MVP 🟡 (Core Complete, UI Integration Remaining)
+**Status:** Authentication ✅ | Dashboard Shell ✅ | Orders MVP ✅ (Complete) | Inventory MVP ⏳ (Next)
 
 #### ✅ Authentication System - COMPLETE
 
@@ -101,9 +101,9 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ Responsive design with collapsible sidebar
 - ✅ Placeholder content on dashboard home page
 
-#### ✅ Orders MVP - IN PROGRESS
+#### ✅ Orders MVP - COMPLETE
 
-**Status:** Database ✅ | Query Layer ✅ | UI Components ✅ | Order Detail Dialog ✅
+**Status:** Database ✅ | Query Layer ✅ | UI Components ✅ | Order Detail Dialog ✅ | Create Order ✅ | Delete Order ✅
 
 - ✅ Supabase schema for `orders` and `inventory` tables
   - Created `docs/migrations/005_create_orders_table.sql`
@@ -156,11 +156,32 @@ This project follows a **collaborative, learning-focused development methodology
     - Status update functionality with dropdown
     - Toast notifications for updates
     - Color-coded status badges (order status + financial status)
-- ⏳ CRUD operations - Partially complete
+- ✅ Delete order functionality
+  - Created `src/components/dashboard/order-delete-dialog.tsx`
+  - Delete button in orders table with confirmation dialog
+  - Uses `useOrderDelete()` hook
+  - Toast notifications for success/error
+- ✅ Create order form
+  - Created `src/app/dashboard/orders/create-order/page.tsx`
+  - Features:
+    - React Hook Form + Zod validation
+    - Auto-generated order numbers (backend)
+    - Manual order number override option
+    - Order basics section (order number, customer email, financial status)
+    - Shipping address section (all fields with required indicators)
+    - Dynamic order items (add/remove items with SKU, name, quantity, price)
+    - Auto-calculated order total
+    - Form validation with visual indicators (asterisks for required fields)
+    - Success toast and redirect after creation
+- ✅ Pending and Fulfilled pages
+  - Updated `/dashboard/orders/pending/page.tsx` with status filter
+  - Updated `/dashboard/orders/fulfilled/page.tsx` with status filter
+  - Both use `OrdersTable` component with `defaultStatus` prop
+- ✅ CRUD operations - Complete
   - ✅ Read (list + detail)
+  - ✅ Create (full form with validation)
   - ✅ Update (status update in dialog)
-  - ⏳ Create (form not yet built)
-  - ⏳ Delete (functionality exists, UI not yet added)
+  - ✅ Delete (with confirmation dialog)
 
 ---
 
@@ -202,6 +223,7 @@ This project follows a **collaborative, learning-focused development methodology
 - `src/hooks/use-inventory.ts` - TanStack Query hooks for inventory
 - `types/orders.ts` - Order TypeScript types
 - `types/inventory.ts` - Inventory TypeScript types
+- `src/lib/validations/order.ts` - Zod validation schema for order creation
 
 ### Dashboard Components
 
@@ -216,8 +238,9 @@ This project follows a **collaborative, learning-focused development methodology
   - `src/components/dashboard/orders-table.tsx` - Orders list table with filtering
   - `src/components/dashboard/orders-table-skeleton.tsx` - Loading skeleton
   - `src/components/dashboard/order-detail-dialog.tsx` - Order detail modal
+  - `src/components/dashboard/order-delete-dialog.tsx` - Delete confirmation dialog
 - Route pages:
-  - `src/app/dashboard/orders/*` - Orders pages (all-orders, pending, fulfilled)
+  - `src/app/dashboard/orders/*` - Orders pages (all-orders, pending, fulfilled, create-order)
   - `src/app/dashboard/inventory/*` - Inventory pages (all-items, low-stock, add-new)
   - `src/app/dashboard/receiving/page.tsx` - Receiving page
   - `src/app/dashboard/settings/*` - Settings pages (profile, integrations, billing)
@@ -251,7 +274,7 @@ This project follows a **collaborative, learning-focused development methodology
 
 ## 🎯 Next Steps (Priority Order)
 
-### 1. Orders MVP (Phase 2 Continuation) - IN PROGRESS
+### 1. Orders MVP (Phase 2 Continuation) - ✅ COMPLETE
 
 **Completed:**
 - ✅ Database schema and migrations
@@ -261,19 +284,37 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ Query helpers and hooks
 - ✅ Orders table with filtering
 - ✅ Order detail dialog with status update
+- ✅ Create order form with full validation
+- ✅ Delete order with confirmation dialog
+- ✅ Pending and Fulfilled pages integrated
 
-**Remaining:**
-- ⏳ Create order form/UI (backend ready, need UI)
-- ⏳ Delete order UI (functionality exists, need button/modal)
+**Optional Enhancements (Future):**
 - ⏳ Pagination (optional - currently shows all orders)
 - ⏳ Sorting (optional - currently sorted by created_at DESC)
-- ⏳ Integrate orders table into all-orders page (component ready)
 
-### 2. Future Phases (Phase 3+)
+### 2. Inventory Management UI (Phase 2 Continuation) - ⏳ NEXT
+
+**Status:** Database ✅ | Query Layer ✅ | Hooks ✅ | UI Components ⏳
+
+**Completed:**
+- ✅ Database schema (`docs/migrations/006_create_inventory_table.sql`)
+- ✅ RLS policies
+- ✅ Query helpers (`src/lib/supabase/queries/inventory.ts`)
+- ✅ TanStack Query hooks (`src/hooks/use-inventory.ts`)
+- ✅ TypeScript types (`types/inventory.ts`)
+- ✅ Route pages created (all-items, low-stock, add-new)
+
+**Remaining:**
+- ⏳ Inventory table component (list with search/filter)
+- ⏳ Inventory item detail/edit dialog
+- ⏳ Create inventory item form
+- ⏳ Low stock alerts/indicators
+- ⏳ Delete inventory item functionality
+
+### 3. Future Phases (Phase 3+)
 
 - Shopify OAuth integration
 - Webhook handlers for order ingestion
-- Inventory management UI
 - Shipping integration (DHL)
 - Stripe billing integration
 
@@ -290,9 +331,7 @@ This project follows a **collaborative, learning-focused development methodology
 ## 🐛 Known Issues / Notes
 
 - Profile server action created but not used (trigger handles it automatically)
-- Orders table component created but not yet integrated into `/dashboard/orders/all-orders` page
-- Create order form not yet built (backend ready)
-- Delete order UI not yet added (functionality exists in hooks)
+- Order number auto-generation happens in backend Server Action (cleaner than frontend)
 - Test orders can be inserted via Supabase SQL Editor for development
 
 ---
@@ -311,9 +350,15 @@ This project follows a **collaborative, learning-focused development methodology
 - Orders MVP data layer complete: database, queries, hooks all implemented
 - Orders table component ready with filtering, search, status badges
 - Order detail dialog complete with full order info and status update functionality
+- Create order form complete with React Hook Form + Zod validation
+- Delete order functionality with confirmation dialog
+- Pending and Fulfilled pages use OrdersTable with status filters
 - TanStack Query handles caching, loading states, and error handling
 - All order operations use Server Actions with RLS policy enforcement
+- Order number auto-generation handled in backend Server Action
 
 ---
 
-**Orders MVP Status: Core functionality complete, UI integration and create/delete forms remaining**
+**Orders MVP Status: ✅ COMPLETE - All CRUD operations implemented and working**
+
+**Next: Inventory Management UI - Data layer ready, UI components needed**
