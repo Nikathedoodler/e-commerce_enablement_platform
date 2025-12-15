@@ -38,14 +38,14 @@ export function NavUser({
     email: string;
     avatar: string;
   };
-  profile: {
+  profile?: {
     company_name?: string;
     full_name?: string;
     role?: string;
-  };
-  authUser: {
+  } | null;
+  authUser?: {
     email: string;
-  };
+  } | null;
 }) {
   const { isMobile } = useSidebar();
 
