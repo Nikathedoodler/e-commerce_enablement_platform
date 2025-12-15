@@ -156,12 +156,11 @@ export async function createReceivingLog(receivingData: ReceivingLogInput) {
       }
     } else {
       // Create new inventory item if it doesn't exist
-      // We need the item name - for now, we'll use SKU as name
-      // In a real scenario, you might want to require name in the form
+      // Use item_name if provided, otherwise use SKU as name
       const { error: createError } = await supabase.from("inventory").insert({
         user_id: user.id,
         sku: receivingData.sku,
-        name: receivingData.sku, // Fallback - ideally should come from form
+        name: receivingData.item_name || receivingData.sku, // Use provided name or SKU as fallback
         quantity: receivingData.quantity,
         location: receivingData.location || null,
         reorder_threshold: 0, // Default, can be updated later

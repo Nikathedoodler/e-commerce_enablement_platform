@@ -30,6 +30,7 @@ export type ReceivingLogInput = Omit<
   "id" | "user_id" | "created_at"
 > & {
   user_id?: string; // Optional for updates, required for creates
+  item_name?: string; // Optional: used when creating new inventory item (not stored in receiving_log)
 };
 
 /**

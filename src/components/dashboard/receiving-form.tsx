@@ -34,6 +34,7 @@ export function ReceivingForm() {
     defaultValues: {
       client_id: "",
       sku: "",
+      item_name: "",
       quantity: 1,
       condition: "good",
       location: "",
@@ -48,6 +49,7 @@ export function ReceivingForm() {
     const receivingLog: ReceivingLogInput = {
       ...data,
       client_id: data.client_id || null,
+      item_name: data.item_name || undefined, // Only include if provided
       location: data.location || null,
       received_at: data.received_at
         ? new Date(data.received_at).toISOString()
@@ -73,7 +75,8 @@ export function ReceivingForm() {
         <CardContent>
           <p className="text-sm text-muted-foreground mb-6">
             Fields marked with <span className="text-destructive">*</span> are
-            required. Items in "good" condition will automatically update inventory quantities.
+            required. Items in "good" condition will automatically update
+            inventory quantities.
           </p>
 
           {/* Section 1: Receiving Details */}
@@ -94,8 +97,25 @@ export function ReceivingForm() {
                     placeholder="e.g., SKU-001"
                     {...register("sku")}
                   />
-                  {errors.sku && (
-                    <FieldError>{errors.sku.message}</FieldError>
+                  {errors.sku && <FieldError>{errors.sku.message}</FieldError>}
+                </Field>
+
+                <Field>
+                  <FieldLabel htmlFor="item_name">
+                    Item Name (Optional)
+                  </FieldLabel>
+                  <FieldDescription>
+                    Product name - only needed if this is a new SKU not yet in
+                    inventory
+                  </FieldDescription>
+                  <Input
+                    id="item_name"
+                    type="text"
+                    placeholder="e.g., Wireless Mouse"
+                    {...register("item_name")}
+                  />
+                  {errors.item_name && (
+                    <FieldError>{errors.item_name.message}</FieldError>
                   )}
                 </Field>
 
@@ -103,9 +123,7 @@ export function ReceivingForm() {
                   <FieldLabel htmlFor="quantity">
                     Quantity <span className="text-destructive">*</span>
                   </FieldLabel>
-                  <FieldDescription>
-                    Number of items received
-                  </FieldDescription>
+                  <FieldDescription>Number of items received</FieldDescription>
                   <Input
                     id="quantity"
                     type="number"
@@ -170,7 +188,9 @@ export function ReceivingForm() {
               </FieldLegend>
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <Field>
-                  <FieldLabel htmlFor="client_id">Client/Supplier ID</FieldLabel>
+                  <FieldLabel htmlFor="client_id">
+                    Client/Supplier ID
+                  </FieldLabel>
                   <FieldDescription>
                     Optional identifier for the client or supplier
                   </FieldDescription>
@@ -225,11 +245,7 @@ export function ReceivingForm() {
 
       {/* Actions */}
       <FieldGroup className="w-full mt-6 lg:flex-row lg:justify-end gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => reset()}
-        >
+        <Button type="button" variant="outline" onClick={() => reset()}>
           Clear Form
         </Button>
         <Button type="submit" disabled={createReceivingLog.isPending}>
@@ -239,4 +255,3 @@ export function ReceivingForm() {
     </form>
   );
 }
-
