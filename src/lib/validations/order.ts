@@ -1,14 +1,14 @@
 import { z } from "zod";
 
 const shippingAddressSchema = z.object({
-  name: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
   address1: z.string().min(1, "Address is required"),
   address2: z.string().optional(),
   city: z.string().min(1, "City is required"),
-  state: z.string().optional(),
+  state: z.string().min(1, "State is required"),
   zip: z.string().min(1, "ZIP code is required"),
   country: z.string().min(1, "Country is required"),
-  phone: z.string().optional(),
+  phone: z.string().min(1, "Phone is required"),
 });
 
 const orderItemSchema = z.object({
@@ -19,7 +19,7 @@ const orderItemSchema = z.object({
 });
 
 export const createOrderSchema = z.object({
-  order_number: z.string().min(1, "Order number is required"),
+  order_number: z.string().optional(), // Will be auto-generated if not provided
   customer_email: z.string().email("Invalid email address"),
   financial_status: z.enum([
     "pending",

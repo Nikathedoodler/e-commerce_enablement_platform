@@ -14,6 +14,7 @@ import {
   Field,
   FieldLabel,
   FieldError,
+  FieldDescription,
 } from "@/components/ui/field";
 import { Separator } from "@/components/ui/separator";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -27,12 +28,10 @@ import { useCreateOrder } from "@/hooks/use-orders";
 import type { OrderInput } from "@/types/orders";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useState } from "react";
 
 type CreateOrderFormData = z.infer<typeof createOrderSchema>;
 
 const CreateOrder = () => {
-  // const [total, setTotal] = useState(0);
   const {
     register,
     handleSubmit,
@@ -42,7 +41,7 @@ const CreateOrder = () => {
   } = useForm<CreateOrderFormData>({
     resolver: zodResolver(createOrderSchema),
     defaultValues: {
-      order_number: "", // or auto-generated
+      order_number: "", // Optional - will be auto-generated on backend if empty
       financial_status: "pending",
       items: [{ sku: "", name: "", quantity: 1, price: 0 }],
       shipping_address: {
@@ -63,10 +62,12 @@ const CreateOrder = () => {
 
     const orderData: OrderInput = {
       ...data,
+      order_number: data.order_number || "", // Will be auto-generated on backend if empty
       status: "pending", // default order status
       total: calculatedTotal,
       tracking_number: null,
-      // user_id will be set on the server using auth, so we don’t pass it
+      shop_id: null, // Manual orders don't have a shop_id
+      // user_id will be set on the server using auth, so we don't pass it
     };
 
     try {
@@ -105,6 +106,10 @@ const CreateOrder = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card>
           <CardContent>
+            <p className="text-sm text-muted-foreground mb-6">
+              Fields marked with <span className="text-destructive">*</span> are
+              required
+            </p>
             {/* Section 1: Order Basics */}
             <FieldGroup>
               <FieldSet>
@@ -112,21 +117,23 @@ const CreateOrder = () => {
                 {/* Order Number, Customer Email, Financial Status fields will go here */}
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                   <Field>
-                    <FieldLabel htmlFor="customer_email">
-                      Order Number
+                    <FieldLabel htmlFor="order_number">
+                      Order Number (optional)
                     </FieldLabel>
                     <Input
                       id="order_number"
                       type="text"
+                      placeholder="Leave empty to auto-generate"
                       {...register("order_number")}
                     />
+
                     {errors.order_number && (
                       <FieldError>{errors.order_number.message}</FieldError>
                     )}
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="customer_email">
-                      Customer Email
+                      Customer Email <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Input
                       id="customer_email"
@@ -139,7 +146,8 @@ const CreateOrder = () => {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="financial_status">
-                      Financial Status
+                      Financial Status{" "}
+                      <span className="text-destructive">*</span>
                     </FieldLabel>
                     <select
                       id="financial_status"
@@ -171,36 +179,85 @@ const CreateOrder = () => {
                 </FieldLegend>
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
                   <Field>
-                    <FieldLabel>Name</FieldLabel>
+                    <FieldLabel>
+                      Name <span className="text-destructive">*</span>
+                    </FieldLabel>
                     <Input {...register("shipping_address.name")} />
+                    {errors.shipping_address?.name && (
+                      <FieldError>
+                        {errors.shipping_address.name.message}
+                      </FieldError>
+                    )}
                   </Field>
                   <Field>
-                    <FieldLabel>address 1</FieldLabel>
+                    <FieldLabel>
+                      Address 1 <span className="text-destructive">*</span>
+                    </FieldLabel>
                     <Input {...register("shipping_address.address1")} />
+                    {errors.shipping_address?.address1 && (
+                      <FieldError>
+                        {errors.shipping_address.address1.message}
+                      </FieldError>
+                    )}
                   </Field>
                   <Field>
-                    <FieldLabel>address 2</FieldLabel>
+                    <FieldLabel>Address 2</FieldLabel>
                     <Input {...register("shipping_address.address2")} />
                   </Field>
                   <Field>
-                    <FieldLabel>Phone</FieldLabel>
+                    <FieldLabel>
+                      Phone <span className="text-destructive">*</span>
+                    </FieldLabel>
                     <Input {...register("shipping_address.phone")} />
+                    {errors.shipping_address?.phone && (
+                      <FieldError>
+                        {errors.shipping_address.phone.message}
+                      </FieldError>
+                    )}
                   </Field>
                   <Field>
-                    <FieldLabel>Country</FieldLabel>
+                    <FieldLabel>
+                      Country <span className="text-destructive">*</span>
+                    </FieldLabel>
                     <Input {...register("shipping_address.country")} />
+                    {errors.shipping_address?.country && (
+                      <FieldError>
+                        {errors.shipping_address.country.message}
+                      </FieldError>
+                    )}
                   </Field>
                   <Field>
-                    <FieldLabel>City</FieldLabel>
+                    <FieldLabel>
+                      City <span className="text-destructive">*</span>
+                    </FieldLabel>
                     <Input {...register("shipping_address.city")} />
+                    {errors.shipping_address?.city && (
+                      <FieldError>
+                        {errors.shipping_address.city.message}
+                      </FieldError>
+                    )}
                   </Field>
                   <Field>
-                    <FieldLabel>State</FieldLabel>
+                    <FieldLabel>
+                      State <span className="text-destructive">*</span>
+                    </FieldLabel>
                     <Input {...register("shipping_address.state")} />
+                    {errors.shipping_address?.state && (
+                      <FieldError>
+                        {errors.shipping_address.state.message}
+                      </FieldError>
+                    )}
                   </Field>
                   <Field>
-                    <FieldLabel>ZIP</FieldLabel>
+                    <FieldLabel>
+                      ZIP <span className="text-destructive">*</span>
+                    </FieldLabel>
                     <Input {...register("shipping_address.zip")} />
+                    {errors.shipping_address?.zip && (
+                      <FieldError>
+                        {errors.shipping_address.zip.message}
+                      </FieldError>
+                    )}
                   </Field>
                 </div>
               </FieldSet>
@@ -231,7 +288,9 @@ const CreateOrder = () => {
                   >
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4  w-full">
                       <Field>
-                        <FieldLabel>SKU</FieldLabel>
+                        <FieldLabel>
+                          SKU <span className="text-destructive">*</span>
+                        </FieldLabel>
                         <Input {...register(`items.${index}.sku`)} />
                         {errors.items?.[index]?.sku && (
                           <FieldError>
@@ -240,7 +299,10 @@ const CreateOrder = () => {
                         )}
                       </Field>
                       <Field>
-                        <FieldLabel>Product Name</FieldLabel>
+                        <FieldLabel>
+                          Product Name{" "}
+                          <span className="text-destructive">*</span>
+                        </FieldLabel>
                         <Input {...register(`items.${index}.name`)} />
                         {errors.items?.[index]?.name && (
                           <FieldError>
@@ -249,7 +311,9 @@ const CreateOrder = () => {
                         )}
                       </Field>
                       <Field>
-                        <FieldLabel>Quantity</FieldLabel>
+                        <FieldLabel>
+                          Quantity <span className="text-destructive">*</span>
+                        </FieldLabel>
                         <Input
                           type="number"
                           {...register(`items.${index}.quantity`, {
@@ -263,7 +327,10 @@ const CreateOrder = () => {
                         )}
                       </Field>
                       <Field>
-                        <FieldLabel>Price (per unit)</FieldLabel>
+                        <FieldLabel>
+                          Price (per unit){" "}
+                          <span className="text-destructive">*</span>
+                        </FieldLabel>
                         <Input
                           type="number"
                           step="0.01"

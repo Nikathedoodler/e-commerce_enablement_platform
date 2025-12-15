@@ -73,6 +73,18 @@ export async function getOrderById(id: string) {
   return { data: data as Order, error: null };
 }
 
+// Generate order number: ORD-YYYYMMDD-HHMMSS
+function generateOrderNumber(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+  return `ORD-${year}${month}${day}-${hours}${minutes}${seconds}`;
+}
+
 export async function createOrder(orderData: OrderInput) {
   const supabase = await createClient();
 
@@ -83,8 +95,13 @@ export async function createOrder(orderData: OrderInput) {
 
   if (userError || !user) return { error: "Not Authenticated", data: null };
 
+  // Auto-generate order_number if not provided or empty
+  const orderNumber =
+    orderData.order_number?.trim() || generateOrderNumber();
+
   const dataToInsert = {
     ...orderData,
+    order_number: orderNumber,
     user_id: user.id,
   };
 
