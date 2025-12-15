@@ -18,6 +18,7 @@ import { InventoryItem } from "@/types/inventory";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useRouter } from "next/navigation";
 import { InventoryDeleteDialog } from "./inventory-delete-dialog";
+import { InventoryDetailDialog } from "./inventory-detail-dialog";
 
 /**
  * Determines if an item is low on stock
@@ -48,6 +49,7 @@ interface InventoryTableProps {
 export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
   const [search, setSearch] = useState<string>("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 
   const debouncedSearch = useDebounce(search, 300);
@@ -164,9 +166,8 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          // TODO: Open detail/edit dialog
-                          // Similar to OrderDetailDialog
-                          console.log("View item:", item);
+                          setSelectedItem(item);
+                          setIsDetailDialogOpen(true);
                         }}
                       >
                         View
@@ -200,8 +201,12 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
         onOpenChange={setIsDeleteDialogOpen}
       />
 
-      {/* TODO: Add InventoryDetailDialog */}
-      {/* Similar to OrderDetailDialog for viewing/editing items */}
+      {/* Detail Dialog */}
+      <InventoryDetailDialog
+        inventoryItem={selectedItem}
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+      />
     </div>
   );
 }
