@@ -39,9 +39,9 @@ export function NavUser({
     avatar: string;
   };
   profile?: {
-    company_name?: string;
-    full_name?: string;
-    role?: string;
+    company_name?: string | null;
+    full_name?: string | null;
+    role?: string | null;
   } | null;
   authUser?: {
     email: string;
