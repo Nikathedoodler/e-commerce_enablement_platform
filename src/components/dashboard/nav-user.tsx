@@ -44,7 +44,7 @@ export function NavUser({
     role?: string | null;
   } | null;
   authUser?: {
-    email: string;
+    email?: string;
   } | null;
 }) {
   const { isMobile } = useSidebar();
