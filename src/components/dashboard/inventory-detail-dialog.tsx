@@ -15,12 +15,7 @@ import { useState } from "react";
 import { useUpdateInventory } from "@/hooks/use-inventory";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import {
-  Field,
-  FieldLabel,
-  FieldDescription,
-  FieldError,
-} from "@/components/ui/field";
+import { Field, FieldLabel, FieldDescription } from "@/components/ui/field";
 
 type InventoryDetailDialogProps = {
   inventoryItem: InventoryItem | null;
@@ -78,7 +73,7 @@ export function InventoryDetailDialog({
       toast.success("Inventory item updated successfully");
       setEditedItem({});
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast.error("Failed to update inventory item");
     }
   };

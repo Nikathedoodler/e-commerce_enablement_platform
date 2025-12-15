@@ -1,6 +1,6 @@
 "use client";
 
-import { Order, OrderItem as OrderItemType } from "@/types/orders";
+import { Order, OrderItem as OrderItemType, OrderStatus } from "@/types/orders";
 import {
   Dialog,
   DialogContent,
@@ -47,11 +47,11 @@ export function OrderDetailDialog({
     try {
       await updateOrder.mutateAsync({
         id: orderItem.id,
-        updates: { status: selectedStatus as any },
+        updates: { status: selectedStatus as OrderStatus },
       });
       toast.success("Order status updated successfully");
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast.error("Failed to update order status");
     }
   };

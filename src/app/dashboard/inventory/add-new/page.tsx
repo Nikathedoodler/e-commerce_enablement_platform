@@ -53,7 +53,7 @@ export default function AddNewItemPage() {
       await createInventory.mutateAsync(inventoryItem);
       toast.success("Inventory item created successfully");
       router.push("/dashboard/inventory/all-items");
-    } catch (err) {
+    } catch {
       toast.error("Failed to create inventory item");
     }
 

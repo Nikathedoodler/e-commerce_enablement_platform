@@ -64,7 +64,7 @@ export function ReceivingForm() {
         toast.info("Inventory quantity has been updated");
       }
       reset(); // Reset form after successful submission
-    } catch (err) {
+    } catch {
       toast.error("Failed to create receiving log");
     }
   };
@@ -75,8 +75,8 @@ export function ReceivingForm() {
         <CardContent>
           <p className="text-sm text-muted-foreground mb-6">
             Fields marked with <span className="text-destructive">*</span> are
-            required. Items in "good" condition will automatically update
-            inventory quantities.
+            required. Items in &quot;good&quot; condition will automatically
+            update inventory quantities.
           </p>
 
           {/* Section 1: Receiving Details */}

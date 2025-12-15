@@ -41,7 +41,7 @@ export function InventoryDeleteDialog({
       await deleteInventoryMutation.mutateAsync(id);
       toast.success("Inventory item deleted successfully");
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete inventory item");
     }
   };

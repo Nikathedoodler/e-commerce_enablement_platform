@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   FieldGroup,
   FieldSet,
@@ -14,7 +8,6 @@ import {
   Field,
   FieldLabel,
   FieldError,
-  FieldDescription,
 } from "@/components/ui/field";
 import { Separator } from "@/components/ui/separator";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -74,7 +67,7 @@ const CreateOrder = () => {
       await createOrder.mutateAsync(orderData);
       toast.success("Order created successfully");
       router.push("/dashboard/orders/all-orders");
-    } catch (err) {
+    } catch {
       toast.error("Failed to create order");
     }
   };

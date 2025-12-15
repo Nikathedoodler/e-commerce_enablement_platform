@@ -16,10 +16,17 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import React, { useState } from "react";
+import type { User } from "@supabase/supabase-js";
+
+type Profile = {
+  company_name?: string | null;
+  full_name?: string | null;
+  role?: string | null;
+} | null;
 
 type DashboardShellProps = {
-  profile: any;
-  user: any;
+  profile: Profile;
+  user: User | null;
   children: React.ReactNode;
 };
 

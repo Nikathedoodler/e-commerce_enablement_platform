@@ -12,7 +12,6 @@ import {
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
-import { ReceivingLogItem } from "@/types/receiving";
 
 function getConditionColor(condition: string) {
   switch (condition) {

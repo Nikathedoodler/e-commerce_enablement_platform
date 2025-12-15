@@ -41,7 +41,7 @@ export function OrderDeleteDialog({
       await deleteOrderMutation.mutateAsync(id);
       toast.success("Order Deleted successfully");
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete order");
     }
   };

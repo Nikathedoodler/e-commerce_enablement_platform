@@ -2,6 +2,13 @@
 
 import * as React from "react";
 import { ArrowDownToLine, Warehouse, Settings2, Package } from "lucide-react";
+import type { User } from "@supabase/supabase-js";
+
+type Profile = {
+  company_name?: string | null;
+  full_name?: string | null;
+  role?: string | null;
+} | null;
 
 import { NavMain } from "@/components/dashboard/nav-main";
 import { NavUser } from "@/components/dashboard/nav-user";
@@ -89,8 +96,8 @@ export function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   onNavSelect?: (main: string, sub?: string) => void;
-  profile?: any;
-  user?: any;
+  profile?: Profile;
+  user?: User | null;
 }) {
   return (
     <Sidebar collapsible="icon" {...props}>
