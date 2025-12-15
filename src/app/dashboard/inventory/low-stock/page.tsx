@@ -1,3 +1,5 @@
+import { InventoryTable } from "@/components/dashboard/inventory-table";
+
 export default function LowStockPage() {
   return (
     <div className="space-y-6">
@@ -7,11 +9,7 @@ export default function LowStockPage() {
           Items that need restocking
         </p>
       </div>
-      <div className="rounded-lg border bg-card p-6">
-        <p className="text-sm text-muted-foreground">
-          Low stock items will be displayed here
-        </p>
-      </div>
+      <InventoryTable lowStockOnly={true} />
     </div>
   );
 }
