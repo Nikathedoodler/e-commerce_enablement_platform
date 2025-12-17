@@ -96,8 +96,7 @@ export async function createOrder(orderData: OrderInput) {
   if (userError || !user) return { error: "Not Authenticated", data: null };
 
   // Auto-generate order_number if not provided or empty
-  const orderNumber =
-    orderData.order_number?.trim() || generateOrderNumber();
+  const orderNumber = orderData.order_number?.trim() || generateOrderNumber();
 
   const dataToInsert = {
     ...orderData,
