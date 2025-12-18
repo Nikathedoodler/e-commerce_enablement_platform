@@ -24,10 +24,6 @@ export async function getShopifyStores() {
     .select("*")
     .order("connected_at", { ascending: false });
 
-  //   if (filters?.user_id) {
-  //     query = query.eq("user_id", filters.user_id);
-  //   }
-
   const { data, error } = await query;
 
   if (error) {

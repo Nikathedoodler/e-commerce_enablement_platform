@@ -1,4 +1,12 @@
+"use client";
+
+import { useState } from "react";
+import { ShopifyConnectionCard } from "@/components/dashboard/shopify-connection-card";
+import { ShopifyConnectDialog } from "@/components/dashboard/shopify-connect-dialog";
+
 export default function IntegrationsPage() {
+  const [connectDialogOpen, setConnectDialogOpen] = useState(false);
+
   return (
     <div className="space-y-6">
       <div>
@@ -8,11 +16,14 @@ export default function IntegrationsPage() {
         </p>
       </div>
       <div className="rounded-lg border bg-card p-6">
-        <p className="text-sm text-muted-foreground">
-          Integration settings will be displayed here
-        </p>
+        <ShopifyConnectionCard
+          onConnectClick={() => setConnectDialogOpen(true)}
+        />
+        <ShopifyConnectDialog
+          open={connectDialogOpen}
+          onOpenChange={setConnectDialogOpen}
+        />
       </div>
     </div>
   );
 }
-
