@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
     const apiSecret = process.env.SHOPIFY_API_SECRET;
     const scopes =
       process.env.SHOPIFY_APP_SCOPES ||
-      "read_orders,write_orders,read_products";
+      "read_customers,read_inventory,read_orders,write_orders,read_products,write_products";
     const redirectUri =
       process.env.SHOPIFY_APP_REDIRECT_URI ||
       `${req.nextUrl.origin}/api/shopify/auth/callback`;
