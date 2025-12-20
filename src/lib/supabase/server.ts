@@ -38,11 +38,12 @@ export async function createClient() {
  */
 export function createServiceRoleClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Use new Secret key (sb_secret_...) or fall back to legacy service role key
+  const serviceRoleKey = process.env.SUPABASE_SECRET_KEY;
 
   if (!supabaseUrl || !serviceRoleKey) {
     throw new Error(
-      "Missing Supabase service role credentials. Required for webhook operations."
+      "Missing Supabase service role credentials. Required for webhook operations. Set SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY."
     );
   }
 
