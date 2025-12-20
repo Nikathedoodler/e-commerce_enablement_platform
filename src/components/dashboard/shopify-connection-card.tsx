@@ -161,17 +161,10 @@ export function ShopifyConnectionCard({
     <>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Store className="h-5 w-5" />
-              Shopify
-            </CardTitle>
-            {onConnectClick && (
-              <Button onClick={onConnectClick} size="sm">
-                Connect Store
-              </Button>
-            )}
-          </div>
+          <CardTitle className="flex items-center gap-2">
+            <Store className="h-5 w-5" />
+            Shopify
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {error && (

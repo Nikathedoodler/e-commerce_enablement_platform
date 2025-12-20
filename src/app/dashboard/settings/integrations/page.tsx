@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { ShopifyConnectionCard } from "@/components/dashboard/shopify-connection-card";
 import { ShopifyConnectDialog } from "@/components/dashboard/shopify-connect-dialog";
 
@@ -9,11 +10,16 @@ export default function IntegrationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Integrations</h1>
-        <p className="text-muted-foreground">
-          Connect your storefronts and services
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Integrations</h1>
+          <p className="text-muted-foreground">
+            Connect your storefronts and services
+          </p>
+        </div>
+        <Button onClick={() => setConnectDialogOpen(true)}>
+          Connect Store
+        </Button>
       </div>
       <div className="rounded-lg border bg-card p-6">
         <ShopifyConnectionCard
