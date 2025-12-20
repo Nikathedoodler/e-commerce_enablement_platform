@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const shop = searchParams.get("shop");
     const state = searchParams.get("state");
     const hmac = searchParams.get("hmac");
-    const timestamp = searchParams.get("timestamp");
+    // timestamp is included in HMAC verification via searchParams.forEach below
 
     // Validate required parameters
     if (!code || !shop || !state || !hmac) {

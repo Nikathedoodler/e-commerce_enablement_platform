@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
     // Get HMAC signature from header
     const hmacHeader = req.headers.get("X-Shopify-Hmac-Sha256");
     const shopDomain = req.headers.get("X-Shopify-Shop-Domain");
-    const topic = req.headers.get("X-Shopify-Topic");
+    // topic header is available for future use if needed to handle different webhook types
 
     // Validate required headers
     if (!hmacHeader || !shopDomain) {

@@ -105,7 +105,7 @@ export function ShopifyConnectionCard({
       toast.success("Store disconnected successfully");
       setDisconnectDialogOpen(false);
       setStoreToDisconnect(null);
-    } catch (error) {
+    } catch {
       toast.error("Failed to disconnect store");
     }
   };

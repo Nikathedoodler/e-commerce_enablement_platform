@@ -19,7 +19,7 @@ export async function getShopifyStores() {
     return { error: "Not Authenticated", data: null };
   }
 
-  let query = supabase
+  const query = supabase
     .from("shopify_stores")
     .select("*")
     .order("connected_at", { ascending: false });

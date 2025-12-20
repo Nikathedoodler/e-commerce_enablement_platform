@@ -92,7 +92,7 @@ export function ShopifyConnectDialog({
 
       // Note: Dialog will close automatically on redirect
       // No need to call onOpenChange(false) since we're navigating away
-    } catch (err) {
+    } catch {
       setError("Failed to initiate connection. Please try again.");
       setIsSubmitting(false);
     }
@@ -117,7 +117,7 @@ export function ShopifyConnectDialog({
             Connect Shopify Store
           </DialogTitle>
           <DialogDescription>
-            Connect your Shopify store to automatically sync orders. You'll be
+            Connect your Shopify store to automatically sync orders. You&apos;ll be
             redirected to Shopify to authorize the connection.
           </DialogDescription>
         </DialogHeader>
@@ -141,8 +141,8 @@ export function ShopifyConnectDialog({
               />
               <FieldDescription>
                 Enter your Shopify store domain. You can use just the store name
-                (e.g., "mystore") or the full domain (e.g.,
-                "mystore.myshopify.com").
+                (e.g., &quot;mystore&quot;) or the full domain (e.g.,
+                &quot;mystore.myshopify.com&quot;).
               </FieldDescription>
               {error && (
                 <p className="text-sm text-destructive mt-1">{error}</p>
