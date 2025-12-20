@@ -148,7 +148,6 @@ export async function GET(req: NextRequest) {
       access_token: accessToken, // In production, encrypt this
       scopes: scopes,
       status: "active",
-      connected_at: new Date().toISOString(),
     });
 
     if (dbError || !storeData) {
