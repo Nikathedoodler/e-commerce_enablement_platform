@@ -129,10 +129,12 @@ function transformShopifyOrder(
  * - X-Shopify-Hmac-Sha256: HMAC signature
  */
 export async function POST(req: NextRequest) {
+  console.log("=== Webhook received ===");
   try {
     // Get the raw body as text (needed for HMAC verification)
     // Note: In Next.js, we need to read the body before parsing JSON
     const rawBody = await req.text();
+    console.log("Raw body length:", rawBody.length);
 
     // Get HMAC signature from header
     const hmacHeader = req.headers.get("X-Shopify-Hmac-Sha256");
@@ -149,24 +151,29 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify HMAC signature
-    const apiSecret = process.env.SHOPIFY_API_SECRET;
-    if (!apiSecret) {
-      console.error("Missing Shopify API secret");
+    // For manually created webhooks, use SHOPIFY_WEBHOOK_SECRET (store's webhook secret)
+    // For API-registered webhooks, use SHOPIFY_API_SECRET (app's client secret)
+    const webhookSecret =
+      process.env.SHOPIFY_WEBHOOK_SECRET || process.env.SHOPIFY_API_SECRET;
+    if (!webhookSecret) {
+      console.error("Missing Shopify webhook secret");
       return NextResponse.json(
         { error: "Server configuration error" },
         { status: 500 }
       );
     }
 
-    if (!verifyHmac(rawBody, hmacHeader, apiSecret)) {
+    if (!verifyHmac(rawBody, hmacHeader, webhookSecret)) {
       console.error("Invalid HMAC signature");
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
+    console.log("HMAC signature verified successfully");
 
     // Parse the order data
     let shopifyOrder: ShopifyWebhookOrder;
     try {
       shopifyOrder = JSON.parse(rawBody);
+      console.log("Order parsed:", shopifyOrder.name, "from", shopDomain);
     } catch (error) {
       console.error("Failed to parse webhook body:", error);
       return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
@@ -195,6 +202,7 @@ export async function POST(req: NextRequest) {
         { status: 200 }
       );
     }
+    console.log("Shop found:", shop.id, "user_id:", shop.user_id);
 
     // Check if order already exists (idempotency)
     // Use shopify order name (e.g., "#1001") as unique identifier
@@ -216,11 +224,32 @@ export async function POST(req: NextRequest) {
     }
 
     // Transform Shopify order to our format
-    const orderInput = transformShopifyOrder(shopifyOrder, shop.id);
+    let orderInput: OrderInput;
+    try {
+      orderInput = transformShopifyOrder(shopifyOrder, shop.id);
+      console.log(
+        "Order transformed:",
+        orderInput.order_number,
+        "Total:",
+        orderInput.total
+      );
+    } catch (error) {
+      console.error("Failed to transform order:", error);
+      return NextResponse.json(
+        { received: true, error: "Failed to transform order" },
+        { status: 200 }
+      );
+    }
 
     // Create order in database
     // Note: We need to bypass RLS since we're creating on behalf of the shop owner
     // We'll use the user_id from the shop record
+    console.log(
+      "Inserting order with user_id:",
+      shop.user_id,
+      "shop_id:",
+      shop.id
+    );
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -232,6 +261,7 @@ export async function POST(req: NextRequest) {
 
     if (orderError) {
       console.error("Failed to create order:", orderError);
+      console.error("Order data:", JSON.stringify(orderInput, null, 2));
       // Return 200 to prevent infinite retries, but log the error
       return NextResponse.json(
         { received: true, error: "Failed to create order" },
