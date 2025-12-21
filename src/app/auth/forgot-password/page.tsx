@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
             <CardHeader>
               <CardTitle>Check your email</CardTitle>
               <CardDescription>
-                We've sent you a password reset link. Click the link in the
+                We&apos;ve sent you a password reset link. Click the link in the
                 email to reset your password.
               </CardDescription>
             </CardHeader>
@@ -74,8 +74,8 @@ export default function ForgotPasswordPage() {
           <CardHeader>
             <CardTitle>Reset your password</CardTitle>
             <CardDescription>
-              Enter your email address and we'll send you a link to reset your
-              password.
+              Enter your email address and we&apos;ll send you a link to reset
+              your password.
             </CardDescription>
           </CardHeader>
           <CardContent>

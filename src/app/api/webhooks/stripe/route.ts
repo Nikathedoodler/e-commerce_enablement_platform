@@ -127,14 +127,22 @@ async function handleCheckoutSessionCompleted(
 
     // Get period timestamps from subscription item (newer Stripe API versions store them here)
     // Fall back to subscription level if not available in item
-    const subAny = subscription as any;
-    const subscriptionItemAny = subscriptionItem as any;
+    const subWithPeriods = subscription as Stripe.Subscription & {
+      current_period_start?: number;
+      current_period_end?: number;
+    };
+    const subscriptionItemWithPeriods =
+      subscriptionItem as Stripe.SubscriptionItem & {
+        current_period_start?: number;
+        current_period_end?: number;
+      };
     const currentPeriodStartNum =
-      subscriptionItemAny.current_period_start ??
-      subAny.current_period_start ??
+      subscriptionItemWithPeriods.current_period_start ??
+      subWithPeriods.current_period_start ??
       subscription.start_date;
     const currentPeriodEndNum =
-      subscriptionItemAny.current_period_end ?? subAny.current_period_end;
+      subscriptionItemWithPeriods.current_period_end ??
+      subWithPeriods.current_period_end;
 
     if (
       !currentPeriodStartNum ||
@@ -143,10 +151,11 @@ async function handleCheckoutSessionCompleted(
       typeof currentPeriodEndNum !== "number"
     ) {
       console.error("Invalid period timestamps in subscription:", {
-        item_current_period_start: subscriptionItemAny.current_period_start,
-        item_current_period_end: subscriptionItemAny.current_period_end,
-        subscription_current_period_start: subAny.current_period_start,
-        subscription_current_period_end: subAny.current_period_end,
+        item_current_period_start:
+          subscriptionItemWithPeriods.current_period_start,
+        item_current_period_end: subscriptionItemWithPeriods.current_period_end,
+        subscription_current_period_start: subWithPeriods.current_period_start,
+        subscription_current_period_end: subWithPeriods.current_period_end,
         start_date: subscription.start_date,
       });
       return {
@@ -203,7 +212,6 @@ async function handleSubscriptionUpdated(
 ) {
   try {
     const subscriptionId = subscription.id;
-    const customerId = subscription.customer as string;
 
     // Get plan tier from price ID
     const priceId = subscription.items.data[0]?.price.id;

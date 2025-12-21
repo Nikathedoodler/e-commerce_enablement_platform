@@ -1,3 +1,5 @@
+import type Stripe from "stripe";
+
 /**
  * Subscription Plan Tier Types
  * Matches the CHECK constraint in the database schema
@@ -116,7 +118,7 @@ export interface StripeWebhookEvent {
   id: string;
   type: StripeWebhookEventType;
   data: {
-    object: any; // Stripe object (subscription, checkout session, etc.)
+    object: Stripe.Checkout.Session | Stripe.Subscription | Stripe.Invoice | Record<string, unknown>; // Stripe object (subscription, checkout session, etc.)
   };
   created: number; // Unix timestamp
 }
