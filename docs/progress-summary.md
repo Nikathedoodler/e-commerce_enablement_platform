@@ -370,6 +370,8 @@ This project follows a **collaborative, learning-focused development methodology
 - `src/app/auth/signup/page.tsx` - Signup page
 - `src/app/auth/check-email/page.tsx` - Email confirmation prompt
 - `src/app/auth/confirm/page.tsx` - Email verification handler
+- `src/app/auth/forgot-password/page.tsx` - Password reset request page
+- `src/app/auth/reset-password/page.tsx` - Password reset confirmation page
 - `src/components/login-form.tsx` - Login form component
 - `src/components/signup-form.tsx` - Signup form component
 
@@ -390,25 +392,29 @@ This project follows a **collaborative, learning-focused development methodology
 - `docs/migrations/007_seed_inventory_data.sql` - Seed data for inventory (if exists)
 - `docs/migrations/008_create_receiving_log_table.sql` - Receiving log table with RLS policies
 - `docs/migrations/009_create_shopify_stores_table.sql` - Shopify stores table with RLS policies
+- `docs/migrations/010_create_subscriptions_table.sql` - Subscriptions table with RLS policies
 
 ### Server Actions
 
 - `src/lib/actions/profile.ts` - Profile update action (created, not actively used yet)
 
-### Data Layer (Orders, Inventory & Receiving)
+### Data Layer (Orders, Inventory, Receiving, Shopify & Billing)
 
 - `src/lib/supabase/queries/orders.ts` - Order query helpers (Server Actions)
 - `src/lib/supabase/queries/inventory.ts` - Inventory query helpers (Server Actions)
 - `src/lib/supabase/queries/receiving.ts` - Receiving log query helpers (Server Actions)
 - `src/lib/supabase/queries/shopify.ts` - Shopify store query helpers (Server Actions)
+- `src/lib/supabase/queries/subscriptions.ts` - Subscription query helpers (Server Actions)
 - `src/hooks/use-orders.ts` - TanStack Query hooks for orders
 - `src/hooks/use-inventory.ts` - TanStack Query hooks for inventory
 - `src/hooks/use-receiving.ts` - TanStack Query hooks for receiving logs
 - `src/hooks/use-shopify.ts` - TanStack Query hooks for Shopify stores
+- `src/hooks/use-subscriptions.ts` - TanStack Query hooks for subscriptions
 - `types/orders.ts` - Order TypeScript types
 - `types/inventory.ts` - Inventory TypeScript types
 - `types/receiving.ts` - Receiving log TypeScript types
 - `types/shopify.ts` - Shopify store and webhook TypeScript types
+- `types/stripe.ts` - Stripe subscription and billing TypeScript types
 - `src/lib/validations/order.ts` - Zod validation schema for order creation
 - `src/lib/validations/inventory.ts` - Zod validation schema for inventory
 - `src/lib/validations/receiving.ts` - Zod validation schema for receiving logs
@@ -447,6 +453,10 @@ This project follows a **collaborative, learning-focused development methodology
   - `src/app/api/shopify/auth/route.ts` - OAuth initiation
   - `src/app/api/shopify/auth/callback/route.ts` - OAuth callback
   - `src/app/api/webhooks/shopify/orders/route.ts` - Order webhook handler
+  - `src/app/api/stripe/checkout/route.ts` - Stripe checkout session creation
+  - `src/app/api/webhooks/stripe/route.ts` - Stripe webhook handler
+- UI Components:
+  - `src/components/ui/badge.tsx` - Badge component for status indicators
 
 ---
 
@@ -462,6 +472,9 @@ This project follows a **collaborative, learning-focused development methodology
 - `SHOPIFY_API_SECRET` - Shopify app API secret (from Partners dashboard)
 - `SHOPIFY_WEBHOOK_SECRET` - Shopify store webhook secret (for manually created webhooks)
 - `SHOPIFY_APP_SCOPES` - Comma-separated OAuth scopes (optional, has defaults)
+- `STRIPE_SECRET_KEY` - Stripe secret API key (sk_test_... or sk_live_...)
+- `STRIPE_PUBLISHABLE_KEY` - Stripe publishable key (pk_test_... or pk_live_...)
+- `STRIPE_WEBHOOK_SECRET` - Stripe webhook signing secret (whsec_...)
 
 ### Supabase Setup
 
@@ -580,10 +593,80 @@ This project follows a **collaborative, learning-focused development methodology
 - ⏳ Order status updates back to Shopify
 - ⏳ Product sync from Shopify
 
-### 5. Future Phases (Phase 4+)
+#### ✅ Stripe Billing Integration (Phase 5) - COMPLETE
+
+**Status:** Database ✅ | Checkout Flow ✅ | Webhook Handler ✅ | Query Helpers ✅ | Hooks ✅ | Billing UI ✅
+
+- ✅ Database schema (`docs/migrations/010_create_subscriptions_table.sql`)
+  - `subscriptions` table with RLS policies
+  - Fields: id, user_id, stripe_customer_id, stripe_subscription_id, plan_tier, status, current_period_start, current_period_end, cancel_at_period_end
+  - Unique constraints on user_id, stripe_customer_id, stripe_subscription_id
+  - Indexes on user_id, stripe_customer_id, stripe_subscription_id, status, plan_tier
+- ✅ TypeScript types (`src/types/stripe.ts`)
+  - `Subscription` - full subscription type
+  - `SubscriptionInput` - create/update input type
+  - `SubscriptionUpdate` - partial update type
+  - `PlanTier` - plan tier enum (starter, professional, enterprise)
+  - `SubscriptionStatus` - status enum types
+  - Stripe webhook event types
+- ✅ Stripe products and pricing
+  - Created 3 products in Stripe Dashboard:
+    - Starter: €199/month
+    - Growth (Professional): €699/month
+    - Scale Pro (Enterprise): €2,000/month
+  - Price IDs configured in checkout route
+- ✅ Checkout route (`src/app/api/stripe/checkout/route.ts`)
+  - Creates Stripe Checkout session
+  - Maps plan tiers to Price IDs
+  - Returns checkout URL for redirect
+  - Validates authentication and plan tier
+- ✅ Webhook handler (`src/app/api/webhooks/stripe/route.ts`)
+  - Verifies webhook signatures for security
+  - Handles `checkout.session.completed` - creates subscription on payment
+  - Handles `customer.subscription.updated` - updates subscription
+  - Handles `customer.subscription.deleted` - marks as canceled
+  - Uses service role client to bypass RLS
+  - Automatic subscription creation/updates in database
+- ✅ Query helpers (`src/lib/supabase/queries/subscriptions.ts`)
+  - `getSubscription()` - fetch current user's subscription
+  - `upsertSubscription()` - create or update subscription
+  - `updateSubscription()` - update subscription details
+- ✅ TanStack Query hooks (`src/hooks/use-subscriptions.ts`)
+  - `useSubscription()` - fetch subscription with auto-refresh
+- ✅ Billing UI (`src/app/dashboard/settings/billing/page.tsx`)
+  - Shows current subscription status and plan details
+  - Displays billing period (start/end dates)
+  - Shows cancellation notice if cancel_at_period_end is true
+  - Plan upgrade/change options with current plan highlighting
+  - Loading states and error handling
+  - Empty state for users without subscription
+- ✅ Badge component (`src/components/ui/badge.tsx`)
+  - Created for status badges in billing UI
+- ✅ Password recovery (`src/app/auth/forgot-password/page.tsx`, `src/app/auth/reset-password/page.tsx`)
+  - Forgot password page with email input
+  - Reset password page with token verification
+  - Updated login form with "Forgot password?" link
+  - Uses Supabase's built-in password reset flow
+- ✅ Key Features:
+  - **Automatic subscription management:** Webhooks automatically sync subscription status
+  - **Secure checkout:** Stripe Checkout handles payment securely
+  - **Real-time updates:** Subscription changes reflected immediately
+  - **Multi-plan support:** Starter, Growth, and Scale Pro plans
+  - **Billing period tracking:** Shows current billing period dates
+  - **Cancellation handling:** Tracks if subscription will cancel at period end
+
+**Optional Enhancements (Future):**
+
+- ⏳ Stripe Customer Portal integration (manage billing/payment methods)
+- ⏳ Plan comparison table with features
+- ⏳ Usage limits enforcement (e.g., 250 orders/month for Starter)
+- ⏳ Email notifications for subscription changes
+- ⏳ Invoice history display
+
+### 6. Future Phases (Phase 6+)
 
 - Shipping integration (DHL)
-- Stripe billing integration
+- Advanced analytics and reporting
 
 ---
 
@@ -646,4 +729,12 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ UI Components: Store connection management in settings
 - ✅ Order Transformation: Shopify orders → Your order format
 
-**Next: Phase 4 - Shipping Integration (DHL) & Billing (Stripe)**
+**Phase 5 Status: ✅ COMPLETE**
+
+- ✅ Stripe Billing: Complete subscription management system
+- ✅ Checkout Flow: Stripe Checkout integration with plan selection
+- ✅ Webhook Handler: Automatic subscription sync from Stripe
+- ✅ Billing UI: Full subscription management interface
+- ✅ Password Recovery: Forgot/reset password functionality
+
+**Next: Phase 6 - Shipping Integration (DHL) & Advanced Features**
