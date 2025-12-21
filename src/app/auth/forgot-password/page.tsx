@@ -2,9 +2,6 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-
-// Force dynamic rendering to prevent static generation issues
-export const dynamic = "force-dynamic";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,23 +23,42 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
+    try {
+      const formData = new FormData(e.currentTarget);
+      const email = formData.get("email") as string;
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
-    });
+      if (!email) {
+        toast.error("Please enter your email address");
+        setLoading(false);
+        return;
+      }
 
-    setLoading(false);
+      const supabase = createClient();
+      const redirectTo = `${window.location.origin}/auth/reset-password`;
 
-    if (error) {
-      toast.error(error.message);
-      return;
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo,
+      });
+
+      if (error) {
+        console.error("Password reset error:", error);
+        toast.error(error.message);
+        setLoading(false);
+        return;
+      }
+
+      console.log("Password reset response:", data);
+
+      // Note: Supabase returns success even if email sending fails
+      // The email will only be sent if SMTP is configured in Supabase dashboard
+      toast.success("Password reset email sent! Check your inbox.");
+      setEmailSent(true);
+    } catch (err) {
+      console.error("Error resetting password:", err);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    toast.success("Password reset email sent! Check your inbox.");
-    setEmailSent(true);
   };
 
   if (emailSent) {
