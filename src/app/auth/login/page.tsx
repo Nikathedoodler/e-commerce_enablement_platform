@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = "force-dynamic";
 import { toast } from "sonner";
 import { LoginForm } from "@/components/login-form";
 

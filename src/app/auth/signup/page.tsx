@@ -2,6 +2,9 @@
 
 import { SignupForm } from "@/components/signup-form";
 import { createClient } from "@/lib/supabase/client";
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = "force-dynamic";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
