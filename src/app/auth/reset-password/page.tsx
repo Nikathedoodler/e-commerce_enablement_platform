@@ -25,24 +25,47 @@ function ResetPasswordContent() {
 
   useEffect(() => {
     async function verifyToken() {
+      // Try multiple ways to get the code parameter
       const code = searchParams.get("code");
       const tokenHash = searchParams.get("token_hash");
       const type = searchParams.get("type");
 
+      // Fallback: check window.location directly in case searchParams doesn't work
+      const urlParams =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search)
+          : null;
+      const codeFromUrl = urlParams?.get("code");
+      const tokenHashFromUrl = urlParams?.get("token_hash");
+      const typeFromUrl = urlParams?.get("type");
+
+      // Use whichever method found the params
+      const finalCode = code || codeFromUrl;
+      const finalTokenHash = tokenHash || tokenHashFromUrl;
+      const finalType = type || typeFromUrl;
+
       // Debug: log all URL parameters
       console.log("Reset password page - URL params:", {
         code,
+        codeFromUrl,
+        finalCode,
         tokenHash,
+        tokenHashFromUrl,
+        finalTokenHash,
         type,
+        typeFromUrl,
+        finalType,
         allParams: Object.fromEntries(searchParams.entries()),
+        windowLocation:
+          typeof window !== "undefined" ? window.location.href : "N/A",
       });
 
       // If no token parameters, redirect to login
-      if (!code && (!tokenHash || type !== "recovery")) {
+      if (!finalCode && (!finalTokenHash || finalType !== "recovery")) {
         console.log("No valid token parameters found:", {
-          code,
-          tokenHash,
-          type,
+          code: finalCode,
+          tokenHash: finalTokenHash,
+          type: finalType,
         });
         toast.error("Invalid or missing reset token");
         router.push("/auth/login");
@@ -52,10 +75,10 @@ function ResetPasswordContent() {
       const supabase = createClient();
 
       // Handle code-based flow - exchange code for session immediately
-      if (code) {
+      if (finalCode) {
         try {
           const { error: exchangeError } =
-            await supabase.auth.exchangeCodeForSession(code);
+            await supabase.auth.exchangeCodeForSession(finalCode);
 
           if (exchangeError) {
             console.error("Code exchange error:", exchangeError);
@@ -73,7 +96,7 @@ function ResetPasswordContent() {
           toast.error("Failed to verify reset link");
           router.push("/auth/login");
         }
-      } else if (tokenHash && type === "recovery") {
+      } else if (finalTokenHash && finalType === "recovery") {
         // For token_hash flow, we'll verify on form submit
         setIsValidToken(true);
         setIsVerifying(false);
@@ -107,13 +130,21 @@ function ResetPasswordContent() {
       const tokenHash = searchParams.get("token_hash");
       const type = searchParams.get("type");
 
+      // Fallback: check window.location directly
+      const urlParams =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search)
+          : null;
+      const finalTokenHash = tokenHash || urlParams?.get("token_hash");
+      const finalType = type || urlParams?.get("type");
+
       const supabase = createClient();
 
       // For code-based flow, the session is already established in useEffect
       // For token_hash flow, verify the OTP now
-      if (tokenHash && type === "recovery") {
+      if (finalTokenHash && finalType === "recovery") {
         const { error: verifyError } = await supabase.auth.verifyOtp({
-          token_hash: tokenHash,
+          token_hash: finalTokenHash,
           type: "recovery",
         });
 
