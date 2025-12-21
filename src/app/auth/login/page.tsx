@@ -11,12 +11,11 @@ import { LoginForm } from "@/components/login-form";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
-
-  const supabase = createClient();
   const router = useRouter();
 
   const handleLogin = async (email: string, password: string) => {
     setLoading(true);
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,

@@ -12,7 +12,6 @@ import { toast } from "sonner";
 export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
 
   const handleSignUp = async (
     email: string,
@@ -31,6 +30,7 @@ export default function SignupPage() {
 
     // Step 1: Create the user account
     // Pass full_name and company_name in metadata so trigger can use them
+    const supabase = createClient();
     const { error } = await supabase.auth.signUp({
       email,
       password,

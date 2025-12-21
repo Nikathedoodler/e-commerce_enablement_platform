@@ -23,7 +23,6 @@ function ResetPasswordContent() {
   const [passwordUpdated, setPasswordUpdated] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClient();
 
   useEffect(() => {
     // Verify the token is present
@@ -65,6 +64,7 @@ function ResetPasswordContent() {
       return;
     }
 
+    const supabase = createClient();
     // Verify the OTP and update password
     const { error: verifyError } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
