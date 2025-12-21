@@ -18,15 +18,20 @@ import {
 function ResetPasswordContent() {
   const [loading, setLoading] = useState(false);
   const [passwordUpdated, setPasswordUpdated] = useState(false);
+  const [isValidToken, setIsValidToken] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Verify the token is present
+    // Check for either code (new flow) or token_hash + type (old flow)
+    const code = searchParams.get("code");
     const tokenHash = searchParams.get("token_hash");
     const type = searchParams.get("type");
 
-    if (!tokenHash || type !== "recovery") {
+    if (code || (tokenHash && type === "recovery")) {
+      setIsValidToken(true);
+    } else {
+      // If we're on the reset password page without valid params, redirect to login
       toast.error("Invalid or missing reset token");
       router.push("/auth/login");
     }
@@ -36,61 +41,83 @@ function ResetPasswordContent() {
     e.preventDefault();
     setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirmPassword") as string;
+    try {
+      const formData = new FormData(e.currentTarget);
+      const password = formData.get("password") as string;
+      const confirmPassword = formData.get("confirmPassword") as string;
 
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match");
+        setLoading(false);
+        return;
+      }
+
+      if (password.length < 6) {
+        toast.error("Password must be at least 6 characters");
+        setLoading(false);
+        return;
+      }
+
+      const code = searchParams.get("code");
+      const tokenHash = searchParams.get("token_hash");
+      const type = searchParams.get("type");
+
+      const supabase = createClient();
+
+      // Handle code-based flow (newer Supabase auth)
+      if (code) {
+        // Exchange code for session first
+        const { error: exchangeError } =
+          await supabase.auth.exchangeCodeForSession(code);
+
+        if (exchangeError) {
+          console.error("Code exchange error:", exchangeError);
+          toast.error(exchangeError.message || "Invalid reset code");
+          setLoading(false);
+          return;
+        }
+      } else if (tokenHash && type === "recovery") {
+        // Handle token_hash flow (older method)
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: "recovery",
+        });
+
+        if (verifyError) {
+          console.error("OTP verify error:", verifyError);
+          toast.error(verifyError.message);
+          setLoading(false);
+          return;
+        }
+      } else {
+        toast.error("Invalid reset token");
+        setLoading(false);
+        return;
+      }
+
+      // Update the password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: password,
+      });
+
+      if (updateError) {
+        console.error("Password update error:", updateError);
+        toast.error(updateError.message);
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Password updated successfully!");
+      setPasswordUpdated(true);
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 2000);
+    } catch (err) {
+      console.error("Error resetting password:", err);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      setLoading(false);
-      return;
-    }
-
-    const tokenHash = searchParams.get("token_hash");
-    const type = searchParams.get("type");
-
-    if (!tokenHash || type !== "recovery") {
-      toast.error("Invalid reset token");
-      setLoading(false);
-      return;
-    }
-
-    const supabase = createClient();
-    // Verify the OTP and update password
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      token_hash: tokenHash,
-      type: "recovery",
-    });
-
-    if (verifyError) {
-      toast.error(verifyError.message);
-      setLoading(false);
-      return;
-    }
-
-    // Update the password
-    const { error: updateError } = await supabase.auth.updateUser({
-      password: password,
-    });
-
-    setLoading(false);
-
-    if (updateError) {
-      toast.error(updateError.message);
-      return;
-    }
-
-    toast.success("Password updated successfully!");
-    setPasswordUpdated(true);
-    setTimeout(() => {
-      router.push("/auth/login");
-    }, 2000);
   };
 
   if (passwordUpdated) {
@@ -104,6 +131,20 @@ function ResetPasswordContent() {
                 Your password has been successfully updated. Redirecting to
                 login...
               </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isValidToken) {
+    return (
+      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+        <div className="w-full max-w-sm">
+          <Card>
+            <CardHeader>
+              <CardTitle>Loading...</CardTitle>
             </CardHeader>
           </Card>
         </div>
