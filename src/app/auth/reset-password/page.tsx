@@ -74,32 +74,49 @@ function ResetPasswordContent() {
 
       const supabase = createClient();
 
-      // Handle code-based flow - exchange code for session immediately
-      if (finalCode) {
-        try {
-          const { error: exchangeError } =
-            await supabase.auth.exchangeCodeForSession(finalCode);
+      // For password reset with code parameter, Supabase redirect should establish session automatically
+      // Check if user is already authenticated from the redirect
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-          if (exchangeError) {
-            console.error("Code exchange error:", exchangeError);
-            toast.error(
-              exchangeError.message || "Invalid or expired reset link"
-            );
-            router.push("/auth/login");
-            return;
-          }
+      if (user) {
+        // Session already established, user can reset password
+        console.log("User session found, allowing password reset");
+        setIsValidToken(true);
+        setIsVerifying(false);
+        return;
+      }
 
+      // If no session yet, check if we have valid parameters
+      // For code-based flow, Supabase should have established session via redirect
+      // If we have a code but no session, the link might be invalid/expired
+      if (finalCode && !user) {
+        console.warn("Code parameter present but no user session found");
+        // Give it a moment - sometimes the session takes a moment to establish
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const {
+          data: { user: retryUser },
+        } = await supabase.auth.getUser();
+        if (retryUser) {
           setIsValidToken(true);
           setIsVerifying(false);
-        } catch (err) {
-          console.error("Error exchanging code:", err);
-          toast.error("Failed to verify reset link");
-          router.push("/auth/login");
+          return;
         }
-      } else if (finalTokenHash && finalType === "recovery") {
+        toast.error("Invalid or expired reset link. Please request a new one.");
+        router.push("/auth/login");
+        return;
+      }
+
+      if (finalTokenHash && finalType === "recovery") {
         // For token_hash flow, we'll verify on form submit
         setIsValidToken(true);
         setIsVerifying(false);
+      } else if (!finalCode && !finalTokenHash) {
+        // No valid parameters at all
+        toast.error("Invalid reset link");
+        router.push("/auth/login");
       }
     }
 
