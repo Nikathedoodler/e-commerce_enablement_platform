@@ -43,7 +43,7 @@ export function createServiceRoleClient() {
 
   if (!supabaseUrl || !serviceRoleKey) {
     throw new Error(
-      "Missing Supabase service role credentials. Required for webhook operations. Set SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY."
+      "Missing Supabase service role credentials. Required for webhook operations. Set SUPABASE_SECRET_KEY."
     );
   }
 

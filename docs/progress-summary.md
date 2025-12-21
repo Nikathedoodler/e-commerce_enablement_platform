@@ -294,6 +294,72 @@ This project follows a **collaborative, learning-focused development methodology
   - **Condition tracking:** Tracks good, damaged, defective, and returned items separately
   - **Multi-tenant:** RLS policies ensure users only see their own data
 
+#### ✅ Shopify Integration (Phase 3) - COMPLETE
+
+**Status:** Database ✅ | OAuth Flow ✅ | Webhook Listener ✅ | UI Components ✅ | Order Sync ✅
+
+- ✅ Database schema (`docs/migrations/009_create_shopify_stores_table.sql`)
+  - `shopify_stores` table with RLS policies
+  - Fields: id, user_id, shop_domain, access_token, scopes, status, connected_at, created_at, updated_at
+  - Unique constraint on (user_id, shop_domain)
+  - Indexes on user_id, shop_domain, status
+- ✅ TypeScript types (`src/types/shopify.ts`)
+  - `ShopifyStore` - full store connection type
+  - `ShopifyStoreInput` - create/update input type
+  - `ShopifyStoreUpdate` - partial update type
+  - `ShopifyWebhookOrder` - webhook payload type
+  - `ShopifyAddress`, `ShopifyLineItem`, `ShopifyCustomer` - supporting types
+- ✅ OAuth flow (`src/app/api/shopify/auth/route.ts` & `callback/route.ts`)
+  - OAuth initiation endpoint with state management
+  - OAuth callback handler with HMAC verification
+  - Token exchange and storage
+  - Secure cookie-based state management
+- ✅ Query helpers (`src/lib/supabase/queries/shopify.ts`)
+  - `getShopifyStores()` - fetch all connected stores
+  - `getShopifyStoreById()` - single store lookup
+  - `upsertShopifyStore()` - create or update store connection
+  - `updateShopifyStore()` - update store details
+  - `deleteShopifyStore()` - disconnect store
+- ✅ TanStack Query hooks (`src/hooks/use-shopify.ts`)
+  - `useShopifyStores()` - list stores with caching
+  - `useDeleteShopifyStore()` - mutation with cache invalidation
+- ✅ UI components
+  - `src/components/dashboard/shopify-connection-card.tsx` - Display connected stores
+  - `src/components/dashboard/shopify-connect-dialog.tsx` - Connect new store dialog
+  - Integrated into `/dashboard/settings/integrations`
+  - Success/error handling with toast notifications
+- ✅ Webhook listener (`src/app/api/webhooks/shopify/orders/route.ts`)
+  - HMAC signature verification (supports both app secret and store webhook secret)
+  - Order payload parsing and transformation
+  - Automatic order creation in database
+  - Links orders to `shop_id` and `user_id`
+  - Idempotency check (prevents duplicate orders)
+  - Error handling with detailed logging
+- ✅ Service role client (`src/lib/supabase/server.ts`)
+  - `createServiceRoleClient()` - bypasses RLS for webhook operations
+  - Uses new Supabase Secret API keys (sb*secret*...)
+- ✅ Order transformation
+  - Shopify order format → Your order format
+  - Address transformation
+  - Line items transformation
+  - Status mapping (pending/processing/fulfilled/cancelled)
+  - Financial status mapping
+- ✅ Key Features:
+  - **Automatic order syncing:** Orders from Shopify automatically appear in dashboard
+  - **Multi-store support:** Users can connect multiple Shopify stores
+  - **Secure token storage:** OAuth tokens stored securely in database
+  - **Webhook security:** HMAC verification ensures authentic requests
+  - **Idempotency:** Prevents duplicate orders from webhook retries
+  - **Error resilience:** Returns 200 on errors to prevent infinite retries
+
+**Optional Enhancements (Future):**
+
+- ⏳ Email notifications when new orders arrive (Resend/SendGrid)
+- ⏳ Real-time dashboard toast notifications for incoming orders
+- ⏳ Webhook registration via API (currently manual setup)
+- ⏳ Order status updates back to Shopify
+- ⏳ Product sync from Shopify
+
 ---
 
 ## 📁 Key Files & Structure
@@ -323,6 +389,7 @@ This project follows a **collaborative, learning-focused development methodology
 - `docs/migrations/006_create_inventory_table.sql` - Inventory table with RLS policies
 - `docs/migrations/007_seed_inventory_data.sql` - Seed data for inventory (if exists)
 - `docs/migrations/008_create_receiving_log_table.sql` - Receiving log table with RLS policies
+- `docs/migrations/009_create_shopify_stores_table.sql` - Shopify stores table with RLS policies
 
 ### Server Actions
 
@@ -333,12 +400,15 @@ This project follows a **collaborative, learning-focused development methodology
 - `src/lib/supabase/queries/orders.ts` - Order query helpers (Server Actions)
 - `src/lib/supabase/queries/inventory.ts` - Inventory query helpers (Server Actions)
 - `src/lib/supabase/queries/receiving.ts` - Receiving log query helpers (Server Actions)
+- `src/lib/supabase/queries/shopify.ts` - Shopify store query helpers (Server Actions)
 - `src/hooks/use-orders.ts` - TanStack Query hooks for orders
 - `src/hooks/use-inventory.ts` - TanStack Query hooks for inventory
 - `src/hooks/use-receiving.ts` - TanStack Query hooks for receiving logs
+- `src/hooks/use-shopify.ts` - TanStack Query hooks for Shopify stores
 - `types/orders.ts` - Order TypeScript types
 - `types/inventory.ts` - Inventory TypeScript types
 - `types/receiving.ts` - Receiving log TypeScript types
+- `types/shopify.ts` - Shopify store and webhook TypeScript types
 - `src/lib/validations/order.ts` - Zod validation schema for order creation
 - `src/lib/validations/inventory.ts` - Zod validation schema for inventory
 - `src/lib/validations/receiving.ts` - Zod validation schema for receiving logs
@@ -365,11 +435,18 @@ This project follows a **collaborative, learning-focused development methodology
 - Receiving components:
   - `src/components/dashboard/receiving-form.tsx` - Receiving entry form
   - `src/components/dashboard/receiving-history-table.tsx` - Receiving history table
+- Shopify components:
+  - `src/components/dashboard/shopify-connection-card.tsx` - Connected stores display
+  - `src/components/dashboard/shopify-connect-dialog.tsx` - Connect store dialog
 - Route pages:
   - `src/app/dashboard/orders/*` - Orders pages (all-orders, pending, fulfilled, create-order)
   - `src/app/dashboard/inventory/*` - Inventory pages (all-items, low-stock, add-new)
   - `src/app/dashboard/receiving/page.tsx` - Receiving page (form + history)
   - `src/app/dashboard/settings/*` - Settings pages (profile, integrations, billing)
+- API routes:
+  - `src/app/api/shopify/auth/route.ts` - OAuth initiation
+  - `src/app/api/shopify/auth/callback/route.ts` - OAuth callback
+  - `src/app/api/webhooks/shopify/orders/route.ts` - Order webhook handler
 
 ---
 
@@ -379,7 +456,12 @@ This project follows a **collaborative, learning-focused development methodology
 
 - `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` - Supabase publishable key
+- `SUPABASE_SECRET_KEY` - Supabase secret API key (for service role operations)
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID` - Google Analytics 4 ID
+- `SHOPIFY_API_KEY` - Shopify app API key (from Partners dashboard)
+- `SHOPIFY_API_SECRET` - Shopify app API secret (from Partners dashboard)
+- `SHOPIFY_WEBHOOK_SECRET` - Shopify store webhook secret (for manually created webhooks)
+- `SHOPIFY_APP_SCOPES` - Comma-separated OAuth scopes (optional, has defaults)
 
 ### Supabase Setup
 
@@ -403,6 +485,7 @@ This project follows a **collaborative, learning-focused development methodology
 ### 1. Orders MVP (Phase 2 Continuation) - ✅ COMPLETE
 
 **Completed:**
+
 - ✅ Database schema and migrations
 - ✅ RLS policies
 - ✅ TanStack Query setup
@@ -415,6 +498,7 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ Pending and Fulfilled pages integrated
 
 **Optional Enhancements (Future):**
+
 - ⏳ Pagination (optional - currently shows all orders)
 - ⏳ Sorting (optional - currently sorted by created_at DESC)
 
@@ -423,6 +507,7 @@ This project follows a **collaborative, learning-focused development methodology
 **Status:** Database ✅ | Query Layer ✅ | Hooks ✅ | UI Components ✅
 
 **Completed:**
+
 - ✅ Database schema (`docs/migrations/006_create_inventory_table.sql`)
 - ✅ RLS policies
 - ✅ Query helpers (`src/lib/supabase/queries/inventory.ts`)
@@ -437,6 +522,7 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ All route pages integrated and working
 
 **Optional Enhancements (Future):**
+
 - ⏳ Pagination (optional - currently shows all items)
 - ⏳ Bulk operations (import/export CSV)
 - ⏳ Advanced filtering (by location, date range)
@@ -446,6 +532,7 @@ This project follows a **collaborative, learning-focused development methodology
 **Status:** Database ✅ | Query Layer ✅ | Hooks ✅ | Validation ✅ | UI Components ✅
 
 **Completed:**
+
 - ✅ Database schema (`docs/migrations/008_create_receiving_log_table.sql`)
 - ✅ RLS policies
 - ✅ Query helpers (`src/lib/supabase/queries/receiving.ts`)
@@ -459,6 +546,7 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ Page integration (`/dashboard/receiving`)
 
 **Optional Enhancements (Future):**
+
 - ⏳ Edit/Delete receiving log entries (backend ready, UI needed)
 - ⏳ Date range filtering in history table
 - ⏳ SKU autocomplete in form
@@ -466,10 +554,34 @@ This project follows a **collaborative, learning-focused development methodology
 - ⏳ CSV export functionality
 - ⏳ Barcode scanning (QuaggaJS integration)
 
-### 4. Future Phases (Phase 3+)
+### 4. Shopify Integration (Phase 3) - ✅ COMPLETE
 
-- Shopify OAuth integration
-- Webhook handlers for order ingestion
+**Status:** Database ✅ | OAuth Flow ✅ | Webhook Listener ✅ | UI Components ✅ | Order Sync ✅
+
+**Completed:**
+
+- ✅ Database schema (`docs/migrations/009_create_shopify_stores_table.sql`)
+- ✅ RLS policies
+- ✅ OAuth flow (initiation and callback handlers)
+- ✅ Query helpers (`src/lib/supabase/queries/shopify.ts`)
+- ✅ TanStack Query hooks (`src/hooks/use-shopify.ts`)
+- ✅ TypeScript types (`types/shopify.ts`)
+- ✅ UI components (connection card and connect dialog)
+- ✅ Webhook listener with HMAC verification
+- ✅ Order transformation and automatic syncing
+- ✅ Service role client for webhook operations
+- ✅ Integration page (`/dashboard/settings/integrations`)
+
+**Optional Enhancements (Future):**
+
+- ⏳ Email notifications when new orders arrive (Resend/SendGrid)
+- ⏳ Real-time dashboard toast notifications for incoming orders
+- ⏳ Webhook registration via API (currently manual setup)
+- ⏳ Order status updates back to Shopify
+- ⏳ Product sync from Shopify
+
+### 5. Future Phases (Phase 4+)
+
 - Shipping integration (DHL)
 - Stripe billing integration
 
@@ -522,8 +634,16 @@ This project follows a **collaborative, learning-focused development methodology
 ---
 
 **Phase 2 Status: ✅ COMPLETE**
+
 - ✅ Orders MVP: All CRUD operations implemented and working
 - ✅ Inventory MVP: All CRUD operations, view/edit, low stock tracking
 - ✅ Receiving Module: Complete with automatic inventory integration
 
-**Next: Phase 3 - Shopify Integration & Webhooks**
+**Phase 3 Status: ✅ COMPLETE**
+
+- ✅ Shopify OAuth: Connect/disconnect stores via OAuth flow
+- ✅ Webhook Listener: Automatic order syncing from Shopify
+- ✅ UI Components: Store connection management in settings
+- ✅ Order Transformation: Shopify orders → Your order format
+
+**Next: Phase 4 - Shipping Integration (DHL) & Billing (Stripe)**
