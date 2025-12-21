@@ -19,22 +19,68 @@ function ResetPasswordContent() {
   const [loading, setLoading] = useState(false);
   const [passwordUpdated, setPasswordUpdated] = useState(false);
   const [isValidToken, setIsValidToken] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Check for either code (new flow) or token_hash + type (old flow)
-    const code = searchParams.get("code");
-    const tokenHash = searchParams.get("token_hash");
-    const type = searchParams.get("type");
+    async function verifyToken() {
+      const code = searchParams.get("code");
+      const tokenHash = searchParams.get("token_hash");
+      const type = searchParams.get("type");
 
-    if (code || (tokenHash && type === "recovery")) {
-      setIsValidToken(true);
-    } else {
-      // If we're on the reset password page without valid params, redirect to login
-      toast.error("Invalid or missing reset token");
-      router.push("/auth/login");
+      // Debug: log all URL parameters
+      console.log("Reset password page - URL params:", {
+        code,
+        tokenHash,
+        type,
+        allParams: Object.fromEntries(searchParams.entries()),
+      });
+
+      // If no token parameters, redirect to login
+      if (!code && (!tokenHash || type !== "recovery")) {
+        console.log("No valid token parameters found:", {
+          code,
+          tokenHash,
+          type,
+        });
+        toast.error("Invalid or missing reset token");
+        router.push("/auth/login");
+        return;
+      }
+
+      const supabase = createClient();
+
+      // Handle code-based flow - exchange code for session immediately
+      if (code) {
+        try {
+          const { error: exchangeError } =
+            await supabase.auth.exchangeCodeForSession(code);
+
+          if (exchangeError) {
+            console.error("Code exchange error:", exchangeError);
+            toast.error(
+              exchangeError.message || "Invalid or expired reset link"
+            );
+            router.push("/auth/login");
+            return;
+          }
+
+          setIsValidToken(true);
+          setIsVerifying(false);
+        } catch (err) {
+          console.error("Error exchanging code:", err);
+          toast.error("Failed to verify reset link");
+          router.push("/auth/login");
+        }
+      } else if (tokenHash && type === "recovery") {
+        // For token_hash flow, we'll verify on form submit
+        setIsValidToken(true);
+        setIsVerifying(false);
+      }
     }
+
+    verifyToken();
   }, [searchParams, router]);
 
   const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -58,26 +104,14 @@ function ResetPasswordContent() {
         return;
       }
 
-      const code = searchParams.get("code");
       const tokenHash = searchParams.get("token_hash");
       const type = searchParams.get("type");
 
       const supabase = createClient();
 
-      // Handle code-based flow (newer Supabase auth)
-      if (code) {
-        // Exchange code for session first
-        const { error: exchangeError } =
-          await supabase.auth.exchangeCodeForSession(code);
-
-        if (exchangeError) {
-          console.error("Code exchange error:", exchangeError);
-          toast.error(exchangeError.message || "Invalid reset code");
-          setLoading(false);
-          return;
-        }
-      } else if (tokenHash && type === "recovery") {
-        // Handle token_hash flow (older method)
+      // For code-based flow, the session is already established in useEffect
+      // For token_hash flow, verify the OTP now
+      if (tokenHash && type === "recovery") {
         const { error: verifyError } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
           type: "recovery",
@@ -89,10 +123,6 @@ function ResetPasswordContent() {
           setLoading(false);
           return;
         }
-      } else {
-        toast.error("Invalid reset token");
-        setLoading(false);
-        return;
       }
 
       // Update the password
@@ -138,13 +168,16 @@ function ResetPasswordContent() {
     );
   }
 
-  if (!isValidToken) {
+  if (isVerifying || !isValidToken) {
     return (
       <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-sm">
           <Card>
             <CardHeader>
-              <CardTitle>Loading...</CardTitle>
+              <CardTitle>Verifying reset link...</CardTitle>
+              <CardDescription>
+                Please wait while we verify your password reset link.
+              </CardDescription>
             </CardHeader>
           </Card>
         </div>
