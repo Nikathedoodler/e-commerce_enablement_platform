@@ -13,6 +13,8 @@ import { useSubscription } from "@/hooks/use-subscriptions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { planFeatures, planComparisonRows } from "@/lib/constants/plans";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const planNames: Record<string, string> = {
   starter: "Starter",
@@ -29,6 +31,7 @@ const planPrices: Record<string, string> = {
 export default function BillingPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [isBillingLoading, setIsBillingLoading] = useState(false);
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
   const { data: subscription, isLoading, error } = useSubscription();
 
   const handleCheckout = async (
@@ -288,8 +291,106 @@ export default function BillingPage() {
               </Button>
             </div>
           </div>
+          <div className="flex justify-center mt-6">
+            <Button
+              variant="outline"
+              onClick={() => setIsComparisonOpen(!isComparisonOpen)}
+              className="flex items-center gap-2"
+            >
+              {isComparisonOpen ? (
+                <>
+                  <ChevronUp className="h-4 w-4" />
+                  Hide Comparison
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="h-4 w-4" />
+                  Compare Plans
+                </>
+              )}
+            </Button>
+          </div>
         </CardContent>
       </Card>
+
+      {/* Plan Comparison Table */}
+      {isComparisonOpen && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Plan Comparison</CardTitle>
+            <CardDescription>
+              Compare features across all plans. Your current plan is
+              highlighted.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th className="text-left px-4 py-3 text-sm font-semibold text-muted-foreground border-b">
+                      Feature
+                    </th>
+                    {planFeatures.map((plan) => {
+                      const isCurrentPlan =
+                        subscription?.plan_tier === plan.tier;
+                      return (
+                        <th
+                          key={plan.tier}
+                          className={`text-left px-4 py-3 text-sm font-semibold border-b ${
+                            isCurrentPlan
+                              ? "bg-primary/10 border-primary/20"
+                              : ""
+                          }`}
+                        >
+                          <div className="flex flex-col gap-1">
+                            <span className="text-base font-bold">
+                              {plan.name}
+                            </span>
+                            {isCurrentPlan && (
+                              <Badge variant="default" className="w-fit">
+                                Current Plan
+                              </Badge>
+                            )}
+                          </div>
+                        </th>
+                      );
+                    })}
+                  </tr>
+                </thead>
+                <tbody>
+                  {planComparisonRows.map((row, idx) => (
+                    <tr
+                      key={row.label}
+                      className={
+                        idx % 2 === 0 ? "bg-muted/30" : "bg-background"
+                      }
+                    >
+                      <td className="px-4 py-3 text-sm font-medium text-muted-foreground">
+                        {row.label}
+                      </td>
+                      {planFeatures.map((plan) => {
+                        const isCurrentPlan =
+                          subscription?.plan_tier === plan.tier;
+                        return (
+                          <td
+                            key={`${plan.tier}-${row.key}`}
+                            className={`px-4 py-3 text-sm ${
+                              isCurrentPlan ? "bg-primary/5 font-medium" : ""
+                            }`}
+                          >
+                            {plan[row.key]}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
