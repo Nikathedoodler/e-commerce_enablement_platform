@@ -28,6 +28,7 @@ const planPrices: Record<string, string> = {
 
 export default function BillingPage() {
   const [loading, setLoading] = useState<string | null>(null);
+  const [isBillingLoading, setIsBillingLoading] = useState(false);
   const { data: subscription, isLoading, error } = useSubscription();
 
   const handleCheckout = async (
@@ -65,6 +66,36 @@ export default function BillingPage() {
     }
   };
 
+  const handleBilling = async () => {
+    setIsBillingLoading(true);
+
+    try {
+      const response = await fetch("/api/stripe/portal", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(
+          `Error: ${data.error || "Failed to create portal session"}`
+        );
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error("billing error", error);
+      toast.error("Failed to redirect to billing");
+    } finally {
+      setIsBillingLoading(false);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -85,7 +116,14 @@ export default function BillingPage() {
       {/* Current Subscription */}
       <Card>
         <CardHeader>
-          <CardTitle>Current Subscription</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Current Subscription</CardTitle>
+            {subscription?.stripe_customer_id && (
+              <Button disabled={isBillingLoading} onClick={handleBilling}>
+                {isBillingLoading ? "Loading..." : "Manage Billing"}
+              </Button>
+            )}
+          </div>
           <CardDescription>
             Your active subscription plan and billing information
           </CardDescription>
