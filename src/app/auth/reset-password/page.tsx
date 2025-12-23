@@ -78,7 +78,6 @@ function ResetPasswordContent() {
       // Check if user is already authenticated from the redirect
       const {
         data: { user },
-        error: userError,
       } = await supabase.auth.getUser();
 
       if (user) {

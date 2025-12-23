@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { createServiceRoleClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { checkOrderLimitForUser } from "@/lib/utils/usage-limits";
 import type {
   ShopifyWebhookOrder,

@@ -246,7 +246,7 @@ export default function BillingPage() {
                       {percentage >= 80 && percentage < 100 && (
                         <div className="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-3">
                           <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                            You're approaching your order limit (
+                            You&apos;re approaching your order limit (
                             {usage.remaining} remaining). Consider upgrading to
                             avoid interruptions.
                           </p>
@@ -268,7 +268,7 @@ export default function BillingPage() {
           ) : (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                You don't have an active subscription yet.
+                You don&apos;t have an active subscription yet.
               </p>
               <p className="text-sm font-medium">
                 Choose a plan below to get started.

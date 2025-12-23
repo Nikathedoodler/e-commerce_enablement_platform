@@ -1,8 +1,7 @@
 import { getSubscriptionPeriodOrderCount } from "../supabase/queries/orders";
 import { getSubscription } from "../supabase/queries/subscriptions";
 import { getPlanLimit } from "../constants/plans";
-import { createServiceRoleClient } from "../supabase/server";
-import type { Subscription } from "@/types/stripe";
+import { createServiceRoleClient } from "../supabase/service-role";
 
 export interface UsageLimitResult {
   allowed: boolean;
