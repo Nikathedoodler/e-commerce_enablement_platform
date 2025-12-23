@@ -72,3 +72,19 @@ export const planComparisonRows = [
   { label: "Support", key: "support" as const },
   { label: "Setup fee", key: "setupFee" as const },
 ];
+
+export function getPlanLimit(planTier: PlanTier): number {
+  if (planTier === "starter") {
+    return 250;
+  }
+
+  if (planTier === "professional") {
+    return 2000;
+  }
+
+  if (planTier === "enterprise") {
+    return 999999;
+  }
+
+  return 0;
+}

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import type { Order, OrderInput, OrderUpdate } from "@/types/orders";
+import { getSubscription } from "./subscriptions";
 
 export async function getOrders(filters?: {
   status?: string;
@@ -151,7 +152,9 @@ export async function deleteOrder(id: string) {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError || !user) return { error: "Not authenticated", data: null };
+  if (userError || !user) {
+    return { error: "Not authenticated", data: null };
+  }
 
   const { data, error } = await supabase
     .from("orders")
@@ -164,4 +167,45 @@ export async function deleteOrder(id: string) {
     return { error: "Failed To Delete", details: error.message, data: null };
 
   return { data: data as Order, error: null };
+}
+
+export async function getSubscriptionPeriodOrderCount() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { error: "Not Authenticated", data: null };
+  }
+
+  const { data, error } = await getSubscription();
+
+  if (error) {
+    return { error: error, data: null };
+  }
+
+  if (!data) {
+    return { data: 0, error: null };
+  }
+
+  // Query orders within the subscription period
+  const { count, error: countError } = await supabase
+    .from("orders")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .gte("created_at", data.current_period_start)
+    .lt("created_at", data.current_period_end);
+
+  if (countError) {
+    return {
+      error: "Failed to count orders",
+      details: countError.message,
+      data: null,
+    };
+  }
+
+  return { data: count ?? 0, error: null };
 }

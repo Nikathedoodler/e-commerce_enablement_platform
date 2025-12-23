@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { planFeatures, planComparisonRows } from "@/lib/constants/plans";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useUsageLimits } from "@/hooks/use-usage-limits";
 
 const planNames: Record<string, string> = {
   starter: "Starter",
@@ -33,6 +34,13 @@ export default function BillingPage() {
   const [isBillingLoading, setIsBillingLoading] = useState(false);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
   const { data: subscription, isLoading, error } = useSubscription();
+  const {
+    data: usage,
+    isLoading: usageLoading,
+    error: usageError,
+  } = useUsageLimits();
+
+  const percentage = usage?.limit ? (usage.current / usage.limit) * 100 : 0;
 
   const handleCheckout = async (
     planTier: "starter" | "professional" | "enterprise"
@@ -167,7 +175,7 @@ export default function BillingPage() {
                   </p>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center gap-10 text-sm">
                 <div>
                   <p className="text-muted-foreground">Current Period Start</p>
                   <p className="font-medium">
@@ -181,6 +189,73 @@ export default function BillingPage() {
                   </p>
                 </div>
               </div>
+
+              {/* Usage Limits Section */}
+              {usageLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-2 w-full" />
+                </div>
+              ) : usageError ? (
+                <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-3">
+                  <p className="text-sm text-red-800 dark:text-red-200">
+                    Failed to load usage data: {usageError.message}
+                  </p>
+                </div>
+              ) : usage ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <p className="text-muted-foreground">Order Usage</p>
+                    <p className="font-medium">
+                      {usage.isUnlimited ? (
+                        <span>
+                          {usage.current} orders{" "}
+                          <span className="text-muted-foreground">
+                            (Unlimited)
+                          </span>
+                        </span>
+                      ) : (
+                        <span>
+                          {usage.current} / {usage.limit} orders
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  {!usage.isUnlimited && (
+                    <>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all ${
+                            percentage >= 100
+                              ? "bg-red-500"
+                              : percentage >= 80
+                              ? "bg-yellow-500"
+                              : "bg-green-500"
+                          }`}
+                          style={{ width: `${Math.min(percentage, 100)}%` }}
+                        />
+                      </div>
+                      {percentage >= 100 && (
+                        <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-3">
+                          <p className="text-sm text-red-800 dark:text-red-200">
+                            Order limit exceeded. Please upgrade to continue
+                            processing orders.
+                          </p>
+                        </div>
+                      )}
+                      {percentage >= 80 && percentage < 100 && (
+                        <div className="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-3">
+                          <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                            You're approaching your order limit (
+                            {usage.remaining} remaining). Consider upgrading to
+                            avoid interruptions.
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              ) : null}
               {subscription.cancel_at_period_end && (
                 <div className="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-3">
                   <p className="text-sm text-yellow-800 dark:text-yellow-200">
