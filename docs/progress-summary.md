@@ -454,6 +454,7 @@ This project follows a **collaborative, learning-focused development methodology
   - `src/app/api/shopify/auth/callback/route.ts` - OAuth callback
   - `src/app/api/webhooks/shopify/orders/route.ts` - Order webhook handler
   - `src/app/api/stripe/checkout/route.ts` - Stripe checkout session creation
+  - `src/app/api/stripe/portal/route.ts` - Stripe Customer Portal session creation
   - `src/app/api/webhooks/stripe/route.ts` - Stripe webhook handler
 - UI Components:
   - `src/components/ui/badge.tsx` - Badge component for status indicators
@@ -631,13 +632,24 @@ This project follows a **collaborative, learning-focused development methodology
   - `getSubscription()` - fetch current user's subscription
   - `upsertSubscription()` - create or update subscription
   - `updateSubscription()` - update subscription details
+- ✅ Usage limits utilities (`src/lib/utils/usage-limits.ts`)
+  - `checkOrderLimit()` - check limits for authenticated user
+  - `checkOrderLimitForUser()` - check limits for specific user_id (webhooks)
+  - Returns usage data: current, limit, remaining, allowed status
+- ✅ Order counting (`src/lib/supabase/queries/orders.ts`)
+  - `getSubscriptionPeriodOrderCount()` - count orders in subscription billing period
 - ✅ TanStack Query hooks (`src/hooks/use-subscriptions.ts`)
   - `useSubscription()` - fetch subscription with auto-refresh
+- ✅ Usage limits hooks (`src/hooks/use-usage-limits.ts`)
+  - `useUsageLimits()` - fetch usage data with auto-refresh
 - ✅ Billing UI (`src/app/dashboard/settings/billing/page.tsx`)
   - Shows current subscription status and plan details
   - Displays billing period (start/end dates)
   - Shows cancellation notice if cancel_at_period_end is true
   - Plan upgrade/change options with current plan highlighting
+  - Usage limits display with progress bar and warnings
+  - Plan comparison table (toggleable)
+  - "Manage Billing" button for Stripe Customer Portal
   - Loading states and error handling
   - Empty state for users without subscription
 - ✅ Badge component (`src/components/ui/badge.tsx`)
@@ -647,6 +659,10 @@ This project follows a **collaborative, learning-focused development methodology
   - Reset password page with token verification
   - Updated login form with "Forgot password?" link
   - Uses Supabase's built-in password reset flow
+- ✅ Plan constants (`src/lib/constants/plans.ts`)
+  - `planFeatures` - array of all plan features and details
+  - `planComparisonRows` - comparison table row definitions
+  - `getPlanLimit()` - function to get order limit for plan tier
 - ✅ Key Features:
   - **Automatic subscription management:** Webhooks automatically sync subscription status
   - **Secure checkout:** Stripe Checkout handles payment securely
@@ -654,12 +670,32 @@ This project follows a **collaborative, learning-focused development methodology
   - **Multi-plan support:** Starter, Growth, and Scale Pro plans
   - **Billing period tracking:** Shows current billing period dates
   - **Cancellation handling:** Tracks if subscription will cancel at period end
+  - **Usage limits:** Enforced based on subscription billing period (not calendar month)
+  - **Customer portal:** Direct access to Stripe's billing management interface
+  - **Plan comparison:** Side-by-side feature comparison with current plan highlighting
+  - **Order blocking:** Prevents order creation when limits exceeded (UI + webhook)
+
+**Additional Features Completed:**
+
+- ✅ Stripe Customer Portal integration (`src/app/api/stripe/portal/route.ts`)
+  - API route to create portal sessions
+  - "Manage Billing" button in billing page
+  - Allows users to manage payment methods, view invoices, and update billing info
+- ✅ Plan comparison table (`src/lib/constants/plans.ts`, `src/app/dashboard/settings/billing/page.tsx`)
+  - Toggleable comparison table showing all plan features
+  - Current plan highlighting with badge
+  - Side-by-side feature comparison (order volume, integrations, support, etc.)
+- ✅ Usage limits enforcement (`src/lib/utils/usage-limits.ts`, `src/hooks/use-usage-limits.ts`)
+  - Plan limits defined: Starter (250), Growth (2000), Enterprise (unlimited)
+  - Order counting based on subscription billing period (not calendar month)
+  - Usage display on billing page with progress bar and warnings
+  - Real-time updates via query invalidation
+  - Enforcement in Shopify webhook (blocks orders when limit exceeded)
+  - Create Order page blocking with error card and upgrade button
+  - Server-side limit checking for webhook operations
 
 **Optional Enhancements (Future):**
 
-- ⏳ Stripe Customer Portal integration (manage billing/payment methods)
-- ⏳ Plan comparison table with features
-- ⏳ Usage limits enforcement (e.g., 250 orders/month for Starter)
 - ⏳ Email notifications for subscription changes
 - ⏳ Invoice history display
 
@@ -736,5 +772,8 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ Webhook Handler: Automatic subscription sync from Stripe
 - ✅ Billing UI: Full subscription management interface
 - ✅ Password Recovery: Forgot/reset password functionality
+- ✅ Customer Portal: Direct access to Stripe billing management
+- ✅ Plan Comparison: Toggleable feature comparison table
+- ✅ Usage Limits: Complete enforcement system with display and blocking
 
 **Next: Phase 6 - Shipping Integration (DHL) & Advanced Features**
