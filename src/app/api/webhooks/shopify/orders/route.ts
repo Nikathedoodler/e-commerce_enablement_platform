@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { createServiceRoleClient } from "@/lib/supabase/server";
+import { checkOrderLimitForUser } from "@/lib/utils/usage-limits";
 import type {
   ShopifyWebhookOrder,
   ShopifyAddress,
@@ -203,6 +204,28 @@ export async function POST(req: NextRequest) {
       );
     }
     console.log("Shop found:", shop.id, "user_id:", shop.user_id);
+
+    // Check usage limits before creating order
+    const usageCheck = await checkOrderLimitForUser(shop.user_id);
+    if (usageCheck.error) {
+      console.error("Failed to check usage limits:", usageCheck.error);
+      // Continue anyway - don't block orders if we can't check limits
+    } else if (usageCheck.data && !usageCheck.data.allowed) {
+      console.warn(
+        `Order limit exceeded for user ${shop.user_id}. Current: ${usageCheck.data.current}/${usageCheck.data.limit}`
+      );
+      // Return 200 to prevent Shopify from retrying, but don't create the order
+      return NextResponse.json(
+        {
+          received: true,
+          error: "Order limit exceeded",
+          message: `Order limit of ${usageCheck.data.limit} orders has been reached. Please upgrade your plan to continue processing orders.`,
+          current: usageCheck.data.current,
+          limit: usageCheck.data.limit,
+        },
+        { status: 200 }
+      );
+    }
 
     // Check if order already exists (idempotency)
     // Use shopify order name (e.g., "#1001") as unique identifier

@@ -55,6 +55,8 @@ export function useCreateOrder() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      // Invalidate usage limits so billing page updates immediately
+      queryClient.invalidateQueries({ queryKey: ["usage-limits"] });
     },
   });
 }
@@ -96,6 +98,8 @@ export function useOrderDelete() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      // Invalidate usage limits so billing page updates immediately
+      queryClient.invalidateQueries({ queryKey: ["usage-limits"] });
     },
   });
 }
