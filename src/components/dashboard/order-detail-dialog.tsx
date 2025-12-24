@@ -21,7 +21,10 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useUpdateOrder } from "@/hooks/use-orders";
+import { useShippingLabelsByOrderId } from "@/hooks/use-shipping";
 import { toast } from "sonner";
+import { GenerateLabelDialog } from "./generate-label-dialog";
+import { Badge } from "@/components/ui/badge";
 
 type OrderDetailDialogProps = {
   orderItem: Order | null;
@@ -37,7 +40,12 @@ export function OrderDetailDialog({
   statusColor,
 }: OrderDetailDialogProps) {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [generateLabelOpen, setGenerateLabelOpen] = useState(false);
   const updateOrder = useUpdateOrder();
+  
+  // Fetch shipping labels for this order
+  const { data: shippingLabels, isLoading: labelsLoading } =
+    useShippingLabelsByOrderId(orderItem?.id || "");
 
   if (!orderItem) return null;
 
@@ -220,8 +228,81 @@ export function OrderDetailDialog({
             </CardContent>
           </Card>
 
-          {/* Tracking Number */}
-          {orderItem.tracking_number && (
+          {/* Shipping Labels */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">
+                  Shipping Labels
+                  {shippingLabels && shippingLabels.length > 0 && (
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">
+                      ({shippingLabels.length})
+                    </span>
+                  )}
+                </CardTitle>
+                <Button
+                  size="sm"
+                  onClick={() => setGenerateLabelOpen(true)}
+                  disabled={!orderItem.shipping_address}
+                >
+                  {shippingLabels && shippingLabels.length > 0
+                    ? "Generate Another Label"
+                    : "Generate Label"}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {labelsLoading ? (
+                <p className="text-sm text-muted-foreground">Loading labels...</p>
+              ) : shippingLabels && shippingLabels.length > 0 ? (
+                <div className="space-y-3">
+                  {shippingLabels.map((label) => (
+                    <div
+                      key={label.id}
+                      className="rounded-lg border p-4 space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{label.carrier}</Badge>
+                          <span className="text-sm font-medium">
+                            {label.tracking_number}
+                          </span>
+                        </div>
+                        <span className="text-sm font-semibold">
+                          {label.cost.toFixed(2)} {label.carrier === "DHL" ? "EUR" : ""}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span>
+                          Generated:{" "}
+                          {new Date(label.generated_at).toLocaleDateString()}
+                        </span>
+                        {label.label_url && (
+                          <a
+                            href={label.label_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            Download Label
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-sm text-muted-foreground">
+                    No shipping labels generated yet. Click "Generate Label" above to create one.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Tracking Number (Legacy - will be replaced by labels) */}
+          {orderItem.tracking_number && !shippingLabels?.length && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Tracking Information</CardTitle>
@@ -264,6 +345,16 @@ export function OrderDetailDialog({
             </CardContent>
           </Card>
         </div>
+
+        {/* Generate Label Dialog */}
+        <GenerateLabelDialog
+          order={orderItem}
+          open={generateLabelOpen}
+          onOpenChange={setGenerateLabelOpen}
+          onSuccess={() => {
+            // Labels will auto-refresh via query invalidation
+          }}
+        />
       </DialogContent>
     </Dialog>
   );
