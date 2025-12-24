@@ -5,7 +5,6 @@ import type {
   DHLRate,
   DHLLabelRequest,
   DHLLabelResponse,
-  DHLServiceType,
 } from "@/types/shipping";
 
 /**
@@ -25,7 +24,7 @@ const DHL_CONFIG = {
  * Returns realistic test data for development
  */
 async function mockCalculateRates(
-  request: DHLRateRequest
+  _request: DHLRateRequest
 ): Promise<{ rates: DHLRate[]; error: null }> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 500));
@@ -71,7 +70,7 @@ async function mockCalculateRates(
  * TODO: Replace mock with actual DHL API call when credentials are ready
  */
 async function realCalculateRates(
-  request: DHLRateRequest
+  _request: DHLRateRequest
 ): Promise<{ rates: DHLRate[]; error: string | null }> {
   try {
     // TODO: Implement actual DHL API call
@@ -98,7 +97,7 @@ async function realCalculateRates(
       return { rates: [], error: error.message || "Failed to calculate rates" };
     }
 
-    const data = await response.json();
+    await response.json();
     // Transform DHL API response to our DHLRate[] format
     return { rates: [], error: null };
   } catch (error) {
@@ -155,7 +154,7 @@ async function mockGenerateLabel(
  * TODO: Replace mock with actual DHL API call when credentials are ready
  */
 async function realGenerateLabel(
-  request: DHLLabelRequest
+  _request: DHLLabelRequest
 ): Promise<{ label: DHLLabelResponse; error: string | null }> {
   try {
     // TODO: Implement actual DHL API call
@@ -185,7 +184,7 @@ async function realGenerateLabel(
       };
     }
 
-    const data = await response.json();
+    await response.json();
     // Transform DHL API response to our DHLLabelResponse format
     return { label: {} as DHLLabelResponse, error: null };
   } catch (error) {

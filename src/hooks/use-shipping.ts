@@ -15,7 +15,7 @@ import type {
   DHLRateRequest,
   DHLLabelRequest,
 } from "@/types/shipping";
-import type { DHLRate, DHLLabelResponse } from "@/types/shipping";
+import type { DHLRate } from "@/types/shipping";
 
 type ShippingLabelsFilters = {
   orderId?: string;

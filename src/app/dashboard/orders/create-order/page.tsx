@@ -123,7 +123,8 @@ const CreateOrder = () => {
               </CardTitle>
             </div>
             <CardDescription className="text-red-800 dark:text-red-200">
-              You've reached your plan's order limit for this billing period.
+              You&apos;ve reached your plan&apos;s order limit for this billing
+              period.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

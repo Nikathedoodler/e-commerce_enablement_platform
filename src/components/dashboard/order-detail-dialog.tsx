@@ -294,7 +294,7 @@ export function OrderDetailDialog({
               ) : (
                 <div className="text-center py-4">
                   <p className="text-sm text-muted-foreground">
-                    No shipping labels generated yet. Click "Generate Label" above to create one.
+                    No shipping labels generated yet. Click &quot;Generate Label&quot; above to create one.
                   </p>
                 </div>
               )}
