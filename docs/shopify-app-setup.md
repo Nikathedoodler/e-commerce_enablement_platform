@@ -39,10 +39,12 @@ After creating the app, you'll need to configure the app details in the **Versio
 2. You'll see your current version (e.g., "e-commerce-enablement-platform-1")
 3. Click on the version or click **"New version"** to create/edit a version
 4. In the version settings, you'll find:
-   - **App URL**: Your application's base URL (e.g., `https://yourdomain.com`)
+   - **App URL**: Your application's base URL (e.g., `https://ai-privacy-compliance.vercel.app`)
    - **Allowed redirection URL(s)**: Where Shopify redirects after OAuth
-     - Add: `https://yourdomain.com/api/shopify/auth/callback`
+     - For production: `https://ai-privacy-compliance.vercel.app/api/shopify/auth/callback`
+     - For development: `http://localhost:3000/api/shopify/auth/callback`
      - You can add multiple URLs (one per line) for different environments
+     - **Important**: The redirect URI is automatically generated from the request origin, so make sure the domain you're accessing matches what's configured here
    - **API scopes**: The permissions your app needs
 
 **Required scopes for your app:**
@@ -84,8 +86,9 @@ SHOPIFY_API_SECRET=your_api_secret_here
 # Optional: Custom scopes (defaults to read_orders,write_orders,read_products)
 SHOPIFY_APP_SCOPES=read_orders,write_orders,read_products
 
-# Optional: Custom redirect URI (defaults to /api/shopify/auth/callback)
-SHOPIFY_APP_REDIRECT_URI=https://yourdomain.com/api/shopify/auth/callback
+# Note: Redirect URI is automatically generated from request origin
+# No need to set SHOPIFY_APP_REDIRECT_URI - it will use the domain you're accessing
+# Make sure your Shopify app's "Allowed redirection URL(s)" includes your production domain
 ```
 
 ## Step 7: Development vs Production

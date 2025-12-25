@@ -48,9 +48,8 @@ export async function GET(req: NextRequest) {
     const scopes =
       process.env.SHOPIFY_APP_SCOPES ||
       "read_customers,read_inventory,read_orders,write_orders,read_products,write_products";
-    const redirectUri =
-      process.env.SHOPIFY_APP_REDIRECT_URI ||
-      `${req.nextUrl.origin}/api/shopify/auth/callback`;
+    // Always use the request origin to ensure it matches the actual domain being used
+    const redirectUri = `${req.nextUrl.origin}/api/shopify/auth/callback`;
 
     // Debug logging (remove after fixing)
     console.log("Shopify OAuth - Redirect URI:", redirectUri);

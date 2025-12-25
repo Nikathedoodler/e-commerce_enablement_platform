@@ -61,19 +61,19 @@ SHOPIFY_API_KEY=your_api_key
 SHOPIFY_API_SECRET=your_api_secret
 SHOPIFY_WEBHOOK_SECRET=your_webhook_secret
 SHOPIFY_APP_SCOPES=read_orders,write_orders,read_products
-SHOPIFY_APP_REDIRECT_URI=https://yourdomain.com/api/shopify/auth/callback
 ```
 
 **Description:**
-- `SHOPIFY_API_KEY`: Shopify app API key
-- `SHOPIFY_API_SECRET`: Shopify app API secret
+- `SHOPIFY_API_KEY`: Shopify app API key (Client ID from Partners dashboard)
+- `SHOPIFY_API_SECRET`: Shopify app API secret (from Partners dashboard)
 - `SHOPIFY_WEBHOOK_SECRET`: Webhook secret (for manually created webhooks)
 - `SHOPIFY_APP_SCOPES`: Comma-separated OAuth scopes (has defaults)
-- `SHOPIFY_APP_REDIRECT_URI`: OAuth callback URL (has default)
 
 **Defaults:**
 - `SHOPIFY_APP_SCOPES`: `read_customers,read_inventory,read_orders,write_orders,read_products,write_products`
-- `SHOPIFY_APP_REDIRECT_URI`: Auto-detected from request origin
+- **Redirect URI**: Automatically generated from request origin (no need to set `SHOPIFY_APP_REDIRECT_URI`)
+  - Production: `https://ai-privacy-compliance.vercel.app/api/shopify/auth/callback`
+  - Development: `http://localhost:3000/api/shopify/auth/callback`
 
 ---
 
