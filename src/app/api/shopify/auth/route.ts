@@ -52,6 +52,10 @@ export async function GET(req: NextRequest) {
       process.env.SHOPIFY_APP_REDIRECT_URI ||
       `${req.nextUrl.origin}/api/shopify/auth/callback`;
 
+    // Debug logging (remove after fixing)
+    console.log("Shopify OAuth - Redirect URI:", redirectUri);
+    console.log("Shopify OAuth - Request origin:", req.nextUrl.origin);
+
     if (!apiKey || !apiSecret) {
       console.error("Missing Shopify API credentials");
       return NextResponse.json(

@@ -18,6 +18,7 @@
 ## Authentication & Access
 
 ### Sign Up Flow
+
 - [ ] Can create new account
 - [ ] Email confirmation link works
 - [ ] Can log in after confirmation
@@ -25,6 +26,7 @@
 - [ ] Company name displays correctly
 
 ### Login Flow
+
 - [ ] Can log in with email/password
 - [ ] Invalid credentials show error
 - [ ] "Forgot Password" link works
@@ -32,6 +34,7 @@
 - [ ] Can reset password successfully
 
 ### Access Control
+
 - [ ] Cannot access dashboard without login
 - [ ] Redirects to login when not authenticated
 - [ ] Logout works correctly
@@ -42,6 +45,7 @@
 ## Orders Management
 
 ### Create Order (Manual)
+
 - [ ] Can navigate to "Create Order" page
 - [ ] Form validation works (required fields)
 - [ ] Can add multiple order items
@@ -52,6 +56,7 @@
 - [ ] Order number is auto-generated if not provided
 
 ### View Orders
+
 - [ ] "All Orders" page loads
 - [ ] Orders are displayed correctly
 - [ ] Can search orders by order number
@@ -61,6 +66,7 @@
 - [ ] "Fulfilled" page shows only fulfilled orders
 
 ### Order Details
+
 - [ ] Can open order detail dialog
 - [ ] All order information displays correctly
 - [ ] Customer information shows
@@ -71,6 +77,7 @@
 - [ ] Status update saves successfully
 
 ### Delete Order
+
 - [ ] Can delete an order
 - [ ] Confirmation dialog appears
 - [ ] Order is removed after deletion
@@ -81,6 +88,7 @@
 ## Shopify Integration
 
 ### Connect Store
+
 - [ ] Can navigate to Integrations page
 - [ ] "Connect Store" button works
 - [ ] Can enter Shopify store domain
@@ -90,6 +98,7 @@
 - [ ] Connection status shows correctly
 
 ### Order Sync (if Shopify connected)
+
 - [ ] Create test order in Shopify
 - [ ] Order appears in dashboard (within 1-2 minutes)
 - [ ] Order information is correct
@@ -102,6 +111,7 @@
 ## Inventory Management
 
 ### Add Inventory
+
 - [ ] Can navigate to "Add New" page
 - [ ] Form validation works
 - [ ] Can create inventory item
@@ -110,6 +120,7 @@
 - [ ] Quantity is saved correctly
 
 ### View Inventory
+
 - [ ] "All Items" page loads
 - [ ] Can search by SKU
 - [ ] Can search by product name
@@ -117,6 +128,7 @@
 - [ ] Low stock items show correct badge
 
 ### Edit Inventory
+
 - [ ] Can open inventory item dialog
 - [ ] Can edit all fields inline
 - [ ] Changes save successfully
@@ -124,6 +136,7 @@
 - [ ] Low stock badge updates when threshold crossed
 
 ### Delete Inventory
+
 - [ ] Can delete inventory item
 - [ ] Confirmation dialog appears
 - [ ] Item is removed after deletion
@@ -133,6 +146,7 @@
 ## Receiving Module
 
 ### Log Receiving
+
 - [ ] Can navigate to Receiving page
 - [ ] Form validation works
 - [ ] Can log receiving entry
@@ -141,6 +155,7 @@
 - [ ] New SKU is created if doesn't exist
 
 ### Receiving History
+
 - [ ] History table displays entries
 - [ ] Can search by SKU
 - [ ] Can search by notes
@@ -152,6 +167,7 @@
 ## Shipping Labels
 
 ### Generate Label
+
 - [ ] Can open order detail dialog
 - [ ] "Generate Label" button is visible
 - [ ] Can open label generation dialog
@@ -166,6 +182,7 @@
 - [ ] Can download label PDF (if URL provided)
 
 ### Multiple Labels
+
 - [ ] Can generate second label for same order
 - [ ] Both labels appear in list
 - [ ] Label count shows correctly "(2)"
@@ -175,6 +192,7 @@
 ## Billing & Subscriptions
 
 ### View Billing
+
 - [ ] Can navigate to Billing page
 - [ ] Current subscription displays (if subscribed)
 - [ ] Plan details show correctly
@@ -183,6 +201,7 @@
 - [ ] Plan comparison table works
 
 ### Checkout Flow (if testing)
+
 - [ ] Can click "Subscribe" or "Upgrade"
 - [ ] Redirects to Stripe Checkout
 - [ ] Can complete checkout (test mode)
@@ -190,6 +209,7 @@
 - [ ] Subscription status updates
 
 ### Customer Portal
+
 - [ ] "Manage Billing" button works
 - [ ] Redirects to Stripe Customer Portal
 - [ ] Can manage payment methods
@@ -200,16 +220,19 @@
 ## Error Handling
 
 ### Network Errors
+
 - [ ] Handles network disconnection gracefully
 - [ ] Shows appropriate error messages
 - [ ] Doesn't crash the app
 
 ### Validation Errors
+
 - [ ] Form validation shows clear errors
 - [ ] Required fields are marked
 - [ ] Invalid data shows helpful messages
 
 ### Not Found
+
 - [ ] Accessing non-existent order shows error
 - [ ] Invalid IDs handled gracefully
 
@@ -236,17 +259,31 @@
 ## Notes Section
 
 **Issues Found:**
-- [ ] Issue 1: _______________________
-- [ ] Issue 2: _______________________
-- [ ] Issue 3: _______________________
+
+- [ ] Issue 1: Company name displayed incorrectly. Still renders “My company” at the top and “company“ under it
+  - steps: 1. Open sign up page, fill company name in registration form. Create account and open dashboard.
+  - screens: company_name.png
+- [ ] Issue 2: Password resent did send email but on the first try it took 5 minutes. On second try received immediately.
+  - Workaround: Maybe show notification for user to wait 10 minutes to receive email?
+- [ ] Issue 3: 3. Clicking link on confimation email transfers to the landing page. It should transfer to the dashboard.
+  - Workaround: change link so it transfers to dashboard route.
+  - [ ] Issue 4: Order detail dialog sometimes shows horizontal scroll.
+    - screens: Order-dialog.png
+    - workaround: dialog window size should not be fixed so It can accomodate content without horizonal scroll
+  - [ ] Issue 3:
+  - [ ] Issue 3:
+  - [ ] Issue 3:
+  - [ ] Issue 3:
 
 **Critical Issues (Blockers):**
-- [ ] _______________________
-- [ ] _______________________
+
+- [ ] ***
+- [ ] ***
 
 **Non-Critical Issues (Can Fix Later):**
-- [ ] _______________________
-- [ ] _______________________
+
+- [ ] ***
+- [ ] ***
 
 ---
 
@@ -256,11 +293,10 @@
 - [ ] Critical issues documented
 - [ ] Ready to proceed to pilot prep (if no blockers)
 
-**Tested By**: _______________________  
-**Date**: _______________________  
+**Tested By**: \***\*\*\*\*\***\_\_\_\***\*\*\*\*\***  
+**Date**: \***\*\*\*\*\***\_\_\_\***\*\*\*\*\***  
 **Status**: ⏳ Not Started | 🔄 In Progress | ✅ Complete
 
 ---
 
 **Next Step**: If no critical blockers, proceed to [Pilot Launch Preparation Checklist](./pilot-launch-preparation-checklist.md)
-
