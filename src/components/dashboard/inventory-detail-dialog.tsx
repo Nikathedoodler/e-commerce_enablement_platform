@@ -151,7 +151,7 @@ export function InventoryDetailDialog({
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <Field>
                   <FieldLabel htmlFor="quantity">
-                    Quantity <span className="text-destructive">*</span>
+                    Quantity
                   </FieldLabel>
                   <FieldDescription>
                     Current stock quantity available
@@ -172,8 +172,7 @@ export function InventoryDetailDialog({
 
                 <Field>
                   <FieldLabel htmlFor="reorder_threshold">
-                    Reorder Threshold{" "}
-                    <span className="text-destructive">*</span>
+                    Reorder Threshold
                   </FieldLabel>
                   <FieldDescription>
                     Alert when quantity falls to or below this number

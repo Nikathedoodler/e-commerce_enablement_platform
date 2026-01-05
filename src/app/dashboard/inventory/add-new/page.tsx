@@ -34,7 +34,7 @@ export default function AddNewItemPage() {
     defaultValues: {
       sku: "",
       name: "",
-      quantity: 0,
+      quantity: 1,
       location: "",
       reorder_threshold: 0,
     },
@@ -137,13 +137,13 @@ export default function AddNewItemPage() {
                       Quantity <span className="text-destructive">*</span>
                     </FieldLabel>
                     <FieldDescription>
-                      Current stock quantity available
+                      Current stock quantity available (minimum: 1)
                     </FieldDescription>
                     <Input
                       id="quantity"
                       type="number"
-                      min="0"
-                      placeholder="0"
+                      min="1"
+                      placeholder="1"
                       {...register("quantity", { valueAsNumber: true })}
                     />
                     {errors.quantity && (
@@ -153,11 +153,10 @@ export default function AddNewItemPage() {
 
                   <Field>
                     <FieldLabel htmlFor="reorder_threshold">
-                      Reorder Threshold{" "}
-                      <span className="text-destructive">*</span>
+                      Reorder Threshold
                     </FieldLabel>
                     <FieldDescription>
-                      Alert when quantity falls to or below this number
+                      Alert when quantity falls to or below this number (default: 0)
                     </FieldDescription>
                     <Input
                       id="reorder_threshold"
