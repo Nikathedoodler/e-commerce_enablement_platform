@@ -264,7 +264,7 @@
   - steps: 1. Open sign up page, fill company name in registration form. Create account and open dashboard.
   - screens: company_name.png
 - [ ] Issue 2: Password resent did send email but on the first try it took 5 minutes. On second try received immediately.
-  - Workaround: Maybe show notification for user to wait 10 minutes to receive email?
+  - Workaround: after password reset, show notification for user that they will receive email in few minutes.
 - [ ] Issue 3: 3. Clicking link on confimation email transfers to the landing page. It should transfer to the dashboard.
   - Workaround: change link so it transfers to dashboard route.
   - [ ] Issue 4: Order detail dialog sometimes shows horizontal scroll.
