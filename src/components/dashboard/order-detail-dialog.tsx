@@ -338,14 +338,22 @@ export function OrderDetailDialog({
                         key={label.id}
                         className="rounded-lg border p-4 space-y-2"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline">{label.carrier}</Badge>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-1">
+                            <div className="flex items-center justify-between sm:justify-start gap-2">
+                              <Badge variant="outline" className="w-fit">
+                                {label.carrier}
+                              </Badge>
+                              <span className="text-sm font-semibold sm:hidden">
+                                {label.cost.toFixed(2)}{" "}
+                                {label.carrier === "DHL" ? "EUR" : ""}
+                              </span>
+                            </div>
                             <span className="text-sm font-medium">
                               {label.tracking_number}
                             </span>
                           </div>
-                          <span className="text-sm font-semibold">
+                          <span className="text-sm font-semibold hidden sm:inline">
                             {label.cost.toFixed(2)}{" "}
                             {label.carrier === "DHL" ? "EUR" : ""}
                           </span>

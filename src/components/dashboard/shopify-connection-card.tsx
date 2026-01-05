@@ -178,10 +178,10 @@ export function ShopifyConnectionCard({
             {data?.map((store, index) => (
               <div key={store.id}>
                 {index > 0 && <Separator className="my-4" />}
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1 space-y-2">
                     {/* Store Domain */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-semibold text-base">
                         {store.shop_domain}
                       </h3>
@@ -206,7 +206,7 @@ export function ShopifyConnectionCard({
                         <p className="text-xs text-muted-foreground mb-1">
                           Permissions:
                         </p>
-                        <p className="text-xs font-mono bg-muted px-2 py-1 rounded">
+                        <p className="text-xs font-mono bg-muted px-2 py-1 rounded break-words">
                           {formatScopes(store.scopes)}
                         </p>
                       </div>
@@ -221,7 +221,7 @@ export function ShopifyConnectionCard({
                       setStoreToDisconnect(store);
                       setDisconnectDialogOpen(true);
                     }}
-                    className="text-destructive hover:text-destructive"
+                    className="text-destructive hover:text-destructive w-full sm:w-auto"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Disconnect
