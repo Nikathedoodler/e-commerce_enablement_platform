@@ -63,7 +63,7 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between gap-4">
         <div className="flex gap-4 items-center">
           <Input
             placeholder="Search orders or email..."
@@ -125,68 +125,70 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
           )}
         </div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Order #</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {orders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell>{order.order_number}</TableCell>
-                <TableCell>{order.customer_email}</TableCell>
-                <TableCell>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                      order.status
-                    )}`}
-                  >
-                    {order.status}
-                  </span>
-                </TableCell>
-                <TableCell>${order.total.toFixed(2)}</TableCell>
-                <TableCell>
-                  {new Date(order.created_at).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      console.log("View order:", order);
-                      setSelectedOrder(order);
-                      setIsViewDialogOpen(true);
-                    }}
-                  >
-                    View
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant={"destructive"}
-                    size="icon"
-                    onClick={() => {
-                      setSelectedOrder(order);
-                      setIsDeleteDialogOpen(true);
-                    }}
-                  >
-                    <Trash2 />
-                  </Button>
-                </TableCell>
+        <div className="overflow-x-auto md:overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order #</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {orders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell>{order.order_number}</TableCell>
+                  <TableCell>{order.customer_email}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        order.status
+                      )}`}
+                    >
+                      {order.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>${order.total.toFixed(2)}</TableCell>
+                  <TableCell>
+                    {new Date(order.created_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        console.log("View order:", order);
+                        setSelectedOrder(order);
+                        setIsViewDialogOpen(true);
+                      }}
+                    >
+                      View
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant={"destructive"}
+                      size="icon"
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                    >
+                      <Trash2 />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
       <OrderDetailDialog
         orderItem={selectedOrder}
