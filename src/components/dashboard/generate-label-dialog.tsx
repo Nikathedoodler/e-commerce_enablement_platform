@@ -102,15 +102,15 @@ export function GenerateLabelDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-lg md:max-w-2xl max-h-[90vh] overflow-y-auto w-full p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>Generate Shipping Label</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-base sm:text-lg">Generate Shipping Label</DialogTitle>
+          <DialogDescription className="text-sm">
             Generate a DHL shipping label for order {order.order_number}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {/* Service Type */}
           <Field>
             <FieldLabel>
@@ -153,7 +153,7 @@ export function GenerateLabelDialog({
           </Field>
 
           {/* Package Dimensions (Optional) */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <Field>
               <FieldLabel>Length (cm)</FieldLabel>
               <Input
@@ -230,17 +230,19 @@ export function GenerateLabelDialog({
           )}
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={generateLabel.isPending}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
             <Button
               onClick={handleGenerate}
               disabled={generateLabel.isPending || !packageWeight}
+              className="w-full sm:w-auto"
             >
               {generateLabel.isPending ? "Generating..." : "Generate Label"}
             </Button>

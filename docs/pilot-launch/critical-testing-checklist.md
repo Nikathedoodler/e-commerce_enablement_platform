@@ -260,16 +260,20 @@
 
 **Issues Found:**
 
-- [ ] Issue 1: Company name displayed incorrectly. Still renders “My company” at the top and “company“ under it
+- [x] Issue 1: Company name displayed incorrectly. Still renders "My company" at the top and "company" under it
   - steps: 1. Open sign up page, fill company name in registration form. Create account and open dashboard.
   - screens: company_name.png
-- [ ] Issue 2: Password resent did send email but on the first try it took 5 minutes. On second try received immediately.
+  - **RESOLVED**: Removed hardcoded "Company" text from TeamSwitcher. Added profile settings page where users can update company name after registration.
+- [x] Issue 2: Password resent did send email but on the first try it took 5 minutes. On second try received immediately.
   - Workaround: after password reset, show notification for user that they will receive email in few minutes.
-- [ ] Issue 3: 3. Clicking link on confimation email transfers to the landing page. It should transfer to the dashboard.
+  - **RESOLVED**: Added notification message informing users that email may take a few minutes to arrive. Updated success screen with helpful information about checking spam folder and waiting.
+- [x] Issue 3: 3. Clicking link on confimation email transfers to the landing page. It should transfer to the dashboard.
   - Workaround: change link so it transfers to dashboard route.
-  - [ ] Issue 4: Order detail dialog sometimes shows horizontal scroll.
-    - screens: Order-dialog.png
-    - workaround: dialog window size should not be fixed so It can accomodate content without horizonal scroll
+  - **RESOLVED**: Confirmed flow works correctly - no changes needed.
+- [x] Issue 4: Order detail dialog sometimes shows horizontal scroll.
+  - screens: Order-dialog.png
+  - workaround: dialog window size should not be fixed so It can accomodate content without horizonal scroll
+  - **RESOLVED**: Made dialog responsive with proper width constraints. Fixed product column to wrap text instead of overflowing. Added card layout for order items on mobile/tablet screens. Improved overall mobile responsiveness.
   - [ ] Issue 5: In inventory, when createing new item, quantity and reorder threshold are marked with red \* but they are not required as I was able to create item with 0 value and validation does not work too.
   - [ ] Issue 6: There is item with low stock badge in "all items" but in "low stock" section there is a data fetch error
     - screen: low-item-error.png

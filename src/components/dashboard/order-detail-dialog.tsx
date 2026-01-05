@@ -42,7 +42,7 @@ export function OrderDetailDialog({
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [generateLabelOpen, setGenerateLabelOpen] = useState(false);
   const updateOrder = useUpdateOrder();
-  
+
   // Fetch shipping labels for this order
   const { data: shippingLabels, isLoading: labelsLoading } =
     useShippingLabelsByOrderId(orderItem?.id || "");
@@ -75,31 +75,39 @@ export function OrderDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 flex-wrap">
-            <span>Order {orderItem.order_number}</span>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor(
-                orderItem.status
-              )}`}
-            >
-              {orderItem.status}
-            </span>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                orderItem.financial_status === "paid"
-                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                  : orderItem.financial_status === "refunded" ||
-                    orderItem.financial_status === "partially_refunded"
-                  ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                  : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
-              }`}
-            >
-              {orderItem.financial_status}
-            </span>
+      <DialogContent className="max-w-[95vw] sm:max-w-2xl md:max-w-3xl max-h-[90vh] w-full overflow-hidden flex flex-col p-4 sm:p-6">
+        <DialogHeader className="flex-shrink-0 text-center sm:text-left">
+          <DialogTitle className="text-base sm:text-lg">
+            Order {orderItem.order_number}
           </DialogTitle>
-          <DialogDescription>
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 mt-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Status:</span>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor(
+                  orderItem.status
+                )}`}
+              >
+                {orderItem.status}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Payment:</span>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  orderItem.financial_status === "paid"
+                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                    : orderItem.financial_status === "refunded" ||
+                      orderItem.financial_status === "partially_refunded"
+                    ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                    : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+                }`}
+              >
+                {orderItem.financial_status}
+              </span>
+            </div>
+          </div>
+          <DialogDescription className="mt-2">
             Placed on{" "}
             {new Date(orderItem.created_at).toLocaleDateString("en-US", {
               year: "numeric",
@@ -111,239 +119,317 @@ export function OrderDetailDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Customer Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Customer Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-1">
-                <p className="font-medium">{orderItem.customer_email}</p>
-                {orderItem.shipping_address?.name && (
-                  <p className="text-sm text-muted-foreground">
-                    {orderItem.shipping_address.name}
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Order Items */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Order Items</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>SKU</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead className="text-right">Quantity</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                    <TableHead className="text-right">Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {orderItem.items.map((item, index) => (
-                    <TableRow key={`${item.sku}-${index}`}>
-                      <TableCell className="font-mono text-sm">
-                        {item.sku}
-                      </TableCell>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="text-right">
-                        {item.quantity}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        ${item.price.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        ${calculateItemTotal(item).toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-
-          {/* Shipping Address */}
-          {orderItem.shipping_address && (
-            <Card>
+        <div className="flex-1 overflow-y-auto overflow-x-auto min-w-0">
+          <div className="space-y-4 min-w-fit">
+            {/* Customer Information */}
+            <Card className="min-w-0 w-full">
               <CardHeader>
-                <CardTitle className="text-lg">Shipping Address</CardTitle>
+                <CardTitle className="text-base sm:text-lg">
+                  Customer Information
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-1">
-                  {orderItem.shipping_address.name && (
-                    <p className="font-medium">
+                  <p className="font-medium">{orderItem.customer_email}</p>
+                  {orderItem.shipping_address?.name && (
+                    <p className="text-sm text-muted-foreground">
                       {orderItem.shipping_address.name}
-                    </p>
-                  )}
-                  <p className="text-sm">
-                    {orderItem.shipping_address.address1}
-                  </p>
-                  {orderItem.shipping_address.address2 && (
-                    <p className="text-sm">
-                      {orderItem.shipping_address.address2}
-                    </p>
-                  )}
-                  <p className="text-sm">
-                    {orderItem.shipping_address.city}
-                    {orderItem.shipping_address.state &&
-                      `, ${orderItem.shipping_address.state}`}{" "}
-                    {orderItem.shipping_address.zip}
-                  </p>
-                  <p className="text-sm">
-                    {orderItem.shipping_address.country}
-                  </p>
-                  {orderItem.shipping_address.phone && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Phone: {orderItem.shipping_address.phone}
                     </p>
                   )}
                 </div>
               </CardContent>
             </Card>
-          )}
 
-          {/* Order Totals */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between font-semibold">
-                  <span>Total</span>
-                  <span>${orderItem.total.toFixed(2)}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Shipping Labels */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">
-                  Shipping Labels
-                  {shippingLabels && shippingLabels.length > 0 && (
-                    <span className="ml-2 text-sm font-normal text-muted-foreground">
-                      ({shippingLabels.length})
-                    </span>
-                  )}
+            {/* Order Items */}
+            <Card className="min-w-0 w-full">
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">
+                  Order Items
                 </CardTitle>
-                <Button
-                  size="sm"
-                  onClick={() => setGenerateLabelOpen(true)}
-                  disabled={!orderItem.shipping_address}
-                >
-                  {shippingLabels && shippingLabels.length > 0
-                    ? "Generate Another Label"
-                    : "Generate Label"}
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {labelsLoading ? (
-                <p className="text-sm text-muted-foreground">Loading labels...</p>
-              ) : shippingLabels && shippingLabels.length > 0 ? (
-                <div className="space-y-3">
-                  {shippingLabels.map((label) => (
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                {/* Mobile/Tablet: Card Layout */}
+                <div className="block md:hidden space-y-3">
+                  {orderItem.items.map((item, index) => (
                     <div
-                      key={label.id}
-                      className="rounded-lg border p-4 space-y-2"
+                      key={`${item.sku}-${index}`}
+                      className="border rounded-lg p-3 space-y-2"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">{label.carrier}</Badge>
-                          <span className="text-sm font-medium">
-                            {label.tracking_number}
-                          </span>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm break-words">
+                            {item.name}
+                          </p>
+                          <p className="font-mono text-xs text-muted-foreground mt-1">
+                            SKU: {item.sku}
+                          </p>
                         </div>
-                        <span className="text-sm font-semibold">
-                          {label.cost.toFixed(2)} {label.carrier === "DHL" ? "EUR" : ""}
-                        </span>
                       </div>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span>
-                          Generated:{" "}
-                          {new Date(label.generated_at).toLocaleDateString()}
-                        </span>
-                        {label.label_url && (
-                          <a
-                            href={label.label_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
-                          >
-                            Download Label
-                          </a>
-                        )}
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 text-sm">
+                        <div className="space-y-1 w-full sm:w-auto">
+                          <div className="flex justify-between gap-4">
+                            <span className="text-muted-foreground">
+                              Quantity:
+                            </span>
+                            <span className="font-medium">{item.quantity}</span>
+                          </div>
+                          <div className="flex justify-between gap-4">
+                            <span className="text-muted-foreground">
+                              Price:
+                            </span>
+                            <span>${item.price.toFixed(2)}</span>
+                          </div>
+                        </div>
+                        <div className="text-left sm:text-right w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0">
+                          <div className="text-xs text-muted-foreground">
+                            Total
+                          </div>
+                          <div className="font-semibold text-base">
+                            ${calculateItemTotal(item).toFixed(2)}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-sm text-muted-foreground">
-                    No shipping labels generated yet. Click &quot;Generate Label&quot; above to create one.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
 
-          {/* Tracking Number (Legacy - will be replaced by labels) */}
-          {orderItem.tracking_number && !shippingLabels?.length && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Tracking Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="font-mono text-sm">{orderItem.tracking_number}</p>
+                {/* Desktop: Table Layout */}
+                <div className="hidden md:block overflow-x-auto -mx-4 sm:-mx-6 px-4 sm:px-6">
+                  <Table className="table-fixed w-full">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">SKU</TableHead>
+                        <TableHead className="w-[200px]">Product</TableHead>
+                        <TableHead className="text-right w-[80px]">
+                          Quantity
+                        </TableHead>
+                        <TableHead className="text-right w-[100px]">
+                          Price
+                        </TableHead>
+                        <TableHead className="text-right w-[100px]">
+                          Total
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {orderItem.items.map((item, index) => (
+                        <TableRow key={`${item.sku}-${index}`}>
+                          <TableCell className="font-mono text-sm">
+                            {item.sku}
+                          </TableCell>
+                          <TableCell className="font-medium w-[200px] overflow-hidden">
+                            <div className="break-words whitespace-normal">
+                              {item.name}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {item.quantity}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ${item.price.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            ${calculateItemTotal(item).toFixed(2)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
-          )}
 
-          {/* Status Update */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Update Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-3 items-center">
-                <select
-                  value={selectedStatus || orderItem.status}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="h-9 rounded-md border border-input bg-transparent px-3 flex-1 max-w-xs"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="processing">Processing</option>
-                  <option value="fulfilled">Fulfilled</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-                <Button
-                  onClick={handleStatusUpdate}
-                  disabled={
-                    !selectedStatus ||
-                    selectedStatus === orderItem.status ||
-                    updateOrder.isPending
-                  }
-                  size="sm"
-                >
-                  {updateOrder.isPending ? "Updating..." : "Update Status"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Shipping Address */}
+            {orderItem.shipping_address && (
+              <Card className="min-w-0 w-full">
+                <CardHeader>
+                  <CardTitle className="text-base sm:text-lg">
+                    Shipping Address
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-1">
+                    {orderItem.shipping_address.name && (
+                      <p className="font-medium">
+                        {orderItem.shipping_address.name}
+                      </p>
+                    )}
+                    <p className="text-sm">
+                      {orderItem.shipping_address.address1}
+                    </p>
+                    {orderItem.shipping_address.address2 && (
+                      <p className="text-sm">
+                        {orderItem.shipping_address.address2}
+                      </p>
+                    )}
+                    <p className="text-sm">
+                      {orderItem.shipping_address.city}
+                      {orderItem.shipping_address.state &&
+                        `, ${orderItem.shipping_address.state}`}{" "}
+                      {orderItem.shipping_address.zip}
+                    </p>
+                    <p className="text-sm">
+                      {orderItem.shipping_address.country}
+                    </p>
+                    {orderItem.shipping_address.phone && (
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Phone: {orderItem.shipping_address.phone}
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Order Totals */}
+            <Card className="min-w-0 w-full">
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">
+                  Order Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>${subtotal.toFixed(2)}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between font-semibold">
+                    <span>Total</span>
+                    <span>${orderItem.total.toFixed(2)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Shipping Labels */}
+            <Card className="min-w-0 w-full">
+              <CardHeader>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <CardTitle className="text-base sm:text-lg">
+                    Shipping Labels
+                    {shippingLabels && shippingLabels.length > 0 && (
+                      <span className="ml-2 text-sm font-normal text-muted-foreground">
+                        ({shippingLabels.length})
+                      </span>
+                    )}
+                  </CardTitle>
+                  <Button
+                    size="sm"
+                    onClick={() => setGenerateLabelOpen(true)}
+                    disabled={!orderItem.shipping_address}
+                  >
+                    {shippingLabels && shippingLabels.length > 0
+                      ? "Generate Another Label"
+                      : "Generate Label"}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {labelsLoading ? (
+                  <p className="text-sm text-muted-foreground">
+                    Loading labels...
+                  </p>
+                ) : shippingLabels && shippingLabels.length > 0 ? (
+                  <div className="space-y-3">
+                    {shippingLabels.map((label) => (
+                      <div
+                        key={label.id}
+                        className="rounded-lg border p-4 space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline">{label.carrier}</Badge>
+                            <span className="text-sm font-medium">
+                              {label.tracking_number}
+                            </span>
+                          </div>
+                          <span className="text-sm font-semibold">
+                            {label.cost.toFixed(2)}{" "}
+                            {label.carrier === "DHL" ? "EUR" : ""}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span>
+                            Generated:{" "}
+                            {new Date(label.generated_at).toLocaleDateString()}
+                          </span>
+                          {label.label_url && (
+                            <a
+                              href={label.label_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              Download Label
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-muted-foreground">
+                      No shipping labels generated yet. Click &quot;Generate
+                      Label&quot; above to create one.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Tracking Number (Legacy - will be replaced by labels) */}
+            {orderItem.tracking_number && !shippingLabels?.length && (
+              <Card className="min-w-0 w-full">
+                <CardHeader>
+                  <CardTitle className="text-base sm:text-lg">
+                    Tracking Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="font-mono text-sm">
+                    {orderItem.tracking_number}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Status Update */}
+            <Card className="min-w-0 w-full">
+              <CardHeader>
+                <CardTitle className="text-base sm:text-lg">
+                  Update Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-3 items-center">
+                  <select
+                    value={selectedStatus || orderItem.status}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="h-9 rounded-md border border-input bg-transparent px-3 flex-1 max-w-xs"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="fulfilled">Fulfilled</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                  <Button
+                    onClick={handleStatusUpdate}
+                    disabled={
+                      !selectedStatus ||
+                      selectedStatus === orderItem.status ||
+                      updateOrder.isPending
+                    }
+                    size="sm"
+                  >
+                    {updateOrder.isPending ? "Updating..." : "Update Status"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Generate Label Dialog */}
