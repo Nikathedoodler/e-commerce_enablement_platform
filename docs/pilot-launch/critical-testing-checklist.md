@@ -274,11 +274,13 @@
   - screens: Order-dialog.png
   - workaround: dialog window size should not be fixed so It can accomodate content without horizonal scroll
   - **RESOLVED**: Made dialog responsive with proper width constraints. Fixed product column to wrap text instead of overflowing. Added card layout for order items on mobile/tablet screens. Improved overall mobile responsiveness.
-  - [ ] Issue 5: In inventory, when createing new item, quantity and reorder threshold are marked with red \* but they are not required as I was able to create item with 0 value and validation does not work too.
+  - [x] Issue 5: In inventory, when createing new item, quantity and reorder threshold are marked with red \* but they are not required as I was able to create item with 0 value and validation does not work too.
+    - **RESOLVED**: Quantity is properly required (min 1) with validation, and reorder threshold correctly does not have a red asterisk as it's optional (can be 0). Validation schema enforces quantity >= 1 for new items.
   - [ ] Issue 6: There is item with low stock badge in "all items" but in "low stock" section there is a data fetch error
     - screen: low-item-error.png
-  - [ ] Issue 7: when generating label, weight is required field but is is automaticlhy field with value 0.1 so user can skip this field and generate value. also when input changed to 0, label is not generated but validation does not show as well.
-  - workaround: Maybe It is better value to be 0 at the start or even empty input. give suggestions which is better.
+  - [x] Issue 7: when generating label, weight is required field but is is automaticlhy field with value 0.1 so user can skip this field and generate value. also when input changed to 0, label is not generated but validation does not show as well.
+    - workaround: Maybe It is better value to be 0 at the start or even empty input. give suggestions which is better.
+    - **RESOLVED**: Weight field now starts empty (not pre-filled with 0.1). Validation properly checks for empty values, NaN, and values <= 0, showing appropriate error messages. User must enter a valid weight > 0 to generate label.
   - [ ] Issue 8:
 
 **Critical Issues (Blockers):**
