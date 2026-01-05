@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Order } from "@/types/orders";
 import type { DHLLabelRequest, DHLServiceType } from "@/types/shipping";
 import {
@@ -12,7 +12,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Field, FieldLabel, FieldDescription } from "@/components/ui/field";
+import {
+  Field,
+  FieldLabel,
+  FieldDescription,
+  FieldError,
+} from "@/components/ui/field";
 import { useGenerateDHLLabel } from "@/hooks/use-shipping";
 import { toast } from "sonner";
 
@@ -43,15 +48,52 @@ export function GenerateLabelDialog({
 }: GenerateLabelDialogProps) {
   const [serviceType, setServiceType] =
     useState<DHLServiceType>("EXPRESS_WORLDWIDE");
-  const [packageWeight, setPackageWeight] = useState<string>("1.0");
+  const [packageWeight, setPackageWeight] = useState<string>("");
   const [packageLength, setPackageLength] = useState<string>("");
   const [packageWidth, setPackageWidth] = useState<string>("");
   const [packageHeight, setPackageHeight] = useState<string>("");
   const [packageDescription, setPackageDescription] = useState<string>("");
+  const [weightError, setWeightError] = useState<string>("");
 
   const generateLabel = useGenerateDHLLabel();
 
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!open) {
+      setPackageWeight("");
+      setPackageLength("");
+      setPackageWidth("");
+      setPackageHeight("");
+      setPackageDescription("");
+      setWeightError("");
+      setServiceType("EXPRESS_WORLDWIDE");
+    }
+  }, [open]);
+
   if (!order) return null;
+
+  const validateWeight = (value: string): string => {
+    if (!value || value.trim() === "") {
+      return "Package weight is required";
+    }
+    const weight = parseFloat(value);
+    if (isNaN(weight)) {
+      return "Please enter a valid number";
+    }
+    if (weight <= 0) {
+      return "Package weight must be greater than 0";
+    }
+    return "";
+  };
+
+  const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPackageWeight(value);
+    // Clear error when user starts typing
+    if (weightError) {
+      setWeightError("");
+    }
+  };
 
   const handleGenerate = async () => {
     if (!order.shipping_address) {
@@ -59,11 +101,14 @@ export function GenerateLabelDialog({
       return;
     }
 
-    const weight = parseFloat(packageWeight);
-    if (isNaN(weight) || weight <= 0) {
-      toast.error("Package weight must be greater than 0");
+    // Validate weight
+    const error = validateWeight(packageWeight);
+    if (error) {
+      setWeightError(error);
       return;
     }
+
+    const weight = parseFloat(packageWeight);
 
     // Build label request
     const labelRequest: DHLLabelRequest = {
@@ -104,7 +149,9 @@ export function GenerateLabelDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] sm:max-w-lg md:max-w-2xl max-h-[90vh] overflow-y-auto w-full p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="text-base sm:text-lg">Generate Shipping Label</DialogTitle>
+          <DialogTitle className="text-base sm:text-lg">
+            Generate Shipping Label
+          </DialogTitle>
           <DialogDescription className="text-sm">
             Generate a DHL shipping label for order {order.order_number}
           </DialogDescription>
@@ -144,11 +191,13 @@ export function GenerateLabelDialog({
               step="0.1"
               min="0.1"
               value={packageWeight}
-              onChange={(e) => setPackageWeight(e.target.value)}
-              placeholder="1.0"
+              onChange={handleWeightChange}
+              placeholder="Enter weight (e.g., 1.5)"
+              className={weightError ? "border-destructive" : ""}
             />
+            {weightError && <FieldError>{weightError}</FieldError>}
             <FieldDescription>
-              Total weight of the package in kilograms
+              Total weight of the package in kilograms (required)
             </FieldDescription>
           </Field>
 
@@ -241,7 +290,11 @@ export function GenerateLabelDialog({
             </Button>
             <Button
               onClick={handleGenerate}
-              disabled={generateLabel.isPending || !packageWeight}
+              disabled={
+                generateLabel.isPending ||
+                !packageWeight ||
+                !!validateWeight(packageWeight)
+              }
               className="w-full sm:w-auto"
             >
               {generateLabel.isPending ? "Generating..." : "Generate Label"}
