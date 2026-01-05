@@ -270,10 +270,12 @@
   - [ ] Issue 4: Order detail dialog sometimes shows horizontal scroll.
     - screens: Order-dialog.png
     - workaround: dialog window size should not be fixed so It can accomodate content without horizonal scroll
-  - [ ] Issue 3:
-  - [ ] Issue 3:
-  - [ ] Issue 3:
-  - [ ] Issue 3:
+  - [ ] Issue 5: In inventory, when createing new item, quantity and reorder threshold are marked with red \* but they are not required as I was able to create item with 0 value and validation does not work too.
+  - [ ] Issue 6: There is item with low stock badge in "all items" but in "low stock" section there is a data fetch error
+    - screen: low-item-error.png
+  - [ ] Issue 7: when generating label, weight is required field but is is automaticlhy field with value 0.1 so user can skip this field and generate value. also when input changed to 0, label is not generated but validation does not show as well.
+  - workaround: Maybe It is better value to be 0 at the start or even empty input. give suggestions which is better.
+  - [ ] Issue 8:
 
 **Critical Issues (Blockers):**
 
