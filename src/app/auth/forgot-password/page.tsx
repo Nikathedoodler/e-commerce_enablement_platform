@@ -51,7 +51,9 @@ export default function ForgotPasswordPage() {
 
       // Note: Supabase returns success even if email sending fails
       // The email will only be sent if SMTP is configured in Supabase dashboard
-      toast.success("Password reset email sent! Check your inbox.");
+      toast.success(
+        "Password reset email sent! Please check your inbox (including spam folder). The email may take a few minutes to arrive."
+      );
       setEmailSent(true);
     } catch (err) {
       console.error("Error resetting password:", err);
@@ -73,7 +75,17 @@ export default function ForgotPasswordPage() {
                 email to reset your password.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              <div className="rounded-lg border bg-muted/50 p-4 text-sm">
+                <p className="font-medium mb-2">Please note:</p>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>The email may take a few minutes to arrive</li>
+                  <li>
+                    Check your spam or junk folder if you don&apos;t see it
+                  </li>
+                  <li>Please wait before requesting another email</li>
+                </ul>
+              </div>
               <Link href="/auth/login">
                 <Button variant="outline" className="w-full">
                   Back to login
@@ -94,7 +106,7 @@ export default function ForgotPasswordPage() {
             <CardTitle>Reset your password</CardTitle>
             <CardDescription>
               Enter your email address and we&apos;ll send you a link to reset
-              your password.
+              your password. The email may take a few minutes to arrive.
             </CardDescription>
           </CardHeader>
           <CardContent>
