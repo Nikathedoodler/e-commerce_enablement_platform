@@ -91,7 +91,7 @@ export function InventoryDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-lg md:max-w-2xl max-h-[90vh] overflow-y-auto w-full p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 flex-wrap">
             <span>{displayItem.name}</span>
@@ -150,9 +150,7 @@ export function InventoryDetailDialog({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <Field>
-                  <FieldLabel htmlFor="quantity">
-                    Quantity
-                  </FieldLabel>
+                  <FieldLabel htmlFor="quantity">Quantity</FieldLabel>
                   <FieldDescription>
                     Current stock quantity available
                   </FieldDescription>

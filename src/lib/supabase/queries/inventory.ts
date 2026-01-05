@@ -31,10 +31,8 @@ export async function getInventoryItems(filters?: {
     );
   }
 
-  if (filters?.lowStockOnly) {
-    query = query.filter("quantity", "lte", "reorder_threshold");
-  }
-
+  // Note: Supabase PostgREST doesn't support column-to-column comparisons
+  // We'll filter low stock items client-side after fetching
   const { data, error } = await query;
 
   if (error)
@@ -44,7 +42,17 @@ export async function getInventoryItems(filters?: {
       data: null,
     };
 
-  return { data: data as InventoryItem[], error: null };
+  let filteredData = (data as InventoryItem[]) || [];
+
+  // Filter low stock items client-side if requested
+  // Low stock = quantity <= reorder_threshold
+  if (filters?.lowStockOnly) {
+    filteredData = filteredData.filter(
+      (item) => item.quantity <= item.reorder_threshold
+    );
+  }
+
+  return { data: filteredData, error: null };
 }
 
 export async function getInventoryItemById(id: string) {
