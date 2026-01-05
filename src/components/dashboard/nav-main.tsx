@@ -16,6 +16,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
 
@@ -36,6 +37,7 @@ export function NavMain({
   onSelect?: (main: string, sub?: string) => void;
 }) {
   const router = useRouter();
+  const { setOpenMobile } = useSidebar();
   const slugify = (value: string) =>
     value
       .trim()
@@ -74,6 +76,7 @@ export function NavMain({
                             const mainSlug = slugify(item.title);
                             const subSlug = slugify(subItem.title);
                             router.push(`/dashboard/${mainSlug}/${subSlug}`);
+                            setOpenMobile(false);
                           }}
                         >
                           <a href={subItem.url}>
@@ -94,6 +97,7 @@ export function NavMain({
                   e.preventDefault();
                   const mainSlug = slugify(item.title);
                   router.push(`/dashboard/${mainSlug}`);
+                  setOpenMobile(false);
                 }}
               >
                 {item.icon && <item.icon />}

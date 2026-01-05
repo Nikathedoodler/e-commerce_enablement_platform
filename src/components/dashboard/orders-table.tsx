@@ -63,13 +63,13 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-4 items-center">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex gap-4 items-center justify-between w-full md:w-auto">
           <Input
             placeholder="Search orders or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="max-w-sm"
+            className="hidden md:block md:max-w-sm"
           />
           {isAllOrdersPage && (
             <select
@@ -84,13 +84,27 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
               <option value="cancelled">Cancelled</option>
             </select>
           )}
+          <Button
+            className="cursor-pointer md:hidden"
+            onClick={() => router.push("/dashboard/orders/create-order")}
+          >
+            Create Order
+          </Button>
         </div>
         <Button
-          className="cursor-pointer"
+          className="cursor-pointer hidden md:block"
           onClick={() => router.push("/dashboard/orders/create-order")}
         >
           Create Order
         </Button>
+      </div>
+      <div className="md:hidden">
+        <Input
+          placeholder="Search orders or email..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full"
+        />
       </div>
       {isLoading ? (
         <OrdersTableSkeleton />
