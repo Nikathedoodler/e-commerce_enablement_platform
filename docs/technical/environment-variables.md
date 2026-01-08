@@ -135,6 +135,31 @@ SENTRY_PROJECT=your-project-name
 
 ---
 
+### Support & Email (Resend)
+
+```env
+RESEND_API_KEY=re_xxxxxxxxxxxxx
+RESEND_FROM_EMAIL=noreply@yourdomain.com
+SUPPORT_EMAIL=support@yourdomain.com
+```
+
+**Description:**
+- `RESEND_API_KEY`: Resend API key for sending emails
+- `RESEND_FROM_EMAIL`: Email address to send from (must be verified in Resend)
+- `SUPPORT_EMAIL`: Email address where support requests are sent
+
+**Where to Find:**
+- Resend Dashboard → API Keys → Create API Key
+- Resend Dashboard → Domains → Add and verify your domain
+- Default `RESEND_FROM_EMAIL`: `onboarding@resend.dev` (for testing only)
+
+**Note:** 
+- For production, you must verify your domain in Resend
+- The `onboarding@resend.dev` email can only be used for testing
+- Support contact form requires `RESEND_API_KEY` to function
+
+---
+
 ### Warehouse/Origin Address (for DHL)
 
 ```env
