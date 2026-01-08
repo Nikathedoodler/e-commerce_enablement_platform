@@ -113,6 +113,28 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
 ---
 
+### Sentry Error Tracking
+
+```env
+NEXT_PUBLIC_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
+SENTRY_ORG=your-org-name
+SENTRY_PROJECT=your-project-name
+```
+
+**Description:**
+- `NEXT_PUBLIC_SENTRY_DSN`: Sentry Data Source Name (DSN) for error tracking
+- `SENTRY_ORG`: Your Sentry organization slug
+- `SENTRY_PROJECT`: Your Sentry project slug
+
+**Where to Find:**
+- Sentry Dashboard → Settings → Projects → [Your Project] → Client Keys (DSN)
+- Sentry Dashboard → Settings → Organization → Organization Slug
+- Sentry Dashboard → Settings → Projects → Project Slug
+
+**Note:** Sentry is optional but highly recommended for production. If `NEXT_PUBLIC_SENTRY_DSN` is not set, Sentry will not initialize.
+
+---
+
 ### Warehouse/Origin Address (for DHL)
 
 ```env
@@ -157,6 +179,11 @@ SHOPIFY_API_SECRET=your_secret
 
 # Analytics (Optional)
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-...
+
+# Sentry Error Tracking (Optional but recommended)
+NEXT_PUBLIC_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
+SENTRY_ORG=your-org-name
+SENTRY_PROJECT=your-project-name
 ```
 
 ### Security Notes
@@ -203,6 +230,11 @@ DHL_API_BASE_URL=https://express.api.dhl.com/mydhlapi
 
 # Analytics
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-...
+
+# Sentry Error Tracking (Recommended for production)
+NEXT_PUBLIC_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
+SENTRY_ORG=your-org-name
+SENTRY_PROJECT=your-project-name
 ```
 
 ### Webhook URLs

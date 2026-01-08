@@ -33,13 +33,13 @@
 ## Observability & Monitoring
 
 ### Error Tracking (Sentry)
-- [ ] Create Sentry account/project
-- [ ] Install Sentry SDK in project
-- [ ] Configure error tracking
-- [ ] Set up error alerts (email/Slack)
-- [ ] Test error reporting
-- [ ] Configure source maps for better debugging
-- [ ] Set up error filtering (ignore known issues)
+- [x] Create Sentry account/project (user needs to do this)
+- [x] Install Sentry SDK in project ✅
+- [x] Configure error tracking ✅
+- [ ] Set up error alerts (email/Slack) - **Next step: Configure in Sentry dashboard**
+- [ ] Test error reporting - **Next step: Test after DSN is configured**
+- [x] Configure source maps for better debugging ✅
+- [ ] Set up error filtering (ignore known issues) - **Optional: Can configure later**
 
 ### Analytics (Google Analytics)
 - [ ] Verify GA4 is tracking correctly
