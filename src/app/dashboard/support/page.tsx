@@ -59,8 +59,8 @@ export default async function SupportPage() {
         <div>
           <h2 className="text-2xl font-semibold">Contact Support</h2>
           <p className="text-muted-foreground">
-            Can't find what you're looking for? Send us a message and we'll get
-            back to you within 24-48 hours.
+            Can&apos;t find what you&apos;re looking for? Send us a message and
+            we&apos;ll get back to you within 24-48 hours.
           </p>
         </div>
         <SupportContactForm

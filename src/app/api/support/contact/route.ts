@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     const categoryLabel = categoryLabels[category] || category;
 
     // Send email via Resend
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: fromEmail,
       to: supportEmail,
       replyTo: email,

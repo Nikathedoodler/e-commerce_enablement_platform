@@ -24,6 +24,7 @@ const DHL_CONFIG = {
  * Returns realistic test data for development
  */
 async function mockCalculateRates(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _request: DHLRateRequest
 ): Promise<{ rates: DHLRate[]; error: null }> {
   // Simulate API delay
@@ -70,6 +71,7 @@ async function mockCalculateRates(
  * TODO: Replace mock with actual DHL API call when credentials are ready
  */
 async function realCalculateRates(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _request: DHLRateRequest
 ): Promise<{ rates: DHLRate[]; error: string | null }> {
   try {
@@ -154,6 +156,7 @@ async function mockGenerateLabel(
  * TODO: Replace mock with actual DHL API call when credentials are ready
  */
 async function realGenerateLabel(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _request: DHLLabelRequest
 ): Promise<{ label: DHLLabelResponse; error: string | null }> {
   try {
