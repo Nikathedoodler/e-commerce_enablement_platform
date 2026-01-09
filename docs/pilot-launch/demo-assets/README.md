@@ -157,10 +157,16 @@ SELECT
 - `05_seed_orders_test.sql` - Test with 2 sample orders (START HERE)
 - `06_seed_orders_full.sql` - Full set of 5 sample orders
 
-**Coming Next:**
+**Receiving Logs:**
 
-- `07_seed_receiving_logs.sql` - Sample receiving log entries
-- `08_demo_walkthrough_script.md` - Demo presentation script
+- `07_seed_receiving_logs_test.sql` - Test with 2 receiving log entries (START HERE)
+- `08_seed_receiving_logs_full.sql` - Full set of 4 receiving log entries
+
+**Demo Materials:**
+
+- `09_demo_walkthrough_script.md` - Complete demo presentation script
+- `10_test_demo_walkthrough.md` - Testing guide for the demo walkthrough
+- `11_create_demo_videos.md` - Guide for creating demo videos (RECOMMENDED)
 
 ---
 

@@ -4,6 +4,8 @@
 **Duration:** 15-20 minutes  
 **Audience:** Pilot users (e-commerce brands/retailers)
 
+**Note:** Consider creating short demo videos as an alternative or supplement to live demos. See `11_create_demo_videos.md` for guidance.
+
 ---
 
 ## 🎯 Demo Objectives
