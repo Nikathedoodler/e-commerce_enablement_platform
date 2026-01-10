@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = "force-dynamic";
 import { toast } from "sonner";
-import { LoginForm } from "@/components/login-form";
+import { LoginFormWithImage } from "@/components/login-form-with-image";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -30,10 +30,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <LoginForm onSubmit={handleLogin} loading={loading} />
-      </div>
-    </div>
+    <LoginFormWithImage
+      onSubmit={handleLogin}
+      loading={loading}
+      companyName="platform"
+      imageSrc="/svg/third-party-logistics.webp"
+    />
   );
 }
