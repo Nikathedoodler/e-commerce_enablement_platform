@@ -68,11 +68,6 @@ const data = {
       icon: ArrowDownToLine,
     },
     {
-      title: "Support",
-      url: "#",
-      icon: HelpCircle,
-    },
-    {
       title: "Settings",
       url: "#",
       icon: Settings2,
@@ -90,6 +85,11 @@ const data = {
           url: "#",
         },
       ],
+    },
+    {
+      title: "Support",
+      url: "#",
+      icon: HelpCircle,
     },
   ],
 };
