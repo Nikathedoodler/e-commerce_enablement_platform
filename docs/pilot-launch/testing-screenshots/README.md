@@ -23,6 +23,7 @@ Use descriptive names with dates:
 **Format**: `category-issue-description-YYYY-MM-DD.png`
 
 **Examples:**
+
 - `orders-label-generation-error-2025-01-15.png`
 - `auth-password-reset-success-2025-01-15.png`
 - `inventory-low-stock-badge-2025-01-15.png`
@@ -43,4 +44,3 @@ Use descriptive names with dates:
 - Keep screenshots organized by category
 - Delete old screenshots after issues are resolved (optional)
 - Use descriptive names so you can find them later
-
