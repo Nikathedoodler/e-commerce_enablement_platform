@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Trash2, Store } from "lucide-react";
 import { ShopifyStore } from "@/types/shopify";
 import { useEffect, useState } from "react";
@@ -121,8 +122,11 @@ export function ShopifyConnectionCard({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="h-20 bg-muted animate-pulse rounded" />
-            <div className="h-20 bg-muted animate-pulse rounded" />
+            <div className="space-y-3">
+              <Skeleton className="h-5 w-48" />
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-16 w-full" />
+            </div>
           </div>
         </CardContent>
       </Card>

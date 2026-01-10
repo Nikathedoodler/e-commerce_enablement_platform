@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
+import { ReceivingHistoryTableSkeleton } from "./receiving-history-table-skeleton";
 
 function getConditionColor(condition: string) {
   switch (condition) {
@@ -70,14 +71,7 @@ export function ReceivingHistoryTable() {
       </div>
 
       {isLoading ? (
-        <div className="space-y-2">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="h-12 w-full animate-pulse rounded-md bg-muted"
-            />
-          ))}
-        </div>
+        <ReceivingHistoryTableSkeleton />
       ) : error ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <p className="text-lg font-medium text-destructive">
