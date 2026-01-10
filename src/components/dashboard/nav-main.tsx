@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 import {
   Collapsible,
@@ -18,7 +19,6 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useRouter } from "next/navigation";
 
 export function NavMain({
   items,
@@ -36,7 +36,6 @@ export function NavMain({
   }[];
   onSelect?: (main: string, sub?: string) => void;
 }) {
-  const router = useRouter();
   const { setOpenMobile } = useSidebar();
   const slugify = (value: string) =>
     value
@@ -66,42 +65,42 @@ export function NavMain({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items?.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton
-                          asChild
-                          onClick={(e) => {
-                            e.preventDefault();
-                            onSelect?.(item.title, subItem.title);
-                            const mainSlug = slugify(item.title);
-                            const subSlug = slugify(subItem.title);
-                            router.push(`/dashboard/${mainSlug}/${subSlug}`);
-                            setOpenMobile(false);
-                          }}
-                        >
-                          <a href={subItem.url}>
-                            <span>{subItem.title}</span>
-                          </a>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
+                    {item.items?.map((subItem) => {
+                      const mainSlug = slugify(item.title);
+                      const subSlug = slugify(subItem.title);
+                      const href = `/dashboard/${mainSlug}/${subSlug}`;
+                      return (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton asChild>
+                            <Link
+                              href={href}
+                              onClick={() => {
+                                onSelect?.(item.title, subItem.title);
+                                setOpenMobile(false);
+                              }}
+                            >
+                              <span>{subItem.title}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible>
           ) : (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                tooltip={item.title}
-                onClick={(e) => {
-                  e.preventDefault();
-                  const mainSlug = slugify(item.title);
-                  router.push(`/dashboard/${mainSlug}`);
-                  setOpenMobile(false);
-                }}
-              >
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
+              <SidebarMenuButton tooltip={item.title} asChild>
+                <Link
+                  href={`/dashboard/${slugify(item.title)}`}
+                  onClick={() => {
+                    setOpenMobile(false);
+                  }}
+                >
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           )
