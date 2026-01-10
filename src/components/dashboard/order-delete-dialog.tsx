@@ -57,39 +57,43 @@ export function OrderDeleteDialog({
         </AlertDialogHeader>
 
         {(orderNumber || customerEmail || total !== undefined) && (
-          <Card className="border-destructive/50">
+          <Card className="border-destructive/50 min-w-0 w-full">
             <CardHeader>
               <CardTitle className="text-lg">Order Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-3 min-w-0">
                 {orderNumber && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
+                  <div className="flex justify-between items-center gap-2 min-w-0">
+                    <span className="text-sm text-muted-foreground shrink-0">
                       Order Number
                     </span>
-                    <span className="font-semibold">#{orderNumber}</span>
+                    <span className="font-semibold text-right break-all">
+                      #{orderNumber}
+                    </span>
                   </div>
                 )}
                 {customerEmail && (
                   <>
                     {orderNumber && <Separator />}
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">
+                    <div className="flex justify-between items-center gap-2 min-w-0">
+                      <span className="text-sm text-muted-foreground shrink-0">
                         Customer Email
                       </span>
-                      <span className="font-medium">{customerEmail}</span>
+                      <span className="font-medium text-right break-all">
+                        {customerEmail}
+                      </span>
                     </div>
                   </>
                 )}
                 {total !== undefined && (
                   <>
                     {(orderNumber || customerEmail) && <Separator />}
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">
+                    <div className="flex justify-between items-center gap-2 min-w-0">
+                      <span className="text-sm text-muted-foreground shrink-0">
                         Total Amount
                       </span>
-                      <span className="font-semibold text-lg">
+                      <span className="font-semibold text-lg text-right">
                         ${total.toFixed(2)}
                       </span>
                     </div>
