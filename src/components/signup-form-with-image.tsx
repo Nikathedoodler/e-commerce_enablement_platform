@@ -13,11 +13,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 
-type LoginFormWithImageProps = Omit<React.ComponentProps<"div">, "onSubmit"> & {
-  onSubmit?: (email: string, password: string) => void | Promise<void>;
+type SignupFormWithImageProps = Omit<React.ComponentProps<"div">, "onSubmit"> & {
+  onSubmit?: (
+    email: string,
+    password: string,
+    confirmPassword: string,
+    fullName: string,
+    companyName?: string
+  ) => void | Promise<void>;
   loading: boolean;
   errorMessage?: string;
-  companyName?: string;
   imageSrc?: string;
 };
 
@@ -70,25 +75,28 @@ const MetaIcon = () => (
   </svg>
 );
 
-export function LoginFormWithImage({
+export function SignupFormWithImage({
   onSubmit,
   loading,
   className,
-  companyName = "Acme Inc",
   imageSrc = "/svg/third-party-logistics.webp",
   ...props
-}: LoginFormWithImageProps) {
+}: SignupFormWithImageProps) {
   return (
     <div
       className={cn("flex min-h-svh w-full flex-col md:flex-row", className)}
       {...props}
     >
-      {/* Left side - Login Form */}
+      {/* Left side - Signup Form */}
       <div className="flex flex-1 flex-col items-center justify-center bg-background p-6 md:p-10">
         <div className="w-full max-w-sm space-y-6">
           <div className="space-y-2 text-center md:text-left">
-            <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
-            <p className="text-muted-foreground">Login to your account</p>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Create an account
+            </h1>
+            <p className="text-muted-foreground">
+              Enter your information to get started
+            </p>
           </div>
 
           <form
@@ -97,12 +105,26 @@ export function LoginFormWithImage({
               const formData = new FormData(event.currentTarget);
               onSubmit?.(
                 formData.get("email") as string,
-                formData.get("password") as string
+                formData.get("password") as string,
+                formData.get("confirm-password") as string,
+                formData.get("fullName") as string,
+                (formData.get("companyName") as string) || undefined
               );
             }}
             className="space-y-4"
           >
             <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
+                <Input
+                  id="fullName"
+                  type="text"
+                  name="fullName"
+                  placeholder="John Doe"
+                  required
+                />
+              </Field>
+
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
@@ -115,15 +137,20 @@ export function LoginFormWithImage({
               </Field>
 
               <Field>
-                <div className="flex items-center justify-between">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
+                <FieldLabel htmlFor="companyName">
+                  Company Name (Optional)
+                </FieldLabel>
+                <Input
+                  id="companyName"
+                  type="text"
+                  name="companyName"
+                  placeholder="Acme Inc."
+                />
+                <FieldDescription>Your company name (optional)</FieldDescription>
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
                 <Input
                   id="password"
                   type="password"
@@ -134,8 +161,22 @@ export function LoginFormWithImage({
               </Field>
 
               <Field>
+                <FieldLabel htmlFor="confirm-password">
+                  Confirm Password
+                </FieldLabel>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  name="confirm-password"
+                  placeholder="Confirm your password"
+                  required
+                />
+                <FieldDescription>Please confirm your password.</FieldDescription>
+              </Field>
+
+              <Field>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Logging in..." : "Login"}
+                  {loading ? "Creating account..." : "Create Account"}
                 </Button>
               </Field>
             </FieldGroup>
@@ -183,12 +224,12 @@ export function LoginFormWithImage({
           </div>
 
           <div className="text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
             <Link
-              href="/auth/signup"
+              href="/auth/login"
               className="font-medium text-foreground underline-offset-4 hover:underline"
             >
-              Sign up
+              Sign in
             </Link>
           </div>
         </div>
@@ -199,7 +240,7 @@ export function LoginFormWithImage({
         <div className="relative w-full h-full max-w-4xl min-h-[600px]">
           <Image
             src={imageSrc}
-            alt="Login illustration"
+            alt="Signup illustration"
             fill
             className={cn(
               imageSrc.endsWith(".svg") || imageSrc.endsWith(".webp")

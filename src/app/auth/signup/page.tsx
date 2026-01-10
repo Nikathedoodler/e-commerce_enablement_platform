@@ -1,6 +1,6 @@
 "use client";
 
-import { SignupForm } from "@/components/signup-form";
+import { SignupFormWithImage } from "@/components/signup-form-with-image";
 import { createClient } from "@/lib/supabase/client";
 
 // Force dynamic rendering to prevent static generation issues
@@ -59,10 +59,10 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <SignupForm onSubmit={handleSignUp} loading={loading} />
-      </div>
-    </div>
+    <SignupFormWithImage
+      onSubmit={handleSignUp}
+      loading={loading}
+      imageSrc="/svg/third-party-logistics.webp"
+    />
   );
 }

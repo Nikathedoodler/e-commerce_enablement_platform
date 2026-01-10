@@ -33,7 +33,6 @@ export default function LoginPage() {
     <LoginFormWithImage
       onSubmit={handleLogin}
       loading={loading}
-      companyName="platform"
       imageSrc="/svg/third-party-logistics.webp"
     />
   );
