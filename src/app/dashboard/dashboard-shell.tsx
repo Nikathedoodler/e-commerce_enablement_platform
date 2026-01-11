@@ -15,6 +15,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { ChatbotWidget } from "@/components/dashboard/chatbot-widget";
 import React, { useState } from "react";
 import type { User } from "@supabase/supabase-js";
 
@@ -69,6 +70,7 @@ export default function DashboardShell({
           {children}
         </main>
       </SidebarInset>
+      <ChatbotWidget />
     </SidebarProvider>
   );
 }

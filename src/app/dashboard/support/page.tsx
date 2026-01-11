@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { HelpCenterLinks } from "@/components/dashboard/help-center-links";
 import { SupportFAQ } from "@/components/dashboard/support-faq";
 import { SupportContactForm } from "@/components/dashboard/support-contact-form";
+import { Chatbot } from "@/components/dashboard/chatbot";
 
 export default async function SupportPage() {
   const supabase = await createClient();
@@ -29,6 +30,20 @@ export default async function SupportPage() {
         <p className="text-muted-foreground">
           Get help, find answers, or contact our support team
         </p>
+      </div>
+
+      {/* AI Chatbot Section */}
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-2xl font-semibold">Chat with our AI Assistant</h2>
+          <p className="text-muted-foreground">
+            Ask questions about orders, inventory, shipping, integrations, and
+            more. Get instant answers to help you use the platform effectively.
+          </p>
+        </div>
+        <div className="h-[600px]">
+          <Chatbot className="h-full" />
+        </div>
       </div>
 
       {/* Help Center Links Section */}
