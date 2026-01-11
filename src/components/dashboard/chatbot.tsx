@@ -23,14 +23,23 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
   // Format messages once and create a stable reference
   const formattedInitialMessages = useMemo(() => {
     if (!initialMessages || initialMessages.length === 0) return [];
-    return initialMessages.map((msg) => ({
-      id: msg.id || `msg-${Date.now()}-${Math.random()}`,
-      role: msg.role as "user" | "assistant" | "system",
-      content:
-        typeof msg.content === "string"
-          ? msg.content
-          : String(msg.content || ""),
-    }));
+    // Map and deduplicate messages by id
+    const messageMap = new Map();
+    initialMessages.forEach((msg, index) => {
+      const id = msg.id || `msg-${Date.now()}-${index}-${Math.random()}`;
+      // Only keep the first occurrence of each id
+      if (!messageMap.has(id)) {
+        messageMap.set(id, {
+          id,
+          role: msg.role as "user" | "assistant" | "system",
+          content:
+            typeof msg.content === "string"
+              ? msg.content
+              : String(msg.content || ""),
+        });
+      }
+    });
+    return Array.from(messageMap.values());
   }, [initialMessages]);
 
   // Debug: Log initial messages to verify they're being passed correctly
@@ -61,8 +70,12 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
       console.log("Attempting to set messages manually");
       if (setMessages) {
         console.log("Using setMessages function");
+        // Deduplicate messages by id before setting
+        const uniqueMessages = formattedInitialMessages.filter(
+          (msg, index, self) => index === self.findIndex((m) => m.id === msg.id)
+        );
         // @ts-ignore - setMessages exists but types may not be complete
-        setMessages(formattedInitialMessages);
+        setMessages(uniqueMessages);
       } else {
         console.warn("setMessages not available from useChat hook");
       }
@@ -129,86 +142,94 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
             </p>
           </div>
         )}
-        {messages.map((message: any) => {
-          // Extract content - handle both string content and parts array format
-          // UIMessage from @ai-sdk/react can have content as string or in parts array
-          let content = "";
-          if (typeof message.content === "string") {
-            content = message.content;
-          } else if (Array.isArray((message as any).parts)) {
-            // Extract text from parts array
-            content = (message as any).parts
-              .filter((part: any) => part.type === "text")
-              .map((part: any) => part.text || part.content || "")
-              .join("");
-          } else if ((message as any).content) {
-            content = String((message as any).content);
-          } else if (typeof (message as any).text === "string") {
-            content = (message as any).text;
-          }
+        {messages
+          .filter((message: any, index: number, self: any[]) => {
+            // Deduplicate messages by id - keep only the first occurrence
+            return index === self.findIndex((m: any) => m.id === message.id);
+          })
+          .map((message: any, index: number) => {
+            // Extract content - handle both string content and parts array format
+            // UIMessage from @ai-sdk/react can have content as string or in parts array
+            let content = "";
+            if (typeof message.content === "string") {
+              content = message.content;
+            } else if (Array.isArray((message as any).parts)) {
+              // Extract text from parts array
+              content = (message as any).parts
+                .filter((part: any) => part.type === "text")
+                .map((part: any) => part.text || part.content || "")
+                .join("");
+            } else if ((message as any).content) {
+              content = String((message as any).content);
+            } else if (typeof (message as any).text === "string") {
+              content = (message as any).text;
+            }
 
-          // Don't render empty messages
-          if (!content && message.role !== "user") {
-            return null;
-          }
+            // Don't render empty messages
+            if (!content && message.role !== "user") {
+              return null;
+            }
 
-          return (
-            <div
-              key={message.id}
-              className={cn(
-                "flex flex-col gap-2",
-                message.role === "user" ? "items-end" : "items-start"
-              )}
-            >
+            // Ensure unique key by combining id with index as fallback
+            const uniqueKey = message.id || `msg-${index}-${Date.now()}`;
+
+            return (
               <div
+                key={uniqueKey}
                 className={cn(
-                  "rounded-lg px-4 py-2 max-w-[80%]",
-                  message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
+                  "flex flex-col gap-2",
+                  message.role === "user" ? "items-end" : "items-start"
                 )}
               >
-                {message.role === "assistant" ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <ReactMarkdown
-                      components={{
-                        p: ({ children }) => (
-                          <p className="mb-2 last:mb-0">{children}</p>
-                        ),
-                        ul: ({ children }) => (
-                          <ul className="list-disc list-inside mb-2">
-                            {children}
-                          </ul>
-                        ),
-                        ol: ({ children }) => (
-                          <ol className="list-decimal list-inside mb-2">
-                            {children}
-                          </ol>
-                        ),
-                        code: ({ children, className }) => {
-                          const isInline = !className;
-                          return isInline ? (
-                            <code className="bg-muted-foreground/20 px-1 py-0.5 rounded text-sm">
+                <div
+                  className={cn(
+                    "rounded-lg px-4 py-2 max-w-[80%]",
+                    message.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
+                  )}
+                >
+                  {message.role === "assistant" ? (
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                      <ReactMarkdown
+                        components={{
+                          p: ({ children }) => (
+                            <p className="mb-2 last:mb-0">{children}</p>
+                          ),
+                          ul: ({ children }) => (
+                            <ul className="list-disc list-inside mb-2">
                               {children}
-                            </code>
-                          ) : (
-                            <code className="block bg-muted-foreground/20 p-2 rounded text-sm overflow-x-auto">
+                            </ul>
+                          ),
+                          ol: ({ children }) => (
+                            <ol className="list-decimal list-inside mb-2">
                               {children}
-                            </code>
-                          );
-                        },
-                      }}
-                    >
-                      {content}
-                    </ReactMarkdown>
-                  </div>
-                ) : (
-                  <p className="text-sm whitespace-pre-wrap">{content}</p>
-                )}
+                            </ol>
+                          ),
+                          code: ({ children, className }) => {
+                            const isInline = !className;
+                            return isInline ? (
+                              <code className="bg-muted-foreground/20 px-1 py-0.5 rounded text-sm">
+                                {children}
+                              </code>
+                            ) : (
+                              <code className="block bg-muted-foreground/20 p-2 rounded text-sm overflow-x-auto">
+                                {children}
+                              </code>
+                            );
+                          },
+                        }}
+                      >
+                        {content}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="text-sm whitespace-pre-wrap">{content}</p>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         {isLoading && (
           <div className="flex items-start gap-2">
             <div className="bg-muted rounded-lg px-4 py-2">
@@ -275,14 +296,23 @@ export function Chatbot({ className }: ChatbotProps) {
   // MUST be called before any early returns to follow Rules of Hooks
   const formattedMessages = useMemo(() => {
     if (!initialMessages || initialMessages.length === 0) return [];
-    return initialMessages.map((msg) => ({
-      id: msg.id || `msg-${Math.random()}`,
-      role: msg.role as "user" | "assistant" | "system",
-      content:
-        typeof msg.content === "string"
-          ? msg.content
-          : String(msg.content || ""),
-    }));
+    // Map and deduplicate messages by id
+    const messageMap = new Map();
+    initialMessages.forEach((msg, index) => {
+      const id = msg.id || `msg-${Date.now()}-${index}-${Math.random()}`;
+      // Only keep the first occurrence of each id
+      if (!messageMap.has(id)) {
+        messageMap.set(id, {
+          id,
+          role: msg.role as "user" | "assistant" | "system",
+          content:
+            typeof msg.content === "string"
+              ? msg.content
+              : String(msg.content || ""),
+        });
+      }
+    });
+    return Array.from(messageMap.values());
   }, [initialMessages]);
 
   // Show loading state while fetching history
