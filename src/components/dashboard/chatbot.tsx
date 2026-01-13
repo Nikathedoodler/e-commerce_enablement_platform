@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useChat } from "@ai-sdk/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,12 +11,14 @@ import { cn } from "@/lib/utils/utils";
 
 type ChatbotProps = {
   className?: string;
+  sizeControls?: React.ReactNode;
 };
 
 // Chat component that uses useChat - separated to allow conditional rendering
 // This ensures useChat only initializes AFTER we have the initial messages
 function ChatContent({ initialMessages }: { initialMessages: any[] }) {
   const [input, setInput] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Ensure messages are in the correct format for useChat
   // useChat expects: { id: string, role: 'user' | 'assistant' | 'system', content: string }
@@ -85,6 +87,13 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
 
   const isLoading = status === "streaming" || status === "submitted";
 
+  // Auto-scroll to bottom when messages change or when streaming
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isLoading]);
+
   // Debug: Log messages from useChat hook
   useEffect(() => {
     console.log("useChat messages:", messages);
@@ -130,9 +139,9 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto space-y-4 mb-2 min-h-[300px] max-h-[600px] pr-2 pt-0">
+      <div className="flex-1 overflow-y-auto space-y-4 mb-0 min-h-0 pr-2 pt-0">
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground py-8">
             <p className="mb-2">Ask me anything about the platform!</p>
@@ -242,10 +251,12 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
             Error: {error.message || "Failed to get response"}
           </div>
         )}
+        {/* Scroll anchor for auto-scroll */}
+        <div ref={messagesEndRef} className="h-0" />
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="flex gap-2 mt-auto">
+      <form onSubmit={handleSubmit} className="flex gap-2 mt-2 mb-0">
         <Input
           value={input}
           onChange={handleInputChange}
@@ -261,11 +272,11 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
           )}
         </Button>
       </form>
-    </>
+    </div>
   );
 }
 
-export function Chatbot({ className }: ChatbotProps) {
+export function Chatbot({ className, sizeControls }: ChatbotProps) {
   const [initialMessages, setInitialMessages] = useState<any[] | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
@@ -333,10 +344,11 @@ export function Chatbot({ className }: ChatbotProps) {
 
   return (
     <Card className={cn("flex flex-col h-full", className)}>
-      <CardHeader className="pb-3 pt-4">
+      <CardHeader className="pb-3 pt-1 flex flex-row items-center justify-between">
         <CardTitle>AI Assistant</CardTitle>
+        {sizeControls && <div className="flex gap-1">{sizeControls}</div>}
       </CardHeader>
-      <CardContent className="flex flex-col flex-1 min-h-0 pb-4 pt-0 px-4">
+      <CardContent className="flex flex-col flex-1 min-h-0 pb-0 pt-0 px-4">
         {/* Pass formatted messages to ensure useChat receives them correctly */}
         {/* Only render ChatContent once messages are loaded (no key to avoid remounting) */}
         <ChatContent initialMessages={formattedMessages} />
