@@ -104,7 +104,9 @@ Calculate shipping rates for an order.
 
 **POST** `/api/shipping/dhl/label`
 
-Generate a shipping label for an order.
+Generate a shipping label for an order. This endpoint supports both manual and automatic generation (via server-side function). All generation attempts are logged in the audit log.
+
+**Note:** Labels can also be generated automatically when order status changes to "processing" (if auto-generation is enabled in settings). See [Shipping Settings Guide](../user-guides/shipping-settings.md) for configuration.
 
 **Request Body:**
 
@@ -167,6 +169,43 @@ Generate a shipping label for an order.
 - `401`: Unauthorized
 - `404`: Order not found
 - `500`: DHL API error
+
+**Audit Logging:**
+- All label generation attempts (manual and automatic) are logged
+- Check Generation History in order detail dialog for audit trail
+- Failed attempts include error messages for debugging
+
+---
+
+### Shipping Settings & Audit Log
+
+**Note:** These are server actions, not HTTP endpoints. Access via query functions.
+
+#### Shipping Settings
+- `getShippingSettings()` - Get current user's shipping settings
+- `updateShippingSettings(updates)` - Update shipping settings
+
+#### Label Generation Audit Log
+- `getLabelAuditLogByOrderId(orderId)` - Get audit log entries for an order
+- `getLabelAuditLogs(filters?)` - Get all audit log entries with optional filters
+
+**Audit Log Entry Structure:**
+```typescript
+{
+  id: string;
+  order_id: string;
+  label_id: string | null;
+  generation_type: "auto" | "manual";
+  status: "pending" | "success" | "failed";
+  error_message: string | null;
+  tracking_number: string | null;
+  carrier: string | null;
+  cost: number | null;
+  triggered_by: string | null; // "status_change" | "shopify_webhook" | "manual_click"
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+```
 
 ---
 

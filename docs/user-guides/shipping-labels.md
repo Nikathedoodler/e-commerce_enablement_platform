@@ -5,11 +5,13 @@ Learn how to generate, manage, and download shipping labels for your orders.
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Generating Labels](#generating-labels)
-3. [DHL Service Types](#dhl-service-types)
-4. [Package Information](#package-information)
-5. [Managing Labels](#managing-labels)
-6. [Troubleshooting](#troubleshooting)
+2. [Automatic Label Generation](#automatic-label-generation)
+3. [Manual Label Generation](#manual-label-generation)
+4. [DHL Service Types](#dhl-service-types)
+5. [Package Information](#package-information)
+6. [Managing Labels](#managing-labels)
+7. [Generation History](#generation-history)
+8. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -22,14 +24,87 @@ Shipping labels are generated through DHL Express integration. Each label includ
 - **Estimated Delivery**: Expected delivery date
 
 **Key Points:**
-- Labels are generated manually when you're ready to ship
+- **Automatic Generation**: Labels can be auto-generated when order status changes to "processing"
+- **Manual Generation**: Generate labels manually when ready to ship
 - Multiple labels can be generated for the same order (split shipments)
 - Labels are automatically saved and linked to orders
 - Tracking numbers are automatically added to orders
+- Complete audit log tracks all generation attempts
 
 ---
 
-## Generating Labels
+## Automatic Label Generation
+
+### Overview
+
+Automatic label generation saves time by creating shipping labels automatically when orders are ready to ship. This feature can be configured in **Settings → Shipping**.
+
+### How It Works
+
+1. **Configure Settings**: Set up auto-generation rules and default package information
+2. **Trigger Events**: Labels generate automatically when:
+   - Order status changes to "processing" (default)
+   - Shopify orders are created (optional)
+   - Manual orders are created (optional)
+3. **Automatic Process**: System uses your default package settings to generate labels
+4. **Result**: Label appears in order detail dialog automatically
+
+### Setting Up Auto-Generation
+
+1. **Go to Settings → Shipping**
+2. **Enable Auto-Generation**:
+   - Check "Enable automatic label generation"
+   - Select which rules to use:
+     - ✅ Generate when order status changes to "processing" (recommended)
+     - ✅ Generate for Shopify orders when created
+     - ✅ Generate for manually created orders
+
+3. **Configure Default Package Information**:
+   - **Default Weight**: Enter typical package weight (kg)
+   - **Dimensions**: Optional length, width, height (cm)
+   - **Default Service Type**: Choose DHL service (e.g., Express Worldwide)
+
+4. **Enter Warehouse/Shipper Information** (required):
+   - Contact name, address, city, postal code, country, phone
+   - This is used as the origin address for all labels
+
+5. **Save Settings**
+
+### When Auto-Generation Triggers
+
+**Status Change Trigger** (Recommended):
+- Order status: `pending` → `processing`
+- Label generates automatically
+- No manual action needed
+
+**Shopify Order Trigger**:
+- New order arrives from Shopify
+- Label generates immediately (if enabled)
+- Order is ready to ship right away
+
+**Manual Order Trigger**:
+- You create an order manually
+- Label generates automatically (if enabled)
+- Useful for quick fulfillment
+
+### Benefits
+
+- ⚡ **Faster Fulfillment**: Labels ready when orders are processed
+- 🔄 **Consistent Process**: Same settings used every time
+- ⏱️ **Time Savings**: No manual label generation needed
+- 📊 **Complete Tracking**: All attempts logged in audit history
+
+### Important Notes
+
+- Auto-generation uses your **default package settings**
+- Ensure default weight matches your typical packages
+- Shipper information must be complete for auto-generation to work
+- If auto-generation fails, you can still generate labels manually
+- All generation attempts are logged in the audit history
+
+---
+
+## Manual Label Generation
 
 ### Prerequisites
 
@@ -143,6 +218,85 @@ Choose the service type based on delivery speed and cost:
 - **Purpose**: Describe package contents
 - **Examples**: "Electronics", "Clothing", "Books"
 - **Use when**: Helps with customs or special handling
+
+---
+
+## Generation History
+
+### Overview
+
+Every label generation attempt (automatic or manual) is recorded in the **Generation History** audit log. This provides complete visibility into all label generation activity.
+
+### Viewing History
+
+1. **Open Order Detail Dialog**
+   - Go to **Orders** → Click any order
+   - Scroll to "Generation History" section
+
+2. **Review Entries**
+   - Each entry shows:
+     - **Status**: Pending, Success, or Failed
+     - **Type**: Auto or Manual
+     - **Timestamp**: When the attempt occurred
+     - **Trigger**: What caused the generation
+     - **Tracking Number**: If successful
+     - **Cost**: Shipping cost
+     - **Error Message**: If generation failed
+
+### Status Meanings
+
+**Pending** ⏳:
+- Label generation is in progress
+- System is waiting for DHL API response
+- Will update to Success or Failed automatically
+- Icon pulses to indicate active status
+
+**Success** ✅:
+- Label generated successfully
+- Tracking number available
+- Cost recorded
+- Label ready to download
+
+**Failed** ❌:
+- Generation encountered an error
+- Error message explains what went wrong
+- Can retry by generating manually
+- Common causes: missing information, API errors, network issues
+
+### Generation Types
+
+**Auto** ⚡:
+- Generated automatically by system
+- Triggered by configured rules
+- Uses default package settings
+- Faster workflow
+
+**Manual** 👋:
+- Generated by user clicking "Generate Label"
+- User provides package details
+- More control over service type and dimensions
+
+### Audit Log Details
+
+Each entry includes:
+- **Trigger Information**: What caused the generation
+  - `status_change`: Order status changed to processing
+  - `shopify_webhook`: Order came from Shopify
+  - `manual_click`: User clicked generate button
+- **Metadata**: Additional context (expandable)
+  - Previous order status
+  - Rules that were checked
+  - Settings used
+  - Package information
+
+### Using History for Troubleshooting
+
+If a label fails to generate:
+1. Check the Generation History
+2. Look for "Failed" entries
+3. Review error message
+4. Check if required information is missing
+5. Try generating manually with corrected information
 
 ---
 
@@ -268,9 +422,39 @@ The label count is shown in the section title: "Shipping Labels (2)"
 
 ## Related Guides
 
+- [Shipping Settings Guide](./shipping-settings.md) - Configure automatic generation
 - [Managing Orders](./managing-orders.md)
 - [Getting Started](./getting-started.md)
 - [Shopify Integration](./shopify-integration.md)
+
+---
+
+## Quick Reference
+
+### Automatic Generation Checklist
+
+- [ ] Shipping settings configured
+- [ ] Auto-generation enabled
+- [ ] Rules selected (status change, Shopify, manual)
+- [ ] Default package weight set
+- [ ] Warehouse/shipper information complete
+- [ ] Test with order status change
+
+### Manual Generation Checklist
+
+- [ ] Order has complete shipping address
+- [ ] Package weight known
+- [ ] Service type selected
+- [ ] Dimensions measured (optional)
+- [ ] Ready to ship
+
+### Troubleshooting Checklist
+
+- [ ] Check Generation History for errors
+- [ ] Verify shipping settings are saved
+- [ ] Ensure order has complete address
+- [ ] Check default package weight is set
+- [ ] Verify warehouse information is complete
 
 ---
 

@@ -194,7 +194,20 @@ export async function triggerAutoLabelGeneration(
 
     // Call the server-side label generation function
     const { generateLabelServer } = await import("./generate-label-server");
-    const result = await generateLabelServer(labelRequest);
+    const result = await generateLabelServer(labelRequest, {
+      generationType: "auto",
+      triggeredBy: reason === "Status changed to processing" 
+        ? "status_change" 
+        : reason.includes("Shopify") 
+        ? "shopify_webhook" 
+        : "manual_order_rule",
+      metadata: {
+        previous_status: previousStatus,
+        current_status: order.status,
+        order_number: order.order_number,
+        rules_checked: settings.auto_generate_rules,
+      },
+    });
 
     if (!result.success) {
       return {

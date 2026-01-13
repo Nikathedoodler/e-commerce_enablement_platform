@@ -1,8 +1,8 @@
 # Shipping Label Generation Flow
 
-## Current Implementation (Manual Only)
+## Current Implementation (Manual + Automatic)
 
-### Flow:
+### Manual Generation Flow:
 1. **Order Created** → Status: `pending`
    - Manually via dashboard, OR
    - Automatically via Shopify webhook
@@ -15,11 +15,25 @@
 
 4. **Order Status** → Can be updated to `processing` or `fulfilled`
 
-### Why Manual?
-- ✅ **Control**: Warehouse staff can verify order details before shipping
-- ✅ **Flexibility**: Choose service type based on urgency/cost
-- ✅ **Accuracy**: Staff can measure actual package weight/dimensions
-- ✅ **Error Prevention**: Avoids generating labels for orders that might be cancelled
+### Automatic Generation Flow:
+1. **Order Created** → Status: `pending`
+
+2. **Order Status Changed** → Status: `pending` → `processing`
+   - System checks auto-generation settings
+   - If enabled, automatically generates label using default settings
+   - Label appears in order detail dialog
+
+3. **Label Ready** → Tracking number added, ready to ship
+
+### Benefits of Automatic Generation:
+- ⚡ **Faster Fulfillment**: Labels ready when orders are processed
+- 🔄 **Consistent Process**: Same settings used every time
+- ⏱️ **Time Savings**: No manual label generation needed
+- 📊 **Complete Tracking**: All attempts logged in audit history
+
+### When to Use Manual vs Automatic:
+- **Automatic**: Standard orders with consistent package sizes
+- **Manual**: Custom packages, special handling, or when you need to verify details first
 
 ---
 
@@ -193,7 +207,44 @@ If implementing automatic generation, you'll need:
 ## Current State Summary
 
 ✅ **Manual Generation**: Fully implemented and working
-⏳ **Automatic Generation**: Not implemented (can be added later)
+✅ **Automatic Generation**: Fully implemented and working
+✅ **Settings Configuration**: Complete UI for configuring auto-generation rules
+✅ **Default Package Settings**: User-configurable defaults for auto-generation
 ✅ **Multiple Labels**: Supported (can generate multiple per order)
 ✅ **Label Management**: View, download, track all labels
+✅ **Audit Log**: Complete history of all generation attempts (auto and manual)
+✅ **Real-time Updates**: Audit log refreshes automatically, no page refresh needed
+
+## Implementation Details
+
+### Automatic Generation Implementation
+
+**Status Change Trigger** (Implemented):
+- When order status changes from `pending` to `processing`
+- Checks user's auto-generation settings
+- Uses default package weight/dimensions from settings
+- Uses default service type from settings
+- Uses warehouse/shipper information from settings
+- Generates label asynchronously (doesn't block order update)
+- Updates audit log with generation attempt
+
+**Configuration**:
+- Settings page: `/dashboard/settings/shipping`
+- Toggle: Enable/disable auto-generation
+- Rules: Configure which triggers to use
+- Defaults: Set package weight, dimensions, service type
+- Shipper Info: Warehouse address and contact details
+
+**Audit Logging**:
+- Every generation attempt is logged
+- Tracks: type (auto/manual), status (pending/success/failed), errors, metadata
+- Real-time updates when status changes
+- Visible in order detail dialog under "Generation History"
+
+### Error Handling
+
+- If auto-generation fails, order update still succeeds
+- Errors are logged in audit log with details
+- User can still generate labels manually if auto-generation fails
+- Failed attempts show error messages in audit log
 

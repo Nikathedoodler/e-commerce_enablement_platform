@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { generateDHLLabel } from "@/lib/shipping/dhl";
-import { createShippingLabel } from "@/lib/supabase/queries/shipping";
+import { generateLabelServer } from "@/lib/shipping/generate-label-server";
 import type { DHLLabelRequest } from "@/types/shipping";
-import type { ShippingLabelInput } from "@/types/shipping";
 
 /**
  * POST /api/shipping/dhl/label
@@ -145,54 +143,39 @@ export async function POST(req: NextRequest) {
       options,
     };
 
-    // Generate label using DHL API wrapper
-    const { label, error } = await generateDHLLabel(labelRequest);
+    // Generate label using server function (includes audit logging)
+    const result = await generateLabelServer(labelRequest, {
+      generationType: "manual",
+      triggeredBy: "manual_click",
+      metadata: {
+        order_number: orderNumber,
+        service_type: serviceType,
+        package_weight: packageData.weight,
+      },
+    });
 
-    if (error) {
-      return NextResponse.json({ error }, { status: 500 });
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error || "Failed to generate shipping label" },
+        { status: 500 }
+      );
     }
 
-    // TODO: Store label PDF in Supabase Storage if labelData is provided
-    // For now, we'll use the labelUrl from DHL response
-    // If label.labelData (base64 PDF) exists, we should upload it to Supabase Storage
+    // Get the saved label to return full details
+    const { data: savedLabel } = await supabase
+      .from("shipping_labels")
+      .select("*")
+      .eq("order_id", orderId)
+      .eq("tracking_number", result.trackingNumber)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
 
-    // Save label metadata to shipping_labels table
-    const labelInput: ShippingLabelInput = {
-      order_id: orderId,
-      carrier: "DHL",
-      label_url: label.labelUrl,
-      tracking_number: label.trackingNumber,
-      cost: label.cost,
-      generated_at: new Date().toISOString(),
-    };
-
-    const { data: savedLabel, error: saveError } = await createShippingLabel(
-      labelInput
-    );
-
-    if (saveError || !savedLabel) {
-      console.error("Failed to save shipping label:", saveError);
-      // Still return the label data even if save fails
-      // The label was generated successfully, just not saved to DB
-      return NextResponse.json({
-        label: {
-          trackingNumber: label.trackingNumber,
-          labelUrl: label.labelUrl,
-          cost: label.cost,
-          currency: label.currency,
-          estimatedDeliveryDate: label.estimatedDeliveryDate,
-          serviceType: label.serviceType,
-        },
-        warning: "Label generated but failed to save to database",
-      });
-    }
-
-    // Update order tracking number if not already set
-    if (order.tracking_number !== label.trackingNumber) {
-      await supabase
-        .from("orders")
-        .update({ tracking_number: label.trackingNumber })
-        .eq("id", orderId);
+    if (!savedLabel) {
+      return NextResponse.json(
+        { error: "Label generated but not found in database" },
+        { status: 500 }
+      );
     }
 
     // Return saved label information
@@ -202,9 +185,8 @@ export async function POST(req: NextRequest) {
         trackingNumber: savedLabel.tracking_number,
         labelUrl: savedLabel.label_url,
         cost: savedLabel.cost,
-        currency: label.currency,
-        estimatedDeliveryDate: label.estimatedDeliveryDate,
-        serviceType: label.serviceType,
+        currency: "EUR", // Default, could be from settings
+        serviceType: serviceType,
         generatedAt: savedLabel.generated_at,
       },
     });

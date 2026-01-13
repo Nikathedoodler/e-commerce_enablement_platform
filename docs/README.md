@@ -11,6 +11,7 @@ Step-by-step guides for using the platform:
 - [Inventory Management](./user-guides/inventory-management.md) - Track products and stock levels
 - [Receiving Workflow](./user-guides/receiving-workflow.md) - Log incoming inventory
 - [Shipping Labels](./user-guides/shipping-labels.md) - Generate and manage shipping labels
+- [Shipping Settings](./user-guides/shipping-settings.md) - Configure automatic label generation
 - [Shopify Integration](./user-guides/shopify-integration.md) - Connect and sync Shopify stores
 
 ## 🔧 Technical Documentation
@@ -46,6 +47,9 @@ Database migrations and schema:
   - `009_create_shopify_stores_table.sql`
   - `010_create_subscriptions_table.sql`
   - `011_create_shipping_labels_table.sql`
+  - `012_create_chat_messages_table.sql`
+  - `013_add_shipping_settings_to_profiles.sql`
+  - `014_create_label_generation_audit_log.sql`
 
 ## 📖 Quick Links
 

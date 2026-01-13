@@ -24,6 +24,7 @@ import { useUpdateOrder } from "@/hooks/use-orders";
 import { useShippingLabelsByOrderId } from "@/hooks/use-shipping";
 import { toast } from "sonner";
 import { GenerateLabelDialog } from "./generate-label-dialog";
+import { LabelAuditLog } from "./label-audit-log";
 import { Badge } from "@/components/ui/badge";
 
 type OrderDetailDialogProps = {
@@ -438,6 +439,9 @@ export function OrderDetailDialog({
                 </CardContent>
               </Card>
             )}
+
+            {/* Label Generation History */}
+            <LabelAuditLog orderId={orderItem.id} />
 
             {/* Status Update */}
             <Card className="min-w-0 w-full">

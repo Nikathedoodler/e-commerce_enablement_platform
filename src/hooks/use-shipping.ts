@@ -134,6 +134,10 @@ export function useGenerateDHLLabel() {
       queryClient.invalidateQueries({
         queryKey: ["shipping_labels", "order", variables.orderId],
       });
+      // Invalidate audit log to show new entry
+      queryClient.invalidateQueries({
+        queryKey: ["label-audit-log", "order", variables.orderId],
+      });
       // Invalidate the order to update tracking number
       queryClient.invalidateQueries({ queryKey: ["order", variables.orderId] });
       // Invalidate orders list to show updated tracking

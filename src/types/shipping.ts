@@ -225,3 +225,34 @@ export interface ShippingSettings {
  * Partial update for shipping settings
  */
 export type ShippingSettingsUpdate = Partial<ShippingSettings>;
+
+/**
+ * Label Generation Audit Log Entry
+ * Tracks all label generation attempts for audit and debugging
+ */
+export interface LabelGenerationAuditLog {
+  id: string; // UUID
+  user_id: string; // UUID
+  order_id: string; // UUID
+  label_id: string | null; // UUID, null if generation failed
+  generation_type: "auto" | "manual";
+  status: "pending" | "success" | "failed";
+  error_message: string | null;
+  tracking_number: string | null;
+  carrier: string | null;
+  cost: number | null; // NUMERIC(10, 2)
+  triggered_by: string | null; // 'status_change', 'shopify_webhook', 'manual_click', etc.
+  metadata: Record<string, unknown>; // JSONB
+  created_at: string; // TIMESTAMPTZ (ISO string)
+}
+
+/**
+ * Label Generation Audit Log Input
+ * For creating new audit log entries
+ */
+export type LabelGenerationAuditLogInput = Omit<
+  LabelGenerationAuditLog,
+  "id" | "user_id" | "created_at"
+> & {
+  user_id?: string; // Optional, will be set from auth context
+};
