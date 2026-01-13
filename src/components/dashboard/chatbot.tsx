@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils/utils";
 type ChatbotProps = {
   className?: string;
   sizeControls?: React.ReactNode;
+  noCard?: boolean;
 };
 
 // Chat component that uses useChat - separated to allow conditional rendering
@@ -276,7 +277,11 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
   );
 }
 
-export function Chatbot({ className, sizeControls }: ChatbotProps) {
+export function Chatbot({
+  className,
+  sizeControls,
+  noCard = false,
+}: ChatbotProps) {
   const [initialMessages, setInitialMessages] = useState<any[] | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
@@ -330,6 +335,16 @@ export function Chatbot({ className, sizeControls }: ChatbotProps) {
   // We MUST wait for messages to load before initializing useChat
   // because useChat only reads initialMessages on first render
   if (isLoadingHistory || initialMessages === null) {
+    if (noCard) {
+      return (
+        <div className={cn("flex flex-col h-full", className)}>
+          <div className="flex flex-col flex-1 min-h-0 items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <Card className={cn("flex flex-col h-full", className)}>
         <CardHeader>
@@ -339,6 +354,18 @@ export function Chatbot({ className, sizeControls }: ChatbotProps) {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
+    );
+  }
+
+  if (noCard) {
+    return (
+      <div className={cn("flex flex-col h-full", className)}>
+        <div className="flex flex-col flex-1 min-h-0 px-4">
+          {/* Pass formatted messages to ensure useChat receives them correctly */}
+          {/* Only render ChatContent once messages are loaded (no key to avoid remounting) */}
+          <ChatContent initialMessages={formattedMessages} />
+        </div>
+      </div>
     );
   }
 

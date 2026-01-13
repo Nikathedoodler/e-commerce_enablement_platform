@@ -90,6 +90,20 @@ const data = {
       title: "Support",
       url: "#",
       icon: HelpCircle,
+      items: [
+        {
+          title: "AI Assistant",
+          url: "#",
+        },
+        {
+          title: "Help Center",
+          url: "#",
+        },
+        {
+          title: "Contact",
+          url: "#",
+        },
+      ],
     },
   ],
 };
