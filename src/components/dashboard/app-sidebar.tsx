@@ -81,6 +81,10 @@ const data = {
           url: "#",
         },
         {
+          title: "Shipping",
+          url: "#",
+        },
+        {
           title: "Billing",
           url: "#",
         },

@@ -44,8 +44,12 @@ export function OrderDetailDialog({
   const updateOrder = useUpdateOrder();
 
   // Fetch shipping labels for this order
-  const { data: shippingLabels, isLoading: labelsLoading } =
-    useShippingLabelsByOrderId(orderItem?.id || "");
+  // Add refetchInterval to poll for new labels (useful when auto-generation happens)
+  const {
+    data: shippingLabels,
+    isLoading: labelsLoading,
+    refetch: refetchLabels,
+  } = useShippingLabelsByOrderId(orderItem?.id || "");
 
   if (!orderItem) return null;
 
@@ -58,6 +62,18 @@ export function OrderDetailDialog({
         updates: { status: selectedStatus as OrderStatus },
       });
       toast.success("Order status updated successfully");
+
+      // If status changed to "processing", auto-generation might happen
+      // Show a message and refresh labels after a delay
+      if (selectedStatus === "processing") {
+        toast.info(
+          "Auto-generating shipping label... Check back in a few seconds."
+        );
+        setTimeout(() => {
+          refetchLabels();
+        }, 3000); // 3 second delay to allow auto-generation to complete
+      }
+
       onOpenChange(false);
     } catch {
       toast.error("Failed to update order status");
@@ -254,26 +270,45 @@ export function OrderDetailDialog({
                         {orderItem.shipping_address.name}
                       </p>
                     )}
-                    <p className="text-sm">
-                      {orderItem.shipping_address.address1}
-                    </p>
+                    {orderItem.shipping_address.address1 && (
+                      <p className="text-sm">
+                        {orderItem.shipping_address.address1}
+                      </p>
+                    )}
                     {orderItem.shipping_address.address2 && (
                       <p className="text-sm">
                         {orderItem.shipping_address.address2}
                       </p>
                     )}
-                    <p className="text-sm">
-                      {orderItem.shipping_address.city}
-                      {orderItem.shipping_address.state &&
-                        `, ${orderItem.shipping_address.state}`}{" "}
-                      {orderItem.shipping_address.zip}
-                    </p>
-                    <p className="text-sm">
-                      {orderItem.shipping_address.country}
-                    </p>
+                    {(orderItem.shipping_address.city ||
+                      orderItem.shipping_address.state ||
+                      orderItem.shipping_address.zip) && (
+                      <p className="text-sm">
+                        {orderItem.shipping_address.city || ""}
+                        {orderItem.shipping_address.city &&
+                          orderItem.shipping_address.state &&
+                          ", "}
+                        {orderItem.shipping_address.state || ""}
+                        {orderItem.shipping_address.zip && " "}
+                        {orderItem.shipping_address.zip || ""}
+                      </p>
+                    )}
+                    {orderItem.shipping_address.country && (
+                      <p className="text-sm">
+                        {orderItem.shipping_address.country}
+                      </p>
+                    )}
                     {orderItem.shipping_address.phone && (
                       <p className="text-sm text-muted-foreground mt-2">
                         Phone: {orderItem.shipping_address.phone}
+                      </p>
+                    )}
+                    {/* Debug: Show if address is incomplete */}
+                    {(!orderItem.shipping_address.city ||
+                      !orderItem.shipping_address.zip ||
+                      !orderItem.shipping_address.country) && (
+                      <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-2">
+                        ⚠️ Incomplete address: Missing city, zip, or country
                       </p>
                     )}
                   </div>

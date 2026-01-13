@@ -131,6 +131,10 @@ export async function updateOrder(id: string, updates: OrderUpdate) {
 
   if (userError || !user) return { error: "Not Authenticated", data: null };
 
+  // Get previous order status before update (for auto-label generation)
+  const { data: previousOrder } = await getOrderById(id);
+  const previousStatus = previousOrder?.status;
+
   const { data, error } = await supabase
     .from("orders")
     .update(updates)
@@ -140,6 +144,34 @@ export async function updateOrder(id: string, updates: OrderUpdate) {
 
   if (error)
     return { error: "Failed To Update", details: error.message, data: null };
+
+  // Trigger auto-label generation if status changed to "processing"
+  // Do this asynchronously so it doesn't block the order update
+  if (
+    updates.status === "processing" &&
+    previousStatus !== "processing"
+  ) {
+    console.log(
+      `[AUTO-LABEL] Order ${id} status changed from "${previousStatus}" to "processing" - triggering auto-generation`
+    );
+    // Import and call auto-generation (fire and forget)
+    import("@/lib/shipping/auto-generate")
+      .then(({ triggerAutoLabelGeneration }) => {
+        console.log(`[AUTO-LABEL] Calling triggerAutoLabelGeneration for order ${id}`);
+        return triggerAutoLabelGeneration(id, previousStatus);
+      })
+      .then((result) => {
+        if (result.success) {
+          console.log(`[AUTO-LABEL] Successfully auto-generated label for order ${id}`);
+        } else {
+          console.error(`[AUTO-LABEL] Failed to auto-generate label for order ${id}:`, result.error);
+        }
+      })
+      .catch((error) => {
+        console.error("[AUTO-LABEL] Error triggering auto-label generation:", error);
+        // Don't fail the order update if auto-generation fails
+      });
+  }
 
   return { data: data as Order, error: null };
 }

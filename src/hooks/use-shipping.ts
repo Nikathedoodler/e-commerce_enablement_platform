@@ -67,6 +67,12 @@ export function useShippingLabelsByOrderId(orderId: string) {
       }
       return result.data;
     },
+    // Refetch every 2 seconds when dialog is open (for auto-generated labels)
+    refetchInterval: (query) => {
+      // Only refetch if we have an orderId and no labels yet (waiting for auto-generation)
+      return query.state.data && query.state.data.length === 0 ? 2000 : false;
+    },
+    refetchOnWindowFocus: true,
   });
 }
 

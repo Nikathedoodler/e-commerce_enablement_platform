@@ -81,6 +81,17 @@ export function useUpdateOrder() {
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["order", variables.id] });
+      
+      // If status changed to "processing", auto-generation might have happened
+      // Invalidate shipping labels after a short delay to allow auto-generation to complete
+      if (variables.updates.status === "processing") {
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ["shipping_labels"] });
+          queryClient.invalidateQueries({ 
+            queryKey: ["shipping_labels", "order", variables.id] 
+          });
+        }, 2000); // 2 second delay to allow auto-generation to complete
+      }
     },
   });
 }

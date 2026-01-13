@@ -185,3 +185,43 @@ export interface GenerateLabelResponse {
   currency: string;
 }
 
+/**
+ * Shipping Settings
+ * User preferences for shipping label automation
+ */
+export interface ShippingSettings {
+  // Auto-generation toggle
+  auto_generate_labels: boolean;
+  
+  // Default package information
+  default_package_weight: number; // kg
+  default_package_length?: number; // cm
+  default_package_width?: number; // cm
+  default_package_height?: number; // cm
+  default_service_type: DHLServiceType;
+  
+  // Auto-generation rules
+  auto_generate_rules: {
+    shopify_orders?: boolean; // Auto-generate for Shopify orders
+    manual_orders?: boolean; // Auto-generate for manually created orders
+    on_status_processing?: boolean; // Auto-generate when status changes to "processing"
+  };
+  
+  // Shipper/Warehouse information
+  shipper_name?: string;
+  shipper_company_name?: string;
+  shipper_address1?: string;
+  shipper_address2?: string;
+  shipper_city?: string;
+  shipper_state?: string;
+  shipper_postal_code?: string;
+  shipper_country?: string;
+  shipper_phone?: string;
+  shipper_email?: string;
+}
+
+/**
+ * Shipping Settings Update
+ * Partial update for shipping settings
+ */
+export type ShippingSettingsUpdate = Partial<ShippingSettings>;
