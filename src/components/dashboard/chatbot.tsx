@@ -132,7 +132,7 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
   return (
     <>
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4 min-h-[300px] max-h-[600px] pr-2">
+      <div className="flex-1 overflow-y-auto space-y-4 mb-2 min-h-[300px] max-h-[600px] pr-2 pt-0">
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground py-8">
             <p className="mb-2">Ask me anything about the platform!</p>
@@ -245,7 +245,7 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      <form onSubmit={handleSubmit} className="flex gap-2 mt-auto">
         <Input
           value={input}
           onChange={handleInputChange}
@@ -333,10 +333,10 @@ export function Chatbot({ className }: ChatbotProps) {
 
   return (
     <Card className={cn("flex flex-col h-full", className)}>
-      <CardHeader>
+      <CardHeader className="pb-3 pt-4">
         <CardTitle>AI Assistant</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col flex-1 min-h-0">
+      <CardContent className="flex flex-col flex-1 min-h-0 pb-4 pt-0 px-4">
         {/* Pass formatted messages to ensure useChat receives them correctly */}
         {/* Only render ChatContent once messages are loaded (no key to avoid remounting) */}
         <ChatContent initialMessages={formattedMessages} />
