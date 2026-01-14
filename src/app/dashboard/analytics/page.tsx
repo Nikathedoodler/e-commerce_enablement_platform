@@ -7,18 +7,12 @@ import {
 } from "@/components/dashboard/analytics/date-range-selector";
 import { MetricCard } from "@/components/dashboard/analytics/metric-card";
 import { ChartAreaInteractive } from "@/components/dashboard/analytics/chart-area-interactive";
-import { OrderStatusChart } from "@/components/dashboard/analytics/order-status-chart";
-import { OrderSourceChart } from "@/components/dashboard/analytics/order-source-chart";
-import { ReceivingConditionChart } from "@/components/dashboard/analytics/receiving-condition-chart";
 import {
   useOrderStats,
   useOrderAnalyticsBatched,
   useOrderTrends,
-  useOrderStatusBreakdown,
-  useOrderSourceBreakdown,
   useInventoryStats,
   useTopSKUs,
-  useReceivingStats,
   useReceivingTrends,
   useLabelStats,
   useLabelTrends,
@@ -53,20 +47,6 @@ export default function AnalyticsPage() {
     isLoading: orderAnalyticsBatched.isLoading,
     error: orderAnalyticsBatched.error,
   };
-  const orderStatusBreakdown = {
-    data: orderAnalyticsBatched.data?.data?.statusBreakdown
-      ? { data: orderAnalyticsBatched.data.data.statusBreakdown }
-      : null,
-    isLoading: orderAnalyticsBatched.isLoading,
-    error: orderAnalyticsBatched.error,
-  };
-  const orderSourceBreakdown = {
-    data: orderAnalyticsBatched.data?.data?.sourceBreakdown
-      ? { data: orderAnalyticsBatched.data.data.sourceBreakdown }
-      : null,
-    isLoading: orderAnalyticsBatched.isLoading,
-    error: orderAnalyticsBatched.error,
-  };
 
   // Determine groupBy based on date range (memoized for performance)
   const groupBy = useMemo((): "day" | "week" | "month" => {
@@ -92,7 +72,6 @@ export default function AnalyticsPage() {
   const orderTrendsGrouped = useOrderTrends(dateRange, groupBy, {
     enabled: criticalDataReady,
   });
-  const receivingStats = useReceivingStats(dateRange);
   const receivingTrendsGrouped = useReceivingTrends(dateRange, groupBy, {
     enabled: criticalDataReady,
   });
@@ -185,17 +164,6 @@ export default function AnalyticsPage() {
             isLoading={orderTrendsGrouped.isLoading}
             valueKey="value"
             defaultTimeRange="30d"
-          />
-        </div>
-
-        <div className="grid gap-4 px-4 grid-cols-1 xl:grid-cols-2 lg:px-6">
-          <OrderStatusChart
-            data={orderStatusBreakdown.data?.data || []}
-            isLoading={orderStatusBreakdown.isLoading}
-          />
-          <OrderSourceChart
-            data={orderSourceBreakdown.data?.data || []}
-            isLoading={orderSourceBreakdown.isLoading}
           />
         </div>
 
@@ -315,7 +283,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Receiving Analytics */}
-        <div className="grid gap-4 px-4 grid-cols-1 xl:grid-cols-2 lg:px-6">
+        <div className="px-4 lg:px-6">
           <ChartAreaInteractive
             title="Receiving Trends"
             description="Items received over time"
@@ -323,10 +291,6 @@ export default function AnalyticsPage() {
             isLoading={receivingTrendsGrouped.isLoading}
             valueKey="quantity"
             defaultTimeRange="30d"
-          />
-          <ReceivingConditionChart
-            data={receivingStats.data?.data || null}
-            isLoading={receivingStats.isLoading}
           />
         </div>
 
