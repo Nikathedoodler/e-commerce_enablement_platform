@@ -41,15 +41,12 @@ export default function AnalyticsPage() {
 
   // Fetch all analytics data
   const orderStats = useOrderStats(dateRange);
-  const orderTrends = useOrderTrends(dateRange, "day");
   const orderStatusBreakdown = useOrderStatusBreakdown(dateRange);
   const orderSourceBreakdown = useOrderSourceBreakdown(dateRange);
   const inventoryStats = useInventoryStats();
   const topSKUs = useTopSKUs(10);
   const receivingStats = useReceivingStats(dateRange);
-  const receivingTrends = useReceivingTrends(dateRange, "day");
   const labelStats = useLabelStats(dateRange);
-  const labelTrends = useLabelTrends(dateRange, "day");
 
   // Determine groupBy based on date range
   const getGroupBy = (): "day" | "week" | "month" => {

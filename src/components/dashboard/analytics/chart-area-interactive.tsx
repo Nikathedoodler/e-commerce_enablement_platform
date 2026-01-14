@@ -139,19 +139,16 @@ export function ChartAreaInteractive({
   }
 
   const chartData = filteredData.map((item) => {
-    const dataItem = item as any;
     let value = 0;
     
-    if (valueKey === "revenue" && "revenue" in dataItem) {
-      value = dataItem.revenue || 0;
-    } else if (valueKey === "quantity" && "quantity" in dataItem) {
-      value = dataItem.quantity || 0;
-    } else if (valueKey === "count" && "count" in dataItem) {
-      value = dataItem.count || 0;
-    } else if ("value" in dataItem) {
-      value = dataItem.value || 0;
-    } else if ("revenue" in dataItem) {
-      value = dataItem.revenue || 0;
+    if (valueKey === "revenue" && "revenue" in item) {
+      value = (item as TrendDataPoint).revenue || 0;
+    } else if (valueKey === "quantity" && "quantity" in item) {
+      value = (item as ReceivingTrendDataPoint).quantity || 0;
+    } else if (valueKey === "count" && "count" in item) {
+      value = (item as LabelTrendDataPoint).count || 0;
+    } else if ("value" in item) {
+      value = (item as TrendDataPoint).value || 0;
     }
     
     return {

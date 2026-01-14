@@ -77,7 +77,7 @@ export function OrderSourceChart({ data, isLoading }: OrderSourceChartProps) {
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  formatter={(value, name, props) => {
+                  formatter={(value, name) => {
                     const item = data.find(
                       (d) =>
                         d.source.toLowerCase() === name?.toString().toLowerCase()

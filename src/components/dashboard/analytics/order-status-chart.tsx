@@ -89,7 +89,7 @@ export function OrderStatusChart({ data, isLoading }: OrderStatusChartProps) {
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  formatter={(value, name, props) => {
+                  formatter={(value, name) => {
                     const item = data.find(
                       (d) =>
                         d.status.toLowerCase() === name?.toString().toLowerCase()

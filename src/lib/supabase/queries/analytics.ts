@@ -709,7 +709,8 @@ export async function getLabelStats(
     let totalCost = 0;
     logs.forEach((log) => {
       if (log.metadata && typeof log.metadata === "object") {
-        const cost = (log.metadata as any).cost;
+        const metadata = log.metadata as Record<string, unknown>;
+        const cost = metadata.cost;
         if (typeof cost === "number") {
           totalCost += cost;
         }
