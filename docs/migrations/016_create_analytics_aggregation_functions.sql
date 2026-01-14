@@ -88,50 +88,50 @@ BEGIN
   IF p_group_by = 'day' THEN
     RETURN QUERY
     SELECT 
-      TO_CHAR(DATE_TRUNC('day', received_at), 'YYYY-MM-DD') as date,
-      COALESCE(SUM(quantity), 0)::BIGINT as quantity,
-      COALESCE(SUM(CASE WHEN condition = 'good' THEN quantity ELSE 0 END), 0)::BIGINT as good,
-      COALESCE(SUM(CASE WHEN condition = 'damaged' THEN quantity ELSE 0 END), 0)::BIGINT as damaged,
-      COALESCE(SUM(CASE WHEN condition = 'defective' THEN quantity ELSE 0 END), 0)::BIGINT as defective,
-      COALESCE(SUM(CASE WHEN condition = 'returned' THEN quantity ELSE 0 END), 0)::BIGINT as returned
-    FROM public.receiving_log
-    WHERE user_id = p_user_id
-      AND received_at >= p_start_date
-      AND received_at <= p_end_date
-    GROUP BY DATE_TRUNC('day', received_at)
-    ORDER BY DATE_TRUNC('day', received_at) ASC;
+      TO_CHAR(DATE_TRUNC('day', rl.received_at), 'YYYY-MM-DD') as date,
+      COALESCE(SUM(rl.quantity), 0)::BIGINT as quantity,
+      COALESCE(SUM(CASE WHEN rl.condition = 'good' THEN rl.quantity ELSE 0 END), 0)::BIGINT as good,
+      COALESCE(SUM(CASE WHEN rl.condition = 'damaged' THEN rl.quantity ELSE 0 END), 0)::BIGINT as damaged,
+      COALESCE(SUM(CASE WHEN rl.condition = 'defective' THEN rl.quantity ELSE 0 END), 0)::BIGINT as defective,
+      COALESCE(SUM(CASE WHEN rl.condition = 'returned' THEN rl.quantity ELSE 0 END), 0)::BIGINT as returned
+    FROM public.receiving_log rl
+    WHERE rl.user_id = p_user_id
+      AND rl.received_at >= p_start_date
+      AND rl.received_at <= p_end_date
+    GROUP BY DATE_TRUNC('day', rl.received_at)
+    ORDER BY DATE_TRUNC('day', rl.received_at) ASC;
     
   ELSIF p_group_by = 'week' THEN
     RETURN QUERY
     SELECT 
-      TO_CHAR(DATE_TRUNC('week', received_at), 'YYYY-MM-DD') as date,
-      COALESCE(SUM(quantity), 0)::BIGINT as quantity,
-      COALESCE(SUM(CASE WHEN condition = 'good' THEN quantity ELSE 0 END), 0)::BIGINT as good,
-      COALESCE(SUM(CASE WHEN condition = 'damaged' THEN quantity ELSE 0 END), 0)::BIGINT as damaged,
-      COALESCE(SUM(CASE WHEN condition = 'defective' THEN quantity ELSE 0 END), 0)::BIGINT as defective,
-      COALESCE(SUM(CASE WHEN condition = 'returned' THEN quantity ELSE 0 END), 0)::BIGINT as returned
-    FROM public.receiving_log
-    WHERE user_id = p_user_id
-      AND received_at >= p_start_date
-      AND received_at <= p_end_date
-    GROUP BY DATE_TRUNC('week', received_at)
-    ORDER BY DATE_TRUNC('week', received_at) ASC;
+      TO_CHAR(DATE_TRUNC('week', rl.received_at), 'YYYY-MM-DD') as date,
+      COALESCE(SUM(rl.quantity), 0)::BIGINT as quantity,
+      COALESCE(SUM(CASE WHEN rl.condition = 'good' THEN rl.quantity ELSE 0 END), 0)::BIGINT as good,
+      COALESCE(SUM(CASE WHEN rl.condition = 'damaged' THEN rl.quantity ELSE 0 END), 0)::BIGINT as damaged,
+      COALESCE(SUM(CASE WHEN rl.condition = 'defective' THEN rl.quantity ELSE 0 END), 0)::BIGINT as defective,
+      COALESCE(SUM(CASE WHEN rl.condition = 'returned' THEN rl.quantity ELSE 0 END), 0)::BIGINT as returned
+    FROM public.receiving_log rl
+    WHERE rl.user_id = p_user_id
+      AND rl.received_at >= p_start_date
+      AND rl.received_at <= p_end_date
+    GROUP BY DATE_TRUNC('week', rl.received_at)
+    ORDER BY DATE_TRUNC('week', rl.received_at) ASC;
     
   ELSE -- month
     RETURN QUERY
     SELECT 
-      TO_CHAR(DATE_TRUNC('month', received_at), 'YYYY-MM') as date,
-      COALESCE(SUM(quantity), 0)::BIGINT as quantity,
-      COALESCE(SUM(CASE WHEN condition = 'good' THEN quantity ELSE 0 END), 0)::BIGINT as good,
-      COALESCE(SUM(CASE WHEN condition = 'damaged' THEN quantity ELSE 0 END), 0)::BIGINT as damaged,
-      COALESCE(SUM(CASE WHEN condition = 'defective' THEN quantity ELSE 0 END), 0)::BIGINT as defective,
-      COALESCE(SUM(CASE WHEN condition = 'returned' THEN quantity ELSE 0 END), 0)::BIGINT as returned
-    FROM public.receiving_log
-    WHERE user_id = p_user_id
-      AND received_at >= p_start_date
-      AND received_at <= p_end_date
-    GROUP BY DATE_TRUNC('month', received_at)
-    ORDER BY DATE_TRUNC('month', received_at) ASC;
+      TO_CHAR(DATE_TRUNC('month', rl.received_at), 'YYYY-MM') as date,
+      COALESCE(SUM(rl.quantity), 0)::BIGINT as quantity,
+      COALESCE(SUM(CASE WHEN rl.condition = 'good' THEN rl.quantity ELSE 0 END), 0)::BIGINT as good,
+      COALESCE(SUM(CASE WHEN rl.condition = 'damaged' THEN rl.quantity ELSE 0 END), 0)::BIGINT as damaged,
+      COALESCE(SUM(CASE WHEN rl.condition = 'defective' THEN rl.quantity ELSE 0 END), 0)::BIGINT as defective,
+      COALESCE(SUM(CASE WHEN rl.condition = 'returned' THEN rl.quantity ELSE 0 END), 0)::BIGINT as returned
+    FROM public.receiving_log rl
+    WHERE rl.user_id = p_user_id
+      AND rl.received_at >= p_start_date
+      AND rl.received_at <= p_end_date
+    GROUP BY DATE_TRUNC('month', rl.received_at)
+    ORDER BY DATE_TRUNC('month', rl.received_at) ASC;
   END IF;
 END;
 $$;

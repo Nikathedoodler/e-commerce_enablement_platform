@@ -3,11 +3,17 @@
 -- Description: Adds comprehensive dummy data for testing analytics page
 -- 
 -- HOW TO USE:
--- 1. Get your user_id first:
---    SELECT id, email FROM auth.users;
--- 2. Replace 'bacc4370-22ed-4dc1-b8ea-acc7f9bc74bf' below with your actual UUID
--- 3. Run this file in Supabase SQL Editor
--- 4. This will add orders, receiving logs, and label audit logs spread across the last 90 days
+-- STEP 1: Get your user_id by running this query first:
+--   SELECT id, email FROM auth.users ORDER BY created_at DESC LIMIT 1;
+--   Or use the helper script: 019_get_user_id_for_seeding.sql
+--
+-- STEP 2: Replace 'YOUR_USER_ID_HERE' below with your actual UUID (keep the quotes!)
+--   Example: If your user_id is 'b24b8854-24cc-4483-8043-b9701f8365d9'
+--   Replace: 'YOUR_USER_ID_HERE' → 'b24b8854-24cc-4483-8043-b9701f8365d9'
+--
+-- STEP 3: Run this entire file in Supabase SQL Editor
+--
+-- NOTE: 'YOUR_USER_ID_HERE' doesn't work in SQL Editor, so you must use your actual UUID
 
 -- ============================================================================
 -- PART 1: ORDERS (30 orders spread across last 90 days)
@@ -450,3 +456,15 @@ FROM public.label_generation_audit_log
 WHERE user_id = 'bacc4370-22ed-4dc1-b8ea-acc7f9bc74bf'
 GROUP BY status, generation_type
 ORDER BY status, generation_type;
+
+-- Diagnostic: Check receiving trends data for last 30 days
+SELECT 
+  TO_CHAR(DATE_TRUNC('day', received_at), 'YYYY-MM-DD') as date,
+  SUM(quantity) as total_quantity,
+  COUNT(*) as entry_count
+FROM public.receiving_log
+WHERE user_id = 'bacc4370-22ed-4dc1-b8ea-acc7f9bc74bf'
+  AND received_at >= NOW() - INTERVAL '30 days'
+  AND received_at <= NOW()
+GROUP BY DATE_TRUNC('day', received_at)
+ORDER BY DATE_TRUNC('day', received_at) DESC;
