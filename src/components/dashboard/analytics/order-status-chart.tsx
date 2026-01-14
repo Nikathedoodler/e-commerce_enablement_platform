@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/chart";
 import { Pie, PieChart, Cell } from "recharts";
 import type { StatusBreakdown } from "@/types/analytics";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface OrderStatusChartProps {
   data: StatusBreakdown[];
@@ -24,6 +25,8 @@ const statusColors: Record<string, string> = {
 };
 
 export function OrderStatusChart({ data, isLoading }: OrderStatusChartProps) {
+  const isMobile = useIsMobile();
+
   if (isLoading) {
     return (
       <Card>
@@ -71,6 +74,9 @@ export function OrderStatusChart({ data, isLoading }: OrderStatusChartProps) {
     {} as Record<string, { label: string; color: string }>
   );
 
+  // Adjust outerRadius based on screen size
+  const outerRadius = isMobile ? 70 : 100;
+
   return (
     <Card>
       <CardHeader>
@@ -102,7 +108,7 @@ export function OrderStatusChart({ data, isLoading }: OrderStatusChartProps) {
               nameKey="name"
               cx="50%"
               cy="50%"
-              outerRadius={100}
+              outerRadius={outerRadius}
               label={(entry) => `${entry.name}: ${entry.value}`}
             >
               {chartData.map((entry, index) => (

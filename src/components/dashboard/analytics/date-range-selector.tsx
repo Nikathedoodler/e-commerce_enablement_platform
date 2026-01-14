@@ -1,7 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { DateRangePreset } from "@/types/analytics";
 
 interface DateRangeSelectorProps {
@@ -21,23 +26,23 @@ export function DateRangeSelector({
   value,
   onChange,
 }: DateRangeSelectorProps) {
+  const selectedPreset = presets.find((p) => p.value === value);
+  
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      {presets.map((preset) => (
-        <Button
-          key={preset.value}
-          variant={value === preset.value ? "default" : "outline"}
-          size="sm"
-          onClick={() => onChange(preset.value)}
-          className={cn(
-            "text-xs whitespace-nowrap",
-            value === preset.value && "bg-primary text-primary-foreground"
-          )}
-        >
-          {preset.label}
-        </Button>
-      ))}
-    </div>
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="w-full sm:w-[180px]">
+        <SelectValue placeholder="Select period">
+          {selectedPreset?.label || "Select period"}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        {presets.map((preset) => (
+          <SelectItem key={preset.value} value={preset.value}>
+            {preset.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 
