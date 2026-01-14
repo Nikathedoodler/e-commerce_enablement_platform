@@ -160,11 +160,11 @@ function ChatContent({ initialMessages }: { initialMessages: ChatMessage[] }) {
           </div>
         )}
         {messages
-          .filter((message: ChatMessage, index: number, self: ChatMessage[]) => {
+          .filter((message, index, self) => {
             // Deduplicate messages by id - keep only the first occurrence
             return index === self.findIndex((m) => m.id === message.id);
           })
-          .map((message: ChatMessage, index: number) => {
+          .map((message, index) => {
             // Extract content - handle both string content and parts array format
             // UIMessage from @ai-sdk/react can have content as string or in parts array
             let content = "";
