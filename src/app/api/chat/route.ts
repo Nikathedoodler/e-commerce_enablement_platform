@@ -130,7 +130,6 @@ Remember: You're here to guide and assist, not to access or modify user data dir
       model: openai("gpt-4o-mini"),
       system: systemPrompt,
       messages: modelMessages,
-      maxTokens: 1000,
     });
 
     // Pass originalMessages so the useChat hook can properly match the streamed response
