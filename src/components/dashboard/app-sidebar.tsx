@@ -7,6 +7,7 @@ import {
   Settings2,
   Package,
   HelpCircle,
+  BarChart3,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
@@ -72,6 +73,11 @@ const data = {
       title: "Receiving",
       url: "#",
       icon: ArrowDownToLine,
+    },
+    {
+      title: "Analytics",
+      url: "#",
+      icon: BarChart3,
     },
     {
       title: "Settings",
