@@ -167,19 +167,26 @@ function ChatContent({ initialMessages }: { initialMessages: ChatMessage[] }) {
           .map((message, index) => {
             // Extract content - handle both string content and parts array format
             // UIMessage from @ai-sdk/react can have content as string or in parts array
+            // Use type assertion to access properties that may exist at runtime
+            const msg = message as unknown as {
+              content?: string | unknown;
+              parts?: Array<{ type: string; text?: string; content?: string }>;
+              text?: string;
+            };
+            
             let content = "";
-            if (typeof message.content === "string") {
-              content = message.content;
-            } else if (Array.isArray(message.parts)) {
+            if (typeof msg.content === "string") {
+              content = msg.content;
+            } else if (Array.isArray(msg.parts)) {
               // Extract text from parts array
-              content = message.parts
+              content = msg.parts
                 .filter((part) => part.type === "text")
                 .map((part) => part.text || part.content || "")
                 .join("");
-            } else if (message.content) {
-              content = String(message.content);
-            } else if (typeof message.text === "string") {
-              content = message.text;
+            } else if (msg.content) {
+              content = String(msg.content);
+            } else if (typeof msg.text === "string") {
+              content = msg.text;
             }
 
             // Don't render empty messages
