@@ -1,8 +1,15 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowDown, ArrowUp, Minus } from "lucide-react";
-import { cn } from "@/lib/utils/utils";
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { TrendingDown, TrendingUp } from "lucide-react";
 
 interface MetricCardProps {
   title: string;
@@ -38,86 +45,59 @@ export function MetricCard({
 
   const getTrendIcon = () => {
     if (trend === "up") {
-      return <ArrowUp className="h-3 w-3" />;
+      return <TrendingUp className="size-4" />;
     }
     if (trend === "down") {
-      return <ArrowDown className="h-3 w-3" />;
+      return <TrendingDown className="size-4" />;
     }
-    return <Minus className="h-3 w-3" />;
-  };
-
-  const getChangeColor = () => {
-    if (trend === "up") {
-      return "text-green-600 dark:text-green-500";
-    }
-    if (trend === "down") {
-      return "text-red-600 dark:text-red-500";
-    }
-    return "text-muted-foreground";
-  };
-
-  const getBadgeBgColor = () => {
-    if (trend === "up") {
-      return "bg-green-50 dark:bg-green-950/20";
-    }
-    if (trend === "down") {
-      return "bg-red-50 dark:bg-red-950/20";
-    }
-    return "bg-muted";
+    return null;
   };
 
   if (isLoading) {
     return (
-      <Card className="bg-gradient-to-b from-background via-muted/20 to-muted/40">
-        <CardContent className="p-6">
-          <div className="space-y-2">
+      <Card className="@container/card">
+        <CardHeader>
+          <CardDescription>
             <div className="h-4 w-24 bg-muted-foreground/20 animate-pulse rounded" />
+          </CardDescription>
+          <CardTitle>
             <div className="h-8 w-32 bg-muted-foreground/20 animate-pulse rounded" />
-            {subtitle && (
-              <div className="h-3 w-40 bg-muted-foreground/20 animate-pulse rounded" />
-            )}
-          </div>
-        </CardContent>
+          </CardTitle>
+        </CardHeader>
+        {subtitle && (
+          <CardFooter>
+            <div className="h-3 w-40 bg-muted-foreground/20 animate-pulse rounded" />
+          </CardFooter>
+        )}
       </Card>
     );
   }
 
   return (
-    <Card className="bg-gradient-to-b from-background via-muted/20 to-muted/40 border-muted">
-      <CardContent className="p-6 relative">
-        {/* Title */}
-        <div className="flex items-start justify-between mb-2">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          {/* Change badge in top right */}
-          {change !== undefined && change !== null && (
-            <div
-              className={cn(
-                "flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium",
-                getBadgeBgColor(),
-                getChangeColor()
-              )}
-            >
+    <Card className="@container/card">
+      <CardHeader>
+        <CardDescription className="text-xs sm:text-sm">
+          {title}
+        </CardDescription>
+        <CardTitle className="text-xl font-semibold tabular-nums sm:text-2xl @[250px]/card:text-3xl">
+          {formatValue(value)}
+        </CardTitle>
+        {change !== undefined && change !== null && (
+          <CardAction>
+            <Badge variant="outline" className="gap-1 text-xs">
               {getTrendIcon()}
-              <span>{formatChange(change)}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Main value */}
-        <p className="text-2xl font-bold mb-2">{formatValue(value)}</p>
-
-        {/* Subtitle */}
-        {subtitle && (
-          <div className="flex items-center gap-1.5">
-            {trend && trend !== "neutral" && (
-              <div className={cn("flex items-center", getChangeColor())}>
-                {getTrendIcon()}
-              </div>
-            )}
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
-          </div>
+              {formatChange(change)}
+            </Badge>
+          </CardAction>
         )}
-      </CardContent>
+      </CardHeader>
+      {subtitle && (
+        <CardFooter className="flex-col items-start gap-1.5 text-xs sm:text-sm">
+          <div className="line-clamp-1 flex gap-2 font-medium">
+            {subtitle} {trend && trend !== "neutral" && getTrendIcon()}
+          </div>
+        </CardFooter>
+      )}
     </Card>
   );
 }

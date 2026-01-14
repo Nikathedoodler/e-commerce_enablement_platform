@@ -22,7 +22,7 @@ export function DateRangeSelector({
   onChange,
 }: DateRangeSelectorProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       {presets.map((preset) => (
         <Button
           key={preset.value}
@@ -30,7 +30,7 @@ export function DateRangeSelector({
           size="sm"
           onClick={() => onChange(preset.value)}
           className={cn(
-            "text-xs",
+            "text-xs whitespace-nowrap",
             value === preset.value && "bg-primary text-primary-foreground"
           )}
         >
