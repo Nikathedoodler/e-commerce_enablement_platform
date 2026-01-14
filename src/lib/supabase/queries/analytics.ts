@@ -16,6 +16,181 @@ import type {
 } from "@/types/analytics";
 
 /**
+ * Batched order analytics - combines stats, status breakdown, and source breakdown
+ * This reduces 3 separate queries to 1, improving performance
+ */
+export async function getOrderAnalyticsBatched(
+  startDate: Date,
+  endDate: Date
+): Promise<{
+  data: {
+    stats: OrderStats;
+    statusBreakdown: StatusBreakdown[];
+    sourceBreakdown: SourceBreakdown[];
+  } | null;
+  error: string | null;
+}> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { error: "Not Authenticated", data: null };
+  }
+
+  try {
+    // Fetch current period orders with all needed fields in one query
+    const { data: orders, error: ordersError } = await supabase
+      .from("orders")
+      .select("status, total, shop_id")
+      .eq("user_id", user.id)
+      .gte("created_at", startDate.toISOString())
+      .lte("created_at", endDate.toISOString());
+
+    if (ordersError) {
+      return { error: ordersError.message, data: null };
+    }
+
+    // Fetch previous period orders for comparison
+    const periodDuration = endDate.getTime() - startDate.getTime();
+    const previousStartDate = new Date(startDate.getTime() - periodDuration);
+    const previousEndDate = startDate;
+
+    const { data: previousOrders, error: prevError } = await supabase
+      .from("orders")
+      .select("total")
+      .eq("user_id", user.id)
+      .gte("created_at", previousStartDate.toISOString())
+      .lte("created_at", previousEndDate.toISOString());
+
+    if (prevError) {
+      console.warn("Failed to fetch previous period:", prevError.message);
+    }
+
+    const orderList = orders || [];
+    const previousOrderList = previousOrders || [];
+
+    // Calculate stats
+    const totalOrders = orderList.length;
+    const totalRevenue = orderList.reduce(
+      (sum, o) => sum + Number(o.total || 0),
+      0
+    );
+    const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    const statusCounts = {
+      pending: 0,
+      processing: 0,
+      fulfilled: 0,
+      cancelled: 0,
+    };
+
+    // Calculate status breakdown
+    const statusBreakdownMap = new Map<string, number>();
+
+    // Calculate source breakdown
+    let shopifyCount = 0;
+    let manualCount = 0;
+
+    // Process all orders in one loop
+    orderList.forEach((order) => {
+      // Status counts for stats
+      const status = order.status as keyof typeof statusCounts;
+      if (status in statusCounts) {
+        statusCounts[status]++;
+      }
+
+      // Status breakdown
+      const orderStatus = order.status || "unknown";
+      statusBreakdownMap.set(
+        orderStatus,
+        (statusBreakdownMap.get(orderStatus) || 0) + 1
+      );
+
+      // Source breakdown
+      if (order.shop_id) {
+        shopifyCount++;
+      } else {
+        manualCount++;
+      }
+    });
+
+    const previousPeriodOrders = previousOrderList.length;
+    const previousPeriodRevenue = previousOrderList.reduce(
+      (sum, o) => sum + Number(o.total || 0),
+      0
+    );
+
+    const ordersChangePercent =
+      previousPeriodOrders > 0
+        ? ((totalOrders - previousPeriodOrders) / previousPeriodOrders) * 100
+        : totalOrders > 0
+        ? 100
+        : 0;
+
+    const revenueChangePercent =
+      previousPeriodRevenue > 0
+        ? ((totalRevenue - previousPeriodRevenue) / previousPeriodRevenue) * 100
+        : totalRevenue > 0
+        ? 100
+        : 0;
+
+    // Build status breakdown array
+    const statusBreakdown: StatusBreakdown[] = Array.from(
+      statusBreakdownMap.entries()
+    ).map(([status, count]) => ({
+      status,
+      count,
+      percentage: totalOrders > 0 ? (count / totalOrders) * 100 : 0,
+    }));
+
+    // Build source breakdown array
+    const total = shopifyCount + manualCount;
+    const sourceBreakdown: SourceBreakdown[] = [
+      {
+        source: "shopify",
+        count: shopifyCount,
+        percentage: total > 0 ? (shopifyCount / total) * 100 : 0,
+      },
+      {
+        source: "manual",
+        count: manualCount,
+        percentage: total > 0 ? (manualCount / total) * 100 : 0,
+      },
+    ];
+
+    return {
+      data: {
+        stats: {
+          totalOrders,
+          totalRevenue,
+          averageOrderValue,
+          pendingCount: statusCounts.pending,
+          processingCount: statusCounts.processing,
+          fulfilledCount: statusCounts.fulfilled,
+          cancelledCount: statusCounts.cancelled,
+          previousPeriodOrders,
+          previousPeriodRevenue,
+          ordersChangePercent,
+          revenueChangePercent,
+        },
+        statusBreakdown,
+        sourceBreakdown,
+      },
+      error: null,
+    };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+      data: null,
+    };
+  }
+}
+
+/**
  * Get order statistics for a date range
  */
 export async function getOrderStats(
@@ -131,6 +306,7 @@ export async function getOrderStats(
 
 /**
  * Get order trends over time
+ * Uses SQL aggregation for better performance
  */
 export async function getOrderTrends(
   startDate: Date,
@@ -149,51 +325,25 @@ export async function getOrderTrends(
   }
 
   try {
-    const { data: orders, error } = await supabase
-      .from("orders")
-      .select("created_at, total")
-      .eq("user_id", user.id)
-      .gte("created_at", startDate.toISOString())
-      .lte("created_at", endDate.toISOString())
-      .order("created_at", { ascending: true });
+    // Use SQL aggregation function instead of client-side grouping
+    const { data, error } = await supabase.rpc("get_order_trends", {
+      p_user_id: user.id,
+      p_start_date: startDate.toISOString(),
+      p_end_date: endDate.toISOString(),
+      p_group_by: groupBy,
+    });
 
     if (error) {
       return { error: error.message, data: null };
     }
 
-    // Group by period
-    const grouped = new Map<string, { count: number; revenue: number }>();
-
-    orders?.forEach((order) => {
-      const date = new Date(order.created_at);
-      let key: string;
-
-      if (groupBy === "day") {
-        key = date.toISOString().split("T")[0]; // YYYY-MM-DD
-      } else if (groupBy === "week") {
-        const weekStart = new Date(date);
-        weekStart.setDate(date.getDate() - date.getDay());
-        key = weekStart.toISOString().split("T")[0];
-      } else {
-        // month
-        key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-      }
-
-      const existing = grouped.get(key) || { count: 0, revenue: 0 };
-      grouped.set(key, {
-        count: existing.count + 1,
-        revenue: existing.revenue + Number(order.total || 0),
-      });
-    });
-
-    // Convert to array and sort
-    const trends: TrendDataPoint[] = Array.from(grouped.entries())
-      .map(([date, data]) => ({
-        date,
-        value: data.count,
-        revenue: data.revenue,
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    // Map the database result to our TrendDataPoint format
+    const trends: TrendDataPoint[] =
+      data?.map((row: { date: string; value: number; revenue: number }) => ({
+        date: row.date,
+        value: Number(row.value),
+        revenue: Number(row.revenue),
+      })) || [];
 
     return { data: trends, error: null };
   } catch (error) {
@@ -536,6 +686,7 @@ export async function getReceivingStats(
 
 /**
  * Get receiving trends over time
+ * Uses SQL aggregation for better performance
  */
 export async function getReceivingTrends(
   startDate: Date,
@@ -554,64 +705,37 @@ export async function getReceivingTrends(
   }
 
   try {
-    const { data: logs, error } = await supabase
-      .from("receiving_log")
-      .select("quantity, condition, received_at")
-      .eq("user_id", user.id)
-      .gte("received_at", startDate.toISOString())
-      .lte("received_at", endDate.toISOString())
-      .order("received_at", { ascending: true });
+    // Use SQL aggregation function instead of client-side grouping
+    const { data, error } = await supabase.rpc("get_receiving_trends", {
+      p_user_id: user.id,
+      p_start_date: startDate.toISOString(),
+      p_end_date: endDate.toISOString(),
+      p_group_by: groupBy,
+    });
 
     if (error) {
       return { error: error.message, data: null };
     }
 
-    // Group by period
-    const grouped = new Map<
-      string,
-      { quantity: number; good: number; damaged: number; defective: number; returned: number }
-    >();
-
-    logs?.forEach((log) => {
-      const date = new Date(log.received_at);
-      let key: string;
-
-      if (groupBy === "day") {
-        key = date.toISOString().split("T")[0];
-      } else if (groupBy === "week") {
-        const weekStart = new Date(date);
-        weekStart.setDate(date.getDate() - date.getDay());
-        key = weekStart.toISOString().split("T")[0];
-      } else {
-        key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-      }
-
-      const existing = grouped.get(key) || {
-        quantity: 0,
-        good: 0,
-        damaged: 0,
-        defective: 0,
-        returned: 0,
-      };
-
-      const qty = log.quantity || 0;
-      const condition = log.condition || "good";
-
-      grouped.set(key, {
-        quantity: existing.quantity + qty,
-        good: existing.good + (condition === "good" ? qty : 0),
-        damaged: existing.damaged + (condition === "damaged" ? qty : 0),
-        defective: existing.defective + (condition === "defective" ? qty : 0),
-        returned: existing.returned + (condition === "returned" ? qty : 0),
-      });
-    });
-
-    const trends: ReceivingTrendDataPoint[] = Array.from(grouped.entries())
-      .map(([date, data]) => ({
-        date,
-        ...data,
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    // Map the database result to our ReceivingTrendDataPoint format
+    const trends: ReceivingTrendDataPoint[] =
+      data?.map(
+        (row: {
+          date: string;
+          quantity: number;
+          good: number;
+          damaged: number;
+          defective: number;
+          returned: number;
+        }) => ({
+          date: row.date,
+          quantity: Number(row.quantity),
+          good: Number(row.good),
+          damaged: Number(row.damaged),
+          defective: Number(row.defective),
+          returned: Number(row.returned),
+        })
+      ) || [];
 
     return { data: trends, error: null };
   } catch (error) {
@@ -750,6 +874,7 @@ export async function getLabelStats(
 
 /**
  * Get label generation trends over time
+ * Uses SQL aggregation for better performance
  */
 export async function getLabelTrends(
   startDate: Date,
@@ -768,75 +893,34 @@ export async function getLabelTrends(
   }
 
   try {
-    // Get orders in date range
-    const { data: orders, error: ordersError } = await supabase
-      .from("orders")
-      .select("id, created_at")
-      .eq("user_id", user.id)
-      .gte("created_at", startDate.toISOString())
-      .lte("created_at", endDate.toISOString());
-
-    if (ordersError) {
-      return { error: ordersError.message, data: null };
-    }
-
-    const orderIds = orders?.map((o) => o.id) || [];
-
-    if (orderIds.length === 0) {
-      return { data: [], error: null };
-    }
-
-    // Get audit logs
-    const { data: auditLogs, error: auditError } = await supabase
-      .from("label_generation_audit_log")
-      .select("status, created_at")
-      .in("order_id", orderIds)
-      .order("created_at", { ascending: true });
-
-    if (auditError) {
-      return { error: auditError.message, data: null };
-    }
-
-    // Group by period
-    const grouped = new Map<
-      string,
-      { count: number; successful: number; failed: number }
-    >();
-
-    auditLogs?.forEach((log) => {
-      const date = new Date(log.created_at);
-      let key: string;
-
-      if (groupBy === "day") {
-        key = date.toISOString().split("T")[0];
-      } else if (groupBy === "week") {
-        const weekStart = new Date(date);
-        weekStart.setDate(date.getDate() - date.getDay());
-        key = weekStart.toISOString().split("T")[0];
-      } else {
-        key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-      }
-
-      const existing = grouped.get(key) || {
-        count: 0,
-        successful: 0,
-        failed: 0,
-      };
-
-      grouped.set(key, {
-        count: existing.count + 1,
-        successful:
-          existing.successful + (log.status === "success" ? 1 : 0),
-        failed: existing.failed + (log.status === "failed" ? 1 : 0),
-      });
+    // Use SQL aggregation function instead of client-side grouping
+    // This is much more efficient as it filters directly by user_id on the audit log table
+    const { data, error } = await supabase.rpc("get_label_trends", {
+      p_user_id: user.id,
+      p_start_date: startDate.toISOString(),
+      p_end_date: endDate.toISOString(),
+      p_group_by: groupBy,
     });
 
-    const trends: LabelTrendDataPoint[] = Array.from(grouped.entries())
-      .map(([date, data]) => ({
-        date,
-        ...data,
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+    if (error) {
+      return { error: error.message, data: null };
+    }
+
+    // Map the database result to our LabelTrendDataPoint format
+    const trends: LabelTrendDataPoint[] =
+      data?.map(
+        (row: {
+          date: string;
+          count: number;
+          successful: number;
+          failed: number;
+        }) => ({
+          date: row.date,
+          count: Number(row.count),
+          successful: Number(row.successful),
+          failed: Number(row.failed),
+        })
+      ) || [];
 
     return { data: trends, error: null };
   } catch (error) {

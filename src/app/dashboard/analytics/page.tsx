@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   DateRangeSelector,
   getDateRangeFromPreset,
@@ -12,6 +12,7 @@ import { OrderSourceChart } from "@/components/dashboard/analytics/order-source-
 import { ReceivingConditionChart } from "@/components/dashboard/analytics/receiving-condition-chart";
 import {
   useOrderStats,
+  useOrderAnalyticsBatched,
   useOrderTrends,
   useOrderStatusBreakdown,
   useOrderSourceBreakdown,
@@ -39,17 +40,36 @@ export default function AnalyticsPage() {
     useState<DateRangePreset>("30d");
   const dateRange = getDateRangeFromPreset(dateRangePreset);
 
-  // Fetch all analytics data
-  const orderStats = useOrderStats(dateRange);
-  const orderStatusBreakdown = useOrderStatusBreakdown(dateRange);
-  const orderSourceBreakdown = useOrderSourceBreakdown(dateRange);
+  // Priority 1: Critical metrics (load immediately)
+  // Use batched query for order analytics (combines stats, status breakdown, source breakdown)
+  const orderAnalyticsBatched = useOrderAnalyticsBatched(dateRange);
   const inventoryStats = useInventoryStats();
-  const topSKUs = useTopSKUs(10);
-  const receivingStats = useReceivingStats(dateRange);
-  const labelStats = useLabelStats(dateRange);
 
-  // Determine groupBy based on date range
-  const getGroupBy = (): "day" | "week" | "month" => {
+  // Extract data from batched query for backward compatibility
+  const orderStats = {
+    data: orderAnalyticsBatched.data?.data?.stats
+      ? { data: orderAnalyticsBatched.data.data.stats }
+      : null,
+    isLoading: orderAnalyticsBatched.isLoading,
+    error: orderAnalyticsBatched.error,
+  };
+  const orderStatusBreakdown = {
+    data: orderAnalyticsBatched.data?.data?.statusBreakdown
+      ? { data: orderAnalyticsBatched.data.data.statusBreakdown }
+      : null,
+    isLoading: orderAnalyticsBatched.isLoading,
+    error: orderAnalyticsBatched.error,
+  };
+  const orderSourceBreakdown = {
+    data: orderAnalyticsBatched.data?.data?.sourceBreakdown
+      ? { data: orderAnalyticsBatched.data.data.sourceBreakdown }
+      : null,
+    isLoading: orderAnalyticsBatched.isLoading,
+    error: orderAnalyticsBatched.error,
+  };
+
+  // Determine groupBy based on date range (memoized for performance)
+  const groupBy = useMemo((): "day" | "week" | "month" => {
     switch (dateRangePreset) {
       case "7d":
       case "30d":
@@ -62,12 +82,27 @@ export default function AnalyticsPage() {
       default:
         return "day";
     }
-  };
+  }, [dateRangePreset]);
 
-  const groupBy = getGroupBy();
-  const orderTrendsGrouped = useOrderTrends(dateRange, groupBy);
-  const receivingTrendsGrouped = useReceivingTrends(dateRange, groupBy);
-  const labelTrendsGrouped = useLabelTrends(dateRange, groupBy);
+  // Priority 2: Charts and secondary data (load after critical metrics are ready)
+  // Only enable these queries once the critical metrics have loaded
+  const criticalDataReady =
+    !orderAnalyticsBatched.isLoading && !inventoryStats.isLoading;
+
+  const orderTrendsGrouped = useOrderTrends(dateRange, groupBy, {
+    enabled: criticalDataReady,
+  });
+  const receivingStats = useReceivingStats(dateRange);
+  const receivingTrendsGrouped = useReceivingTrends(dateRange, groupBy, {
+    enabled: criticalDataReady,
+  });
+  const labelStats = useLabelStats(dateRange);
+  const labelTrendsGrouped = useLabelTrends(dateRange, groupBy, {
+    enabled: criticalDataReady,
+  });
+
+  // Top SKUs can load independently (has longer stale time)
+  const topSKUs = useTopSKUs(10);
 
   // Calculate trend indicators
   const getTrend = (changePercent: number): "up" | "down" | "neutral" => {

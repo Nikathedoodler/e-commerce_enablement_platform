@@ -2,6 +2,7 @@
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
 
 import {
   Collapsible,
@@ -19,6 +20,11 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { getDateRangeFromPreset } from "@/components/dashboard/analytics/date-range-selector";
+import {
+  getOrderAnalyticsBatched,
+  getInventoryStats,
+} from "@/lib/supabase/queries/analytics";
 
 export function NavMain({
   items,
@@ -37,12 +43,38 @@ export function NavMain({
   onSelect?: (main: string, sub?: string) => void;
 }) {
   const { setOpenMobile } = useSidebar();
+  const queryClient = useQueryClient();
+  
   const slugify = (value: string) =>
     value
       .trim()
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)+/g, "");
+
+  // Prefetch analytics data on hover
+  const handleAnalyticsHover = () => {
+    const dateRange = getDateRangeFromPreset("30d");
+    
+    // Prefetch critical analytics data using the same query keys and functions as the hooks
+    queryClient.prefetchQuery({
+      queryKey: [
+        "analytics",
+        "order-analytics-batched",
+        dateRange.startDate,
+        dateRange.endDate,
+      ],
+      queryFn: () =>
+        getOrderAnalyticsBatched(dateRange.startDate, dateRange.endDate),
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    });
+
+    queryClient.prefetchQuery({
+      queryKey: ["analytics", "inventory-stats"],
+      queryFn: () => getInventoryStats(),
+      staleTime: 1000 * 60 * 15, // 15 minutes
+    });
+  };
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -96,6 +128,12 @@ export function NavMain({
                   href={`/dashboard/${slugify(item.title)}`}
                   onClick={() => {
                     setOpenMobile(false);
+                  }}
+                  onMouseEnter={() => {
+                    // Prefetch analytics data when hovering over Analytics link
+                    if (item.title.toLowerCase() === "analytics") {
+                      handleAnalyticsHover();
+                    }
                   }}
                 >
                   {item.icon && <item.icon />}
