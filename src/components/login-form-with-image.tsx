@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils/utils";
 import { Button } from "@/components/ui/button";
 import {
   Field,
-  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
@@ -74,7 +73,6 @@ export function LoginFormWithImage({
   onSubmit,
   loading,
   className,
-  companyName = "Acme Inc",
   imageSrc = "/svg/third-party-logistics.webp",
   ...props
 }: LoginFormWithImageProps) {

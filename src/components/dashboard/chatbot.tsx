@@ -15,9 +15,17 @@ type ChatbotProps = {
   noCard?: boolean;
 };
 
+type ChatMessage = {
+  id?: string;
+  role: "user" | "assistant" | "system";
+  content: string | unknown;
+  parts?: Array<{ type: string; text?: string; content?: string }>;
+  text?: string;
+};
+
 // Chat component that uses useChat - separated to allow conditional rendering
 // This ensures useChat only initializes AFTER we have the initial messages
-function ChatContent({ initialMessages }: { initialMessages: any[] }) {
+function ChatContent({ initialMessages }: { initialMessages: ChatMessage[] }) {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -55,7 +63,7 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
   }, [formattedInitialMessages]);
 
   const { messages, sendMessage, status, error, setMessages } = useChat({
-    // @ts-ignore - api property exists in runtime but types may be outdated
+    // @ts-expect-error - api property exists in runtime but types may be outdated
     api: "/api/chat",
     initialMessages: formattedInitialMessages,
   });
@@ -77,7 +85,7 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
         const uniqueMessages = formattedInitialMessages.filter(
           (msg, index, self) => index === self.findIndex((m) => m.id === msg.id)
         );
-        // @ts-ignore - setMessages exists but types may not be complete
+        // @ts-expect-error - setMessages exists but types may not be complete
         setMessages(uniqueMessages);
       } else {
         console.warn("setMessages not available from useChat hook");
@@ -130,7 +138,7 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    // @ts-ignore - sendMessage accepts content in this format at runtime
+    // @ts-expect-error - sendMessage accepts content in this format at runtime
     sendMessage({ content: input });
     setInput("");
   };
@@ -153,26 +161,26 @@ function ChatContent({ initialMessages }: { initialMessages: any[] }) {
           </div>
         )}
         {messages
-          .filter((message: any, index: number, self: any[]) => {
+          .filter((message: ChatMessage, index: number, self: ChatMessage[]) => {
             // Deduplicate messages by id - keep only the first occurrence
-            return index === self.findIndex((m: any) => m.id === message.id);
+            return index === self.findIndex((m) => m.id === message.id);
           })
-          .map((message: any, index: number) => {
+          .map((message: ChatMessage, index: number) => {
             // Extract content - handle both string content and parts array format
             // UIMessage from @ai-sdk/react can have content as string or in parts array
             let content = "";
             if (typeof message.content === "string") {
               content = message.content;
-            } else if (Array.isArray((message as any).parts)) {
+            } else if (Array.isArray(message.parts)) {
               // Extract text from parts array
-              content = (message as any).parts
-                .filter((part: any) => part.type === "text")
-                .map((part: any) => part.text || part.content || "")
+              content = message.parts
+                .filter((part) => part.type === "text")
+                .map((part) => part.text || part.content || "")
                 .join("");
-            } else if ((message as any).content) {
-              content = String((message as any).content);
-            } else if (typeof (message as any).text === "string") {
-              content = (message as any).text;
+            } else if (message.content) {
+              content = String(message.content);
+            } else if (typeof message.text === "string") {
+              content = message.text;
             }
 
             // Don't render empty messages
@@ -282,7 +290,7 @@ export function Chatbot({
   sizeControls,
   noCard = false,
 }: ChatbotProps) {
-  const [initialMessages, setInitialMessages] = useState<any[] | null>(null);
+  const [initialMessages, setInitialMessages] = useState<ChatMessage[] | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
   // Load messages from database on mount

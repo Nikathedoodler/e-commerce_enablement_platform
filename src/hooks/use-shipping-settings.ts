@@ -3,7 +3,7 @@ import {
   getShippingSettings,
   updateShippingSettings,
 } from "@/lib/supabase/queries/shipping-settings";
-import type { ShippingSettings, ShippingSettingsUpdate } from "@/types/shipping";
+import type { ShippingSettingsUpdate } from "@/types/shipping";
 
 /**
  * Hook to get shipping settings

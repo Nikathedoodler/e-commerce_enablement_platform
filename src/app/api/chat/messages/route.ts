@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
  * GET /api/chat/messages
  * Retrieves chat messages for the authenticated user
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
     const {
@@ -89,17 +89,24 @@ export async function POST(req: NextRequest) {
     }
 
     // Prepare messages for insertion (filter out system messages if any)
-    const messagesToInsert = messages
-      .filter((msg: any) => msg.role !== "system")
-      .map((msg: any) => {
+    type ChatMessage = {
+      id?: string;
+      role: string;
+      content?: string | unknown;
+      parts?: Array<{ type: string; text?: string; content?: string }>;
+    };
+
+    const messagesToInsert = (messages as ChatMessage[])
+      .filter((msg) => msg.role !== "system")
+      .map((msg) => {
         // Extract content - handle both string and parts array format
         let content = "";
         if (typeof msg.content === "string") {
           content = msg.content;
         } else if (Array.isArray(msg.parts)) {
           content = msg.parts
-            .filter((part: any) => part.type === "text")
-            .map((part: any) => part.text || part.content || "")
+            .filter((part) => part.type === "text")
+            .map((part) => part.text || part.content || "")
             .join("");
         } else if (msg.content) {
           content = String(msg.content);
@@ -112,7 +119,7 @@ export async function POST(req: NextRequest) {
           message_id: msg.id,
         };
       })
-      .filter((msg: any) => msg.content && msg.role); // Filter out empty messages
+      .filter((msg) => msg.content && msg.role); // Filter out empty messages
 
     if (messagesToInsert.length === 0) {
       return NextResponse.json({ success: true, saved: 0 });
