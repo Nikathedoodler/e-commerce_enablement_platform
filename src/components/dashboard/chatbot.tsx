@@ -85,7 +85,6 @@ function ChatContent({ initialMessages }: { initialMessages: ChatMessage[] }) {
         const uniqueMessages = formattedInitialMessages.filter(
           (msg, index, self) => index === self.findIndex((m) => m.id === msg.id)
         );
-        // @ts-expect-error - setMessages exists but types may not be complete
         setMessages(uniqueMessages);
       } else {
         console.warn("setMessages not available from useChat hook");
