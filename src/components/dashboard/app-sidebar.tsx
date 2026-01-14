@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { ArrowDownToLine, Warehouse, Settings2, Package, HelpCircle } from "lucide-react";
+import {
+  ArrowDownToLine,
+  Warehouse,
+  Settings2,
+  Package,
+  HelpCircle,
+} from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 type Profile = {
@@ -95,10 +101,6 @@ const data = {
       url: "#",
       icon: HelpCircle,
       items: [
-        {
-          title: "AI Assistant",
-          url: "#",
-        },
         {
           title: "Help Center",
           url: "#",
