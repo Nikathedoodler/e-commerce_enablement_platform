@@ -66,6 +66,11 @@ export async function POST(req: NextRequest) {
 
     // Manually convert UI messages to ModelMessages format
     // streamText expects messages in the format: { role: 'user'|'assistant'|'system', content: string }
+    type MessagePart = {
+      type: string;
+      text?: string;
+    };
+
     const modelMessages = validMessages.map((msg) => {
       // Extract content - could be a string or in parts array
       let content = '';
@@ -73,9 +78,9 @@ export async function POST(req: NextRequest) {
         content = msg.content;
       } else if (Array.isArray(msg.parts)) {
         // If content is in parts, extract text from parts
-        content = msg.parts
-          .filter(part => part.type === 'text')
-          .map(part => part.text)
+        content = (msg.parts as MessagePart[])
+          .filter((part: MessagePart) => part.type === 'text')
+          .map((part: MessagePart) => part.text || '')
           .join('');
       } else if (msg.content) {
         content = String(msg.content);
