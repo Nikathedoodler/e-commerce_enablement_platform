@@ -198,7 +198,7 @@ export async function triggerAutoLabelGeneration(
       generationType: "auto",
       triggeredBy: reason === "Status changed to processing" 
         ? "status_change" 
-        : reason.includes("Shopify") 
+        : reason && reason.includes("Shopify") 
         ? "shopify_webhook" 
         : "manual_order_rule",
       metadata: {
