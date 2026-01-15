@@ -1,13 +1,26 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
+import dynamic from "next/dynamic";
 import { useChat } from "@ai-sdk/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ReactMarkdown from "react-markdown";
 import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
+
+// Dynamically import ReactMarkdown to reduce initial bundle size
+// Only loads when chatbot is rendered (lazy-loaded component)
+const ReactMarkdown = dynamic(() => import("react-markdown"), {
+  ssr: false,
+  loading: () => (
+    <div className="animate-pulse space-y-2">
+      <div className="h-4 w-full bg-muted rounded" />
+      <div className="h-4 w-5/6 bg-muted rounded" />
+      <div className="h-4 w-4/6 bg-muted rounded" />
+    </div>
+  ),
+});
 
 type ChatbotProps = {
   className?: string;

@@ -2,7 +2,25 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    // Optimize barrel file imports for better performance
+    // This automatically transforms barrel imports to direct imports at build time
+    // Reduces bundle size and improves dev/build performance significantly
+    optimizePackageImports: [
+      "lucide-react",
+      "@radix-ui/react-alert-dialog",
+      "@radix-ui/react-select",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-separator",
+      "@radix-ui/react-label",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-avatar",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-collapsible",
+    ],
+  },
 };
 
 // Make sure adding Sentry options is the last code to run before exporting

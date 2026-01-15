@@ -29,6 +29,13 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
+// Calculate trend indicators - moved outside component to avoid recreation on every render
+function getTrend(changePercent: number): "up" | "down" | "neutral" {
+  if (changePercent > 0) return "up";
+  if (changePercent < 0) return "down";
+  return "neutral";
+}
+
 export default function AnalyticsPage() {
   const [dateRangePreset, setDateRangePreset] =
     useState<DateRangePreset>("30d");
@@ -82,13 +89,6 @@ export default function AnalyticsPage() {
 
   // Top SKUs can load independently (has longer stale time)
   const topSKUs = useTopSKUs(10);
-
-  // Calculate trend indicators
-  const getTrend = (changePercent: number): "up" | "down" | "neutral" => {
-    if (changePercent > 0) return "up";
-    if (changePercent < 0) return "down";
-    return "neutral";
-  };
 
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
