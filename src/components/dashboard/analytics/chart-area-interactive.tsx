@@ -24,10 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { 
-  TrendDataPoint, 
-  ReceivingTrendDataPoint, 
-  LabelTrendDataPoint 
+import type {
+  TrendDataPoint,
+  ReceivingTrendDataPoint,
+  LabelTrendDataPoint,
 } from "@/types/analytics";
 
 interface ChartAreaInteractiveProps {
@@ -79,7 +79,7 @@ export function ChartAreaInteractive({
   // Filter data based on time range
   const getFilteredData = () => {
     if (!data || data.length === 0) return [];
-    
+
     const now = new Date();
     const daysToShow = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
     const cutoffDate = new Date(now);
@@ -97,7 +97,7 @@ export function ChartAreaInteractive({
   const getValueFormatter = () => {
     if (formatValue) return formatValue;
     if (showRevenue) {
-      return (value: number) => 
+      return (value: number) =>
         `$${value.toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
@@ -112,11 +112,16 @@ export function ChartAreaInteractive({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          {description && <CardDescription>{description}</CardDescription>}
+          <CardDescription className="text-xs sm:text-sm">
+            {title}
+          </CardDescription>
+          <CardTitle className="text-base sm:text-lg">
+            {description || "Overview"}
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-[250px] w-full bg-muted animate-pulse rounded" />
+        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+          {/* Fixed dimensions matching actual chart: h-[200px] sm:h-[250px] */}
+          <div className="h-[200px] w-full bg-muted animate-pulse rounded sm:h-[250px]" />
         </CardContent>
       </Card>
     );
@@ -126,11 +131,16 @@ export function ChartAreaInteractive({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          {description && <CardDescription>{description}</CardDescription>}
+          <CardDescription className="text-xs sm:text-sm">
+            {title}
+          </CardDescription>
+          <CardTitle className="text-base sm:text-lg">
+            {description || "Overview"}
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-[250px] w-full flex items-center justify-center text-muted-foreground">
+        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+          {/* Fixed dimensions matching actual chart: h-[200px] sm:h-[250px] */}
+          <div className="h-[200px] w-full flex items-center justify-center text-muted-foreground sm:h-[250px]">
             No data available
           </div>
         </CardContent>
@@ -140,7 +150,7 @@ export function ChartAreaInteractive({
 
   const chartData = filteredData.map((item) => {
     let value = 0;
-    
+
     if (valueKey === "revenue" && "revenue" in item) {
       value = (item as TrendDataPoint).revenue || 0;
     } else if (valueKey === "quantity" && "quantity" in item) {
@@ -150,7 +160,7 @@ export function ChartAreaInteractive({
     } else if ("value" in item) {
       value = (item as TrendDataPoint).value || 0;
     }
-    
+
     return {
       date: item.date,
       value,
@@ -160,8 +170,12 @@ export function ChartAreaInteractive({
   return (
     <Card>
       <CardHeader>
-        <CardDescription className="text-xs sm:text-sm">{title}</CardDescription>
-        <CardTitle className="text-base sm:text-lg">{description || "Overview"}</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">
+          {title}
+        </CardDescription>
+        <CardTitle className="text-base sm:text-lg">
+          {description || "Overview"}
+        </CardTitle>
         <CardAction>
           <Select value={timeRange} onValueChange={handleTimeRangeChange}>
             <SelectTrigger
@@ -231,10 +245,7 @@ export function ChartAreaInteractive({
                     });
                   }}
                   formatter={(value) => {
-                    return [
-                      valueFormatter(Number(value)),
-                      title,
-                    ];
+                    return [valueFormatter(Number(value)), title];
                   }}
                   indicator="dot"
                 />

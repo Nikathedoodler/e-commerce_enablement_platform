@@ -31,11 +31,12 @@ export default function RootLayout({
     <html lang="en">
       {gaMeasurementId && (
         <>
+          {/* Defer Google Analytics to reduce initial JavaScript execution */}
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
-            strategy="afterInteractive"
+            strategy="lazyOnload"
           />
-          <Script id="google-analytics" strategy="afterInteractive">
+          <Script id="google-analytics" strategy="lazyOnload">
             {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}

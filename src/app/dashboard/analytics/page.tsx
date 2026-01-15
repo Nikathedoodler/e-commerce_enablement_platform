@@ -1,12 +1,25 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
+import dynamic from "next/dynamic";
 import {
   DateRangeSelector,
   getDateRangeFromPreset,
 } from "@/components/dashboard/analytics/date-range-selector";
 import { MetricCard } from "@/components/dashboard/analytics/metric-card";
-import { ChartAreaInteractive } from "@/components/dashboard/analytics/chart-area-interactive";
+import { ChartSkeleton } from "@/components/dashboard/analytics/chart-skeleton";
+
+// Dynamic import for heavy chart component (recharts library)
+const ChartAreaInteractive = dynamic(
+  () =>
+    import("@/components/dashboard/analytics/chart-area-interactive").then(
+      (mod) => ({ default: mod.ChartAreaInteractive })
+    ),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  }
+);
 import {
   useOrderStats,
   useOrderAnalyticsBatched,
@@ -82,7 +95,10 @@ export default function AnalyticsPage() {
   const receivingTrendsGrouped = useReceivingTrends(dateRange, groupBy, {
     enabled: criticalDataReady,
   });
-  const labelStats = useLabelStats(dateRange);
+  // Label stats can also load progressively after critical data
+  const labelStats = useLabelStats(dateRange, {
+    enabled: criticalDataReady,
+  });
   const labelTrendsGrouped = useLabelTrends(dateRange, groupBy, {
     enabled: criticalDataReady,
   });
@@ -157,26 +173,41 @@ export default function AnalyticsPage() {
 
         {/* Order Analytics */}
         <div className="px-4 lg:px-6">
-          <ChartAreaInteractive
-            title="Order Volume"
-            description="Orders over time"
-            data={orderTrendsGrouped.data?.data || []}
-            isLoading={orderTrendsGrouped.isLoading}
-            valueKey="value"
-            defaultTimeRange="30d"
-          />
+          <Suspense
+            fallback={
+              <ChartSkeleton
+                title="Order Volume"
+                description="Orders over time"
+              />
+            }
+          >
+            <ChartAreaInteractive
+              title="Order Volume"
+              description="Orders over time"
+              data={orderTrendsGrouped.data?.data || []}
+              isLoading={orderTrendsGrouped.isLoading}
+              valueKey="value"
+              defaultTimeRange="30d"
+            />
+          </Suspense>
         </div>
 
         <div className="px-4 lg:px-6">
-          <ChartAreaInteractive
-            title="Revenue"
-            description="Revenue trends"
-            data={orderTrendsGrouped.data?.data || []}
-            isLoading={orderTrendsGrouped.isLoading}
-            valueKey="revenue"
-            showRevenue={true}
-            defaultTimeRange="30d"
-          />
+          <Suspense
+            fallback={
+              <ChartSkeleton title="Revenue" description="Revenue trends" />
+            }
+          >
+            <ChartAreaInteractive
+              title="Revenue"
+              description="Revenue trends"
+              data={orderTrendsGrouped.data?.data || []}
+              isLoading={orderTrendsGrouped.isLoading}
+              valueKey="revenue"
+              showRevenue={true}
+              defaultTimeRange="30d"
+            />
+          </Suspense>
         </div>
 
         {/* Inventory Analytics */}
@@ -284,14 +315,23 @@ export default function AnalyticsPage() {
 
         {/* Receiving Analytics */}
         <div className="px-4 lg:px-6">
-          <ChartAreaInteractive
-            title="Receiving Trends"
-            description="Items received over time"
-            data={receivingTrendsGrouped.data?.data || []}
-            isLoading={receivingTrendsGrouped.isLoading}
-            valueKey="quantity"
-            defaultTimeRange="30d"
-          />
+          <Suspense
+            fallback={
+              <ChartSkeleton
+                title="Receiving Trends"
+                description="Items received over time"
+              />
+            }
+          >
+            <ChartAreaInteractive
+              title="Receiving Trends"
+              description="Items received over time"
+              data={receivingTrendsGrouped.data?.data || []}
+              isLoading={receivingTrendsGrouped.isLoading}
+              valueKey="quantity"
+              defaultTimeRange="30d"
+            />
+          </Suspense>
         </div>
 
         {/* Shipping & Label Analytics */}
@@ -346,14 +386,23 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            <ChartAreaInteractive
-              title="Label Generation"
-              description="Labels generated over time"
-              data={labelTrendsGrouped.data?.data || []}
-              isLoading={labelTrendsGrouped.isLoading}
-              valueKey="count"
-              defaultTimeRange="30d"
-            />
+            <Suspense
+              fallback={
+                <ChartSkeleton
+                  title="Label Generation"
+                  description="Labels generated over time"
+                />
+              }
+            >
+              <ChartAreaInteractive
+                title="Label Generation"
+                description="Labels generated over time"
+                data={labelTrendsGrouped.data?.data || []}
+                isLoading={labelTrendsGrouped.isLoading}
+                valueKey="count"
+                defaultTimeRange="30d"
+              />
+            </Suspense>
           </CardContent>
         </Card>
       </div>

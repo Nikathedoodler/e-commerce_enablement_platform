@@ -14,17 +14,19 @@ import {
   getLabelStats,
   getLabelTrends,
 } from "@/lib/supabase/queries/analytics";
-import type {
-  DateRange,
-  GroupByPeriod,
-} from "@/types/analytics";
+import type { DateRange, GroupByPeriod } from "@/types/analytics";
 
 /**
  * Hook to get order statistics
  */
 export function useOrderStats(dateRange: DateRange) {
   return useQuery({
-    queryKey: ["analytics", "order-stats", dateRange.startDate, dateRange.endDate],
+    queryKey: [
+      "analytics",
+      "order-stats",
+      dateRange.startDate,
+      dateRange.endDate,
+    ],
     queryFn: () => getOrderStats(dateRange.startDate, dateRange.endDate),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -69,7 +71,8 @@ export function useOrderTrends(
       dateRange.endDate,
       groupBy,
     ],
-    queryFn: () => getOrderTrends(dateRange.startDate, dateRange.endDate, groupBy),
+    queryFn: () =>
+      getOrderTrends(dateRange.startDate, dateRange.endDate, groupBy),
     staleTime: 1000 * 60 * 5,
     enabled: options?.enabled !== false,
   });
@@ -136,7 +139,10 @@ export function useInventoryStats(options?: { enabled?: boolean }) {
  * Hook to get top SKUs
  * Increased stale time since top SKUs don't change frequently
  */
-export function useTopSKUs(limit: number = 10, options?: { enabled?: boolean }) {
+export function useTopSKUs(
+  limit: number = 10,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: ["analytics", "top-skus", limit],
     queryFn: () => getTopSKUs(limit),
@@ -187,8 +193,12 @@ export function useReceivingTrends(
 
 /**
  * Hook to get label generation statistics
+ * Can be enabled conditionally for progressive loading
  */
-export function useLabelStats(dateRange: DateRange) {
+export function useLabelStats(
+  dateRange: DateRange,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: [
       "analytics",
@@ -198,6 +208,7 @@ export function useLabelStats(dateRange: DateRange) {
     ],
     queryFn: () => getLabelStats(dateRange.startDate, dateRange.endDate),
     staleTime: 1000 * 60 * 5,
+    enabled: options?.enabled !== false,
   });
 }
 

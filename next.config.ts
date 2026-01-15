@@ -19,7 +19,37 @@ const nextConfig: NextConfig = {
       "@radix-ui/react-avatar",
       "@radix-ui/react-accordion",
       "@radix-ui/react-collapsible",
+      "recharts", // Optimize recharts imports
     ],
+  },
+  // Production optimizations
+  compress: true, // Enable gzip compression
+  poweredByHeader: false, // Remove X-Powered-By header
+  // Optimize production builds
+  swcMinify: true, // Use SWC minifier (faster than Terser)
+  // Reduce JavaScript execution time
+  compiler: {
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? {
+            exclude: ["error", "warn"], // Keep error and warn logs
+          }
+        : false,
+  },
+  // Enable back/forward cache while maintaining security
+  // Use 'private, no-cache' instead of 'no-store' to allow bfcache
+  async headers() {
+    return [
+      {
+        source: "/dashboard/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, no-cache, must-revalidate",
+          },
+        ],
+      },
+    ];
   },
 };
 
