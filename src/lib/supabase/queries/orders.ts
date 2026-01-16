@@ -7,6 +7,8 @@ import { getSubscription } from "./subscriptions";
 export async function getOrders(filters?: {
   status?: string;
   search?: string;
+  page?: number;
+  pageSize?: number;
 }) {
   const supabase = await createClient();
 
@@ -19,7 +21,17 @@ export async function getOrders(filters?: {
     return { error: "Not Authenticated", data: null };
   }
 
-  // Build the query
+  const page = filters?.page || 1;
+  const pageSize = filters?.pageSize || 10;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  // Build the base query for counting
+  let countQuery = supabase
+    .from("orders")
+    .select("*", { count: "exact", head: true });
+
+  // Build the query for data
   let query = supabase
     .from("orders")
     .select("*")
@@ -28,13 +40,24 @@ export async function getOrders(filters?: {
   // Apply filters if provided
   if (filters?.status) {
     query = query.eq("status", filters.status);
+    countQuery = countQuery.eq("status", filters.status);
   }
 
   if (filters?.search) {
-    query = query.or(
-      `order_number.ilike.%${filters.search}%,customer_email.ilike.%${filters.search}%`
-    );
+    const searchFilter = `order_number.ilike.%${filters.search}%,customer_email.ilike.%${filters.search}%`;
+    query = query.or(searchFilter);
+    countQuery = countQuery.or(searchFilter);
   }
+
+  // Get total count
+  const { count, error: countError } = await countQuery;
+
+  if (countError) {
+    return { error: countError.message, data: null };
+  }
+
+  // Apply pagination
+  query = query.range(from, to);
 
   // Execute query
   const { data, error } = await query;
@@ -43,7 +66,19 @@ export async function getOrders(filters?: {
     return { error: error.message, data: null };
   }
 
-  return { data: data as Order[], error: null };
+  const totalItems = count ?? 0;
+  const totalPages = Math.ceil(totalItems / pageSize);
+
+  return {
+    data: data as Order[],
+    pagination: {
+      page,
+      pageSize,
+      totalItems,
+      totalPages,
+    },
+    error: null,
+  };
 }
 
 export async function getOrderById(id: string) {

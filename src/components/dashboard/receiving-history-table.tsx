@@ -9,10 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 import { ReceivingHistoryTableSkeleton } from "./receiving-history-table-skeleton";
+import { Pagination } from "@/components/ui/pagination";
 
 function getConditionColor(condition: string) {
   switch (condition) {
@@ -32,19 +33,31 @@ function getConditionColor(condition: string) {
 export function ReceivingHistoryTable() {
   const [search, setSearch] = useState<string>("");
   const [conditionFilter, setConditionFilter] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
 
   const debouncedSearch = useDebounce(search, 300);
 
   const filters = {
     search: debouncedSearch || undefined,
+    page,
+    pageSize,
   };
 
-  const { data: logs, isLoading, error } = useReceivingLogs(filters);
+  const { data: logsResult, isLoading, error } = useReceivingLogs(filters);
+  const logs = logsResult?.data || [];
+  const pagination = logsResult?.pagination;
 
   // Filter by condition on client side if needed
+  // Note: For better performance with large datasets, consider moving condition filter to server-side
   const filteredLogs = conditionFilter
     ? logs?.filter((log) => log.condition === conditionFilter)
     : logs;
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
   return (
     <div className="space-y-4">
@@ -144,6 +157,24 @@ export function ReceivingHistoryTable() {
             ))}
           </TableBody>
         </Table>
+      )}
+      {pagination && pagination.totalPages > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            pageSize={pagination.pageSize}
+            totalItems={pagination.totalItems}
+            onPageChange={(newPage) => {
+              setPage(newPage);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            onPageSizeChange={(newPageSize) => {
+              setPageSize(newPageSize);
+              setPage(1); // Reset to first page when changing page size
+            }}
+          />
+        </div>
       )}
     </div>
   );

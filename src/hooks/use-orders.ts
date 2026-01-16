@@ -13,6 +13,8 @@ import type { OrderInput, OrderUpdate } from "@/types/orders";
 type OrdersFilters = {
   status?: string;
   search?: string;
+  page?: number;
+  pageSize?: number;
 };
 
 export function useOrders(filters?: OrdersFilters) {
@@ -23,7 +25,10 @@ export function useOrders(filters?: OrdersFilters) {
       if (result.error) {
         throw new Error(result.error);
       }
-      return result.data;
+      return {
+        data: result.data,
+        pagination: result.pagination,
+      };
     },
   });
 }

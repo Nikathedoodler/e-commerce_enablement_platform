@@ -2,6 +2,7 @@
 
 import { useState, useMemo, Suspense } from "react";
 import dynamic from "next/dynamic";
+import { Pagination } from "@/components/ui/pagination";
 import {
   DateRangeSelector,
   getDateRangeFromPreset,
@@ -52,6 +53,8 @@ function getTrend(changePercent: number): "up" | "down" | "neutral" {
 export default function AnalyticsPage() {
   const [dateRangePreset, setDateRangePreset] =
     useState<DateRangePreset>("30d");
+  const [topSKUsPage, setTopSKUsPage] = useState<number>(1);
+  const [topSKUsPageSize, setTopSKUsPageSize] = useState<number>(10);
   const dateRange = getDateRangeFromPreset(dateRangePreset);
 
   // Priority 1: Critical metrics (load immediately)
@@ -104,7 +107,11 @@ export default function AnalyticsPage() {
   });
 
   // Top SKUs can load independently (has longer stale time)
-  const topSKUs = useTopSKUs(10);
+  const topSKUs = useTopSKUs(10, {
+    enabled: true,
+    page: topSKUsPage,
+    pageSize: topSKUsPageSize,
+  });
 
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
@@ -255,7 +262,7 @@ export default function AnalyticsPage() {
             {topSKUs.data?.data && topSKUs.data.data.length > 0 && (
               <div className="mt-6">
                 <h3 className="text-base font-semibold mb-4 sm:text-lg">
-                  Top 10 SKUs by Quantity
+                  Top SKUs by Quantity
                 </h3>
                 <div className="rounded-lg border overflow-x-auto">
                   <Table>
@@ -308,6 +315,25 @@ export default function AnalyticsPage() {
                     </TableBody>
                   </Table>
                 </div>
+                {topSKUs.data?.pagination &&
+                  topSKUs.data.pagination.totalPages > 0 && (
+                    <div className="mt-4">
+                      <Pagination
+                        currentPage={topSKUs.data.pagination.page}
+                        totalPages={topSKUs.data.pagination.totalPages}
+                        pageSize={topSKUs.data.pagination.pageSize}
+                        totalItems={topSKUs.data.pagination.totalItems}
+                        onPageChange={(newPage) => {
+                          setTopSKUsPage(newPage);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        onPageSizeChange={(newPageSize) => {
+                          setTopSKUsPageSize(newPageSize);
+                          setTopSKUsPage(1); // Reset to first page when changing page size
+                        }}
+                      />
+                    </div>
+                  )}
               </div>
             )}
           </CardContent>

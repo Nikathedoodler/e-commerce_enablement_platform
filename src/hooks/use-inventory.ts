@@ -13,6 +13,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 type InventoryFilters = {
   search?: string;
   lowStockOnly?: string;
+  page?: number;
+  pageSize?: number;
 };
 
 export function useInventories(filters?: InventoryFilters) {
@@ -24,7 +26,10 @@ export function useInventories(filters?: InventoryFilters) {
         throw new Error(result.error);
       }
 
-      return result.data;
+      return {
+        data: result.data,
+        pagination: result.pagination,
+      };
     },
   });
 }

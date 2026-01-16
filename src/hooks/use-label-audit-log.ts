@@ -38,6 +38,8 @@ export function useLabelAuditLogs(filters?: {
   status?: "pending" | "success" | "failed";
   generationType?: "auto" | "manual";
   limit?: number;
+  page?: number;
+  pageSize?: number;
 }) {
   return useQuery({
     queryKey: ["label-audit-log", filters],
@@ -46,7 +48,10 @@ export function useLabelAuditLogs(filters?: {
       if (result.error) {
         throw new Error(result.error);
       }
-      return result.data;
+      return {
+        data: result.data,
+        pagination: result.pagination,
+      };
     },
   });
 }

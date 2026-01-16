@@ -16,6 +16,8 @@ type ReceivingFilters = {
   client_id?: string;
   startDate?: string;
   endDate?: string;
+  page?: number;
+  pageSize?: number;
 };
 
 export function useReceivingLogs(filters?: ReceivingFilters) {
@@ -27,7 +29,10 @@ export function useReceivingLogs(filters?: ReceivingFilters) {
         throw new Error(result.error);
       }
 
-      return result.data;
+      return {
+        data: result.data,
+        pagination: result.pagination,
+      };
     },
   });
 }

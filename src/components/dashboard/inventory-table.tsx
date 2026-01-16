@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
@@ -19,6 +19,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { useRouter } from "next/navigation";
 import { InventoryDeleteDialog } from "./inventory-delete-dialog";
 import { InventoryDetailDialog } from "./inventory-detail-dialog";
+import { Pagination } from "@/components/ui/pagination";
 
 /**
  * Determines if an item is low on stock
@@ -51,6 +52,8 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
 
   const debouncedSearch = useDebounce(search, 300);
   const router = useRouter();
@@ -61,9 +64,18 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
     // Convert boolean to string "true" if lowStockOnly is true
     // The query helper expects a string or undefined
     lowStockOnly: lowStockOnly ? "true" : undefined,
+    page,
+    pageSize,
   };
 
-  const { data: items, isLoading, error } = useInventories(filters);
+  const { data: itemsResult, isLoading, error } = useInventories(filters);
+  const items = itemsResult?.data || [];
+  const pagination = itemsResult?.pagination;
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
   return (
     <div className="space-y-4">
@@ -189,6 +201,24 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
             })}
           </TableBody>
         </Table>
+      )}
+      {pagination && pagination.totalPages > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            pageSize={pagination.pageSize}
+            totalItems={pagination.totalItems}
+            onPageChange={(newPage) => {
+              setPage(newPage);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            onPageSizeChange={(newPageSize) => {
+              setPageSize(newPageSize);
+              setPage(1); // Reset to first page when changing page size
+            }}
+          />
+        </div>
       )}
 
       {/* Delete Dialog */}

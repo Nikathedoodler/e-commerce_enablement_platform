@@ -141,11 +141,14 @@ export function useInventoryStats(options?: { enabled?: boolean }) {
  */
 export function useTopSKUs(
   limit: number = 10,
-  options?: { enabled?: boolean }
+  options?: { enabled?: boolean; page?: number; pageSize?: number }
 ) {
   return useQuery({
-    queryKey: ["analytics", "top-skus", limit],
-    queryFn: () => getTopSKUs(limit),
+    queryKey: ["analytics", "top-skus", limit, options?.page, options?.pageSize],
+    queryFn: () =>
+      options?.page !== undefined && options?.pageSize !== undefined
+        ? getTopSKUs(limit, options.page, options.pageSize)
+        : getTopSKUs(limit),
     staleTime: 1000 * 60 * 30, // 30 minutes (top SKUs are relatively stable)
     enabled: options?.enabled !== false,
   });

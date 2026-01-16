@@ -540,8 +540,19 @@ export async function getInventoryStats(): Promise<{
  * Get top SKUs by quantity
  */
 export async function getTopSKUs(
-  limit: number = 10
-): Promise<{ data: TopSKU[] | null; error: string | null }> {
+  limit: number = 10,
+  page?: number,
+  pageSize?: number
+): Promise<{
+  data: TopSKU[] | null;
+  pagination?: {
+    page: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+  };
+  error: string | null;
+}> {
   const supabase = await createClient();
 
   const {
@@ -554,27 +565,79 @@ export async function getTopSKUs(
   }
 
   try {
-    const { data: inventory, error } = await supabase
-      .from("inventory")
-      .select("sku, name, quantity, location, reorder_threshold")
-      .eq("user_id", user.id)
-      .order("quantity", { ascending: false })
-      .limit(limit);
+    // If pagination is requested, use it; otherwise use limit for backward compatibility
+    if (page !== undefined && pageSize !== undefined) {
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
 
-    if (error) {
-      return { error: error.message, data: null };
+      // Get total count
+      const { count, error: countError } = await supabase
+        .from("inventory")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+
+      if (countError) {
+        return { error: countError.message, data: null };
+      }
+
+      // Get paginated data
+      const { data: inventory, error } = await supabase
+        .from("inventory")
+        .select("sku, name, quantity, location, reorder_threshold")
+        .eq("user_id", user.id)
+        .order("quantity", { ascending: false })
+        .range(from, to);
+
+      if (error) {
+        return { error: error.message, data: null };
+      }
+
+      const topSKUs: TopSKU[] =
+        inventory?.map((item) => ({
+          sku: item.sku,
+          name: item.name,
+          quantity: item.quantity,
+          location: item.location,
+          isLowStock: item.quantity <= item.reorder_threshold,
+        })) || [];
+
+      const totalItems = count ?? 0;
+      const totalPages = Math.ceil(totalItems / pageSize);
+
+      return {
+        data: topSKUs,
+        pagination: {
+          page,
+          pageSize,
+          totalItems,
+          totalPages,
+        },
+        error: null,
+      };
+    } else {
+      // Backward compatibility: use limit
+      const { data: inventory, error } = await supabase
+        .from("inventory")
+        .select("sku, name, quantity, location, reorder_threshold")
+        .eq("user_id", user.id)
+        .order("quantity", { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        return { error: error.message, data: null };
+      }
+
+      const topSKUs: TopSKU[] =
+        inventory?.map((item) => ({
+          sku: item.sku,
+          name: item.name,
+          quantity: item.quantity,
+          location: item.location,
+          isLowStock: item.quantity <= item.reorder_threshold,
+        })) || [];
+
+      return { data: topSKUs, error: null };
     }
-
-    const topSKUs: TopSKU[] =
-      inventory?.map((item) => ({
-        sku: item.sku,
-        name: item.name,
-        quantity: item.quantity,
-        location: item.location,
-        isLowStock: item.quantity <= item.reorder_threshold,
-      })) || [];
-
-    return { data: topSKUs, error: null };
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : "Unknown error",

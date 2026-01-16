@@ -13,6 +13,8 @@ export async function getReceivingLogs(filters?: {
   client_id?: string;
   startDate?: string;
   endDate?: string;
+  page?: number;
+  pageSize?: number;
 }) {
   const supabase = await createClient();
 
@@ -23,30 +25,60 @@ export async function getReceivingLogs(filters?: {
 
   if (userError || !user) return { error: "Not Authenticated", data: null };
 
+  const page = filters?.page || 1;
+  const pageSize = filters?.pageSize || 10;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  // Build the base query for counting
+  let countQuery = supabase
+    .from("receiving_log")
+    .select("*", { count: "exact", head: true });
+
+  // Build the query for data
   let query = supabase
     .from("receiving_log")
     .select("*")
     .order("received_at", { ascending: false });
 
   if (filters?.search) {
-    query = query.or(`sku.ilike.%${filters.search}%,notes.ilike.%${filters.search}%`);
+    const searchFilter = `sku.ilike.%${filters.search}%,notes.ilike.%${filters.search}%`;
+    query = query.or(searchFilter);
+    countQuery = countQuery.or(searchFilter);
   }
 
   if (filters?.sku) {
     query = query.eq("sku", filters.sku);
+    countQuery = countQuery.eq("sku", filters.sku);
   }
 
   if (filters?.client_id) {
     query = query.eq("client_id", filters.client_id);
+    countQuery = countQuery.eq("client_id", filters.client_id);
   }
 
   if (filters?.startDate) {
     query = query.gte("received_at", filters.startDate);
+    countQuery = countQuery.gte("received_at", filters.startDate);
   }
 
   if (filters?.endDate) {
     query = query.lte("received_at", filters.endDate);
+    countQuery = countQuery.lte("received_at", filters.endDate);
   }
+
+  // Get total count
+  const { count, error: countError } = await countQuery;
+
+  if (countError)
+    return {
+      error: "Failed to fetch receiving logs",
+      details: countError.message,
+      data: null,
+    };
+
+  // Apply pagination
+  query = query.range(from, to);
 
   const { data, error } = await query;
 
@@ -57,7 +89,19 @@ export async function getReceivingLogs(filters?: {
       data: null,
     };
 
-  return { data: data as ReceivingLogItem[], error: null };
+  const totalItems = count ?? 0;
+  const totalPages = Math.ceil(totalItems / pageSize);
+
+  return {
+    data: data as ReceivingLogItem[],
+    pagination: {
+      page,
+      pageSize,
+      totalItems,
+      totalPages,
+    },
+    error: null,
+  };
 }
 
 export async function getReceivingLogById(id: string) {

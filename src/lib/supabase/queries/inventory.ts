@@ -10,6 +10,8 @@ import {
 export async function getInventoryItems(filters?: {
   lowStockOnly?: string;
   search?: string;
+  page?: number;
+  pageSize?: number;
 }) {
   const supabase = await createClient();
 
@@ -20,19 +22,42 @@ export async function getInventoryItems(filters?: {
 
   if (userError || !user) return { error: "Not Authenticated", data: null };
 
+  const page = filters?.page || 1;
+  const pageSize = filters?.pageSize || 10;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  // Build the base query for counting
+  let countQuery = supabase
+    .from("inventory")
+    .select("*", { count: "exact", head: true });
+
+  // Build the query for data
   let query = supabase
     .from("inventory")
     .select("*")
     .order("created_at", { ascending: false });
 
   if (filters?.search) {
-    query = query.or(
-      `sku.ilike.%${filters.search}%,name.ilike.%${filters.search}%`
-    );
+    const searchFilter = `sku.ilike.%${filters.search}%,name.ilike.%${filters.search}%`;
+    query = query.or(searchFilter);
+    countQuery = countQuery.or(searchFilter);
   }
 
-  // Note: Supabase PostgREST doesn't support column-to-column comparisons
-  // We'll filter low stock items client-side after fetching
+  // Get total count before filtering
+  const { count, error: countError } = await countQuery;
+
+  if (countError)
+    return {
+      error: "Failed To Fetch Inventory",
+      details: countError.message,
+      data: null,
+    };
+
+  // Apply pagination
+  query = query.range(from, to);
+
+  // Execute query
   const { data, error } = await query;
 
   if (error)
@@ -46,13 +71,60 @@ export async function getInventoryItems(filters?: {
 
   // Filter low stock items client-side if requested
   // Low stock = quantity <= reorder_threshold
+  // Note: We need to count after filtering for accurate pagination
   if (filters?.lowStockOnly) {
     filteredData = filteredData.filter(
       (item) => item.quantity <= item.reorder_threshold
     );
+    // For low stock filtering, we need to fetch all and filter client-side
+    // then apply pagination. This is a limitation of Supabase PostgREST.
+    // For better performance with large datasets, consider adding a database view or function.
+    const allData = await supabase
+      .from("inventory")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (allData.error) {
+      return {
+        error: "Failed To Fetch Inventory",
+        details: allData.error.message,
+        data: null,
+      };
+    }
+
+    const allFiltered = (allData.data as InventoryItem[]).filter(
+      (item) => item.quantity <= item.reorder_threshold
+    );
+
+    const totalItems = allFiltered.length;
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const paginatedData = allFiltered.slice(from, to + 1);
+
+    return {
+      data: paginatedData,
+      pagination: {
+        page,
+        pageSize,
+        totalItems,
+        totalPages,
+      },
+      error: null,
+    };
   }
 
-  return { data: filteredData, error: null };
+  const totalItems = count ?? 0;
+  const totalPages = Math.ceil(totalItems / pageSize);
+
+  return {
+    data: filteredData,
+    pagination: {
+      page,
+      pageSize,
+      totalItems,
+      totalPages,
+    },
+    error: null,
+  };
 }
 
 export async function getInventoryItemById(id: string) {

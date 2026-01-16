@@ -83,8 +83,16 @@ export async function getLabelAuditLogs(filters?: {
   status?: "pending" | "success" | "failed";
   generationType?: "auto" | "manual";
   limit?: number;
+  page?: number;
+  pageSize?: number;
 }): Promise<{
   data: LabelGenerationAuditLog[] | null;
+  pagination?: {
+    page: number;
+    pageSize: number;
+    totalItems: number;
+    totalPages: number;
+  };
   error: string | null;
 }> {
   const supabase = await createClient();
@@ -98,6 +106,50 @@ export async function getLabelAuditLogs(filters?: {
     return { data: null, error: "Not Authenticated" };
   }
 
+  // If limit is provided (for backward compatibility), use it instead of pagination
+  if (filters?.limit) {
+    let query = supabase
+      .from("label_generation_audit_log")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (filters?.orderId) {
+      query = query.eq("order_id", filters.orderId);
+    }
+
+    if (filters?.status) {
+      query = query.eq("status", filters.status);
+    }
+
+    if (filters?.generationType) {
+      query = query.eq("generation_type", filters.generationType);
+    }
+
+    query = query.limit(filters.limit);
+
+    const { data, error } = await query;
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+
+    return { data: data as LabelGenerationAuditLog[], error: null };
+  }
+
+  // Pagination mode
+  const page = filters?.page || 1;
+  const pageSize = filters?.pageSize || 10;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  // Build the base query for counting
+  let countQuery = supabase
+    .from("label_generation_audit_log")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  // Build the query for data
   let query = supabase
     .from("label_generation_audit_log")
     .select("*")
@@ -106,19 +158,28 @@ export async function getLabelAuditLogs(filters?: {
 
   if (filters?.orderId) {
     query = query.eq("order_id", filters.orderId);
+    countQuery = countQuery.eq("order_id", filters.orderId);
   }
 
   if (filters?.status) {
     query = query.eq("status", filters.status);
+    countQuery = countQuery.eq("status", filters.status);
   }
 
   if (filters?.generationType) {
     query = query.eq("generation_type", filters.generationType);
+    countQuery = countQuery.eq("generation_type", filters.generationType);
   }
 
-  if (filters?.limit) {
-    query = query.limit(filters.limit);
+  // Get total count
+  const { count, error: countError } = await countQuery;
+
+  if (countError) {
+    return { data: null, error: countError.message };
   }
+
+  // Apply pagination
+  query = query.range(from, to);
 
   const { data, error } = await query;
 
@@ -126,7 +187,19 @@ export async function getLabelAuditLogs(filters?: {
     return { data: null, error: error.message };
   }
 
-  return { data: data as LabelGenerationAuditLog[], error: null };
+  const totalItems = count ?? 0;
+  const totalPages = Math.ceil(totalItems / pageSize);
+
+  return {
+    data: data as LabelGenerationAuditLog[],
+    pagination: {
+      page,
+      pageSize,
+      totalItems,
+      totalPages,
+    },
+    error: null,
+  };
 }
 
 /**

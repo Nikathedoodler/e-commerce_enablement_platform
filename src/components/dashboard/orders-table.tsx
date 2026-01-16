@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
@@ -20,6 +20,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { usePathname } from "next/navigation";
 import { OrderDeleteDialog } from "./order-delete-dialog";
 import { useRouter } from "next/navigation";
+import { Pagination } from "@/components/ui/pagination";
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -49,6 +50,8 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -57,9 +60,18 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
   const filters = {
     search: debouncedSearch || undefined,
     status: statusFilter || undefined,
+    page,
+    pageSize,
   };
 
-  const { data: orders, isLoading, error } = useOrders(filters);
+  const { data: ordersResult, isLoading, error } = useOrders(filters);
+  const orders = ordersResult?.data || [];
+  const pagination = ordersResult?.pagination;
+
+  // Reset to page 1 when search or status filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, statusFilter]);
 
   return (
     <div className="space-y-4">
@@ -202,6 +214,24 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
               ))}
             </TableBody>
           </Table>
+        </div>
+      )}
+      {pagination && pagination.totalPages > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            pageSize={pagination.pageSize}
+            totalItems={pagination.totalItems}
+            onPageChange={(newPage) => {
+              setPage(newPage);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            onPageSizeChange={(newPageSize) => {
+              setPageSize(newPageSize);
+              setPage(1); // Reset to first page when changing page size
+            }}
+          />
         </div>
       )}
       <OrderDetailDialog
