@@ -22,7 +22,6 @@ const ChartAreaInteractive = dynamic(
   }
 );
 import {
-  useOrderStats,
   useOrderAnalyticsBatched,
   useOrderTrends,
   useInventoryStats,

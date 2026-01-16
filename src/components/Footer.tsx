@@ -112,7 +112,7 @@ const Footer = () => {
                 transition={{ duration: 0.8, type: "string", stiffness: 100 }}
                 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-8xl font-extrabold text-gray-800 leading-tight sm:leading-tight md:leading-none mb-3 sm:mb-4 md:mb-6 text-center md:text-left"
               >
-                LET'S WORK
+                LET&apos;S WORK
                 <br />
                 TOGETHER
               </motion.h1>

@@ -102,7 +102,7 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
     if (searchFromURL !== searchInput) {
       setSearchInput(searchFromURL);
     }
-  }, [searchFromURL]);
+  }, [searchFromURL, searchInput]);
 
   // Build filters object from URL params
   const filters = {
