@@ -12,7 +12,7 @@ import {
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { InventoryTableSkeleton } from "./inventory-table-skeleton";
 import { InventoryItem } from "@/types/inventory";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -54,6 +54,8 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [sortBy, setSortBy] = useState<string>("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const debouncedSearch = useDebounce(search, 300);
   const router = useRouter();
@@ -66,16 +68,40 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
     lowStockOnly: lowStockOnly ? "true" : undefined,
     page,
     pageSize,
+    sortBy,
+    sortOrder,
   };
 
   const { data: itemsResult, isLoading, error } = useInventories(filters);
   const items = itemsResult?.data || [];
   const pagination = itemsResult?.pagination;
 
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search or sort changes
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, sortBy, sortOrder]);
+
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      // Toggle sort order if clicking the same column
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      // Set new column and default to descending
+      setSortBy(column);
+      setSortOrder("desc");
+    }
+  };
+
+  const SortIcon = ({ column }: { column: string }) => {
+    if (sortBy !== column) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />;
+    }
+    return sortOrder === "asc" ? (
+      <ArrowUp className="ml-2 h-4 w-4" />
+    ) : (
+      <ArrowDown className="ml-2 h-4 w-4" />
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -138,11 +164,51 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>SKU</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Reorder Threshold</TableHead>
-              <TableHead>Location</TableHead>
+              <TableHead>
+                <button
+                  onClick={() => handleSort("sku")}
+                  className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                >
+                  SKU
+                  <SortIcon column="sku" />
+                </button>
+              </TableHead>
+              <TableHead>
+                <button
+                  onClick={() => handleSort("name")}
+                  className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                >
+                  Name
+                  <SortIcon column="name" />
+                </button>
+              </TableHead>
+              <TableHead>
+                <button
+                  onClick={() => handleSort("quantity")}
+                  className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                >
+                  Quantity
+                  <SortIcon column="quantity" />
+                </button>
+              </TableHead>
+              <TableHead>
+                <button
+                  onClick={() => handleSort("reorder_threshold")}
+                  className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                >
+                  Reorder Threshold
+                  <SortIcon column="reorder_threshold" />
+                </button>
+              </TableHead>
+              <TableHead>
+                <button
+                  onClick={() => handleSort("location")}
+                  className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                >
+                  Location
+                  <SortIcon column="location" />
+                </button>
+              </TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>

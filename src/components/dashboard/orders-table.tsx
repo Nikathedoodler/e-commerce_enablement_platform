@@ -12,7 +12,7 @@ import {
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { OrdersTableSkeleton } from "./orders-table-skeleton";
 import { OrderDetailDialog } from "./order-detail-dialog";
 import { Order } from "@/types/orders";
@@ -52,6 +52,8 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [sortBy, setSortBy] = useState<string>("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -62,16 +64,40 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
     status: statusFilter || undefined,
     page,
     pageSize,
+    sortBy,
+    sortOrder,
   };
 
   const { data: ordersResult, isLoading, error } = useOrders(filters);
   const orders = ordersResult?.data || [];
   const pagination = ordersResult?.pagination;
 
-  // Reset to page 1 when search or status filter changes
+  // Reset to page 1 when search, status filter, or sort changes
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, statusFilter]);
+  }, [debouncedSearch, statusFilter, sortBy, sortOrder]);
+
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      // Toggle sort order if clicking the same column
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      // Set new column and default to descending
+      setSortBy(column);
+      setSortOrder("desc");
+    }
+  };
+
+  const SortIcon = ({ column }: { column: string }) => {
+    if (sortBy !== column) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />;
+    }
+    return sortOrder === "asc" ? (
+      <ArrowUp className="ml-2 h-4 w-4" />
+    ) : (
+      <ArrowDown className="ml-2 h-4 w-4" />
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -155,11 +181,51 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order #</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort("order_number")}
+                    className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    Order #
+                    <SortIcon column="order_number" />
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort("customer_email")}
+                    className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    Customer
+                    <SortIcon column="customer_email" />
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort("status")}
+                    className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    Status
+                    <SortIcon column="status" />
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort("total")}
+                    className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    Total
+                    <SortIcon column="total" />
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort("created_at")}
+                    className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    Date
+                    <SortIcon column="created_at" />
+                  </button>
+                </TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>

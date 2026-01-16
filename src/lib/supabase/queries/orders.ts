@@ -9,6 +9,8 @@ export async function getOrders(filters?: {
   search?: string;
   page?: number;
   pageSize?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }) {
   const supabase = await createClient();
 
@@ -26,6 +28,19 @@ export async function getOrders(filters?: {
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
+  // Valid sort columns for orders
+  const validSortColumns = [
+    "order_number",
+    "customer_email",
+    "status",
+    "total",
+    "created_at",
+  ];
+  const sortBy = filters?.sortBy && validSortColumns.includes(filters.sortBy)
+    ? filters.sortBy
+    : "created_at";
+  const sortOrder = filters?.sortOrder === "asc" ? "asc" : "desc";
+
   // Build the base query for counting
   let countQuery = supabase
     .from("orders")
@@ -35,7 +50,7 @@ export async function getOrders(filters?: {
   let query = supabase
     .from("orders")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order(sortBy, { ascending: sortOrder === "asc" });
 
   // Apply filters if provided
   if (filters?.status) {

@@ -12,6 +12,8 @@ export async function getInventoryItems(filters?: {
   search?: string;
   page?: number;
   pageSize?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }) {
   const supabase = await createClient();
 
@@ -27,6 +29,21 @@ export async function getInventoryItems(filters?: {
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
+  // Valid sort columns for inventory
+  const validSortColumns = [
+    "sku",
+    "name",
+    "quantity",
+    "reorder_threshold",
+    "location",
+    "created_at",
+  ];
+  const sortBy =
+    filters?.sortBy && validSortColumns.includes(filters.sortBy)
+      ? filters.sortBy
+      : "created_at";
+  const sortOrder = filters?.sortOrder === "asc" ? "asc" : "desc";
+
   // Build the base query for counting
   let countQuery = supabase
     .from("inventory")
@@ -36,7 +53,7 @@ export async function getInventoryItems(filters?: {
   let query = supabase
     .from("inventory")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order(sortBy, { ascending: sortOrder === "asc" });
 
   if (filters?.search) {
     const searchFilter = `sku.ilike.%${filters.search}%,name.ilike.%${filters.search}%`;
@@ -82,7 +99,7 @@ export async function getInventoryItems(filters?: {
     const allData = await supabase
       .from("inventory")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order(sortBy, { ascending: sortOrder === "asc" });
 
     if (allData.error) {
       return {

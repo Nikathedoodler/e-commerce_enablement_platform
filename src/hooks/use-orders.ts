@@ -15,6 +15,8 @@ type OrdersFilters = {
   search?: string;
   page?: number;
   pageSize?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 };
 
 export function useOrders(filters?: OrdersFilters) {
