@@ -56,7 +56,7 @@ const Hero = () => {
   return (
     <div
       id="#top"
-      className="max-w-7xl mx-auto flex flex-col justify-center items-center space-y-6 py-10 px-12 scroll-mt-10"
+      className="max-w-7xl mx-auto flex flex-col justify-center items-center space-y-6 py-10 px-4 sm:px-6 md:px-8 lg:px-12 scroll-mt-10"
     >
       <motion.h1
         initial={{ scale: 0 }}
@@ -117,7 +117,7 @@ const Hero = () => {
         initial={{ y: 0, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 1.5 }}
-        className="overflow-hidden w-3/4"
+        className="overflow-hidden w-full sm:w-4/5 md:w-3/4"
       >
         <div className="flex gap-4 lg:gap-14 xl:gap-28 mt-6 mb-10 animate-marquee min-w-max">
           <Image
@@ -182,7 +182,7 @@ const Hero = () => {
         initial={{ y: 30, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, delay: 1 }}
-        className="relative w-full xl:mb-12"
+        className="relative w-full mb-6 sm:mb-8 md:mb-10 xl:mb-12"
       >
         {/* Outer white glow to blend with page background */}
         <div

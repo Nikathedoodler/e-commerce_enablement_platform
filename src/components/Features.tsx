@@ -6,7 +6,7 @@ const Features = () => {
   return (
     <div
       id="features"
-      className="max-w-7xl mx-auto text-gray-900 flex flex-col space-y-10 py-10 px-12 scroll-mt-40"
+      className="max-w-7xl mx-auto text-gray-900 flex flex-col space-y-10 py-10 px-4 sm:px-6 md:px-8 lg:px-12 scroll-mt-40"
     >
       <motion.div
         // initial={{ y: 30, opacity: 0 }}
@@ -114,21 +114,21 @@ const Features = () => {
         // initial={{ y: 30, opacity: 0 }}
         // whileInView={{ y: 0, opacity: 1 }}
         // transition={{ duration: 1, delay: 1 }}
-        className="w-full bg-gray-100 rounded-xl p-6 shadow-2xl "
+        className="w-full bg-gray-100 rounded-xl p-4 sm:p-6 shadow-2xl"
       >
         <div>
-          <h1 className="text-xl font-bold">Available Features</h1>
+          <h1 className="text-lg sm:text-xl font-bold">Available Features</h1>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mt-4 sm:mt-6">
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
               src="/images/tracking.png"
-              className="h-10 lg:h-10 w-auto"
+              className="h-8 sm:h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
-            <h1 className="text-md font-semibold text-center lg:text-start">
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
               Real-time order tracking
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
@@ -136,15 +136,15 @@ const Features = () => {
               transparency through every step of fulfillment.
             </p>
           </div>
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
               src="/images/warehouse_inventory.png"
-              className="h-10 lg:h-10 w-auto"
+              className="h-8 sm:h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
-            <h1 className="text-md font-semibold text-center lg:text-start">
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
               Warehouse inventory dashboard
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
@@ -152,15 +152,15 @@ const Features = () => {
               shortages and streamline restocking.
             </p>
           </div>
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
               src="/images/fast-delivery-icon.webp"
-              className="h-10 lg:h-10 w-auto"
+              className="h-8 sm:h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
-            <h1 className="text-md font-semibold text-center lg:text-start">
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
               Fast EU delivery
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
@@ -168,15 +168,15 @@ const Features = () => {
               cost-efficiency from tax-advantaged warehouses.
             </p>
           </div>
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
               src="/images/ai-prediction.png"
-              className="h-10 lg:h-8 w-auto"
+              className="h-8 sm:h-10 lg:h-8 w-auto"
               width={32}
               height={16}
             />
-            <h1 className="text-md font-semibold text-center lg:text-start">
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
               AI-based cost prediction
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
@@ -184,15 +184,15 @@ const Features = () => {
               help you optimize operations and pricing.
             </p>
           </div>
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
               src="/images/routing.jpg"
-              className="h-10 lg:h-8 w-auto"
+              className="h-8 sm:h-10 lg:h-8 w-auto"
               width={32}
               height={16}
             />
-            <h1 className="text-md font-semibold text-center lg:text-start">
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
               Automated Order Routing
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
@@ -200,15 +200,15 @@ const Features = () => {
               for the fastest, lowest-cost delivery
             </p>
           </div>
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
               src="/images/return_management.png"
-              className="h-10 lg:h-10 w-auto"
+              className="h-8 sm:h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
-            <h1 className="text-md font-semibold text-center lg:text-start">
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
               Returns Management
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
@@ -216,15 +216,15 @@ const Features = () => {
               labels and real-time status tracking
             </p>
           </div>
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
               src="/images/inventory_alert.png"
-              className="h-10 lg:h-10 w-auto"
+              className="h-8 sm:h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
-            <h1 className="text-md font-semibold text-center lg:text-start">
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
               Real-Time Inventory Alerts
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">
@@ -232,15 +232,15 @@ const Features = () => {
               out-of-stock situations and improve sales velocity
             </p>
           </div>
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-6 shadow-xl hover:-translate-y-2  hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
               src="/images/package.png"
-              className="h-10 lg:h-10 w-auto"
+              className="h-8 sm:h-10 lg:h-10 w-auto"
               width={32}
               height={16}
             />
-            <h1 className="text-md font-semibold text-center lg:text-start">
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
               Custom Packing Solutions
             </h1>
             <p className="hidden xl:block text-sm xl:text-xs">

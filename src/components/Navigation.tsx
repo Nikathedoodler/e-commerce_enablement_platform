@@ -82,12 +82,13 @@ const Navigation = () => {
         {/* <SignIn /> */}
       </div>
       {/* Right: Language, Login */}
-      <div className="flex space-x-4">
+      <div className="flex items-center space-x-2 sm:space-x-4">
         <a
           href="#contact"
-          className="px-6 py-2 mr-0 bg-black hover:shadow-md hover:shadow-green-400 rounded-full font-semibold text-white shadow-md shadow-black/80 transition-all duration-200 hover:scale-105 group cursor-pointer"
+          className="px-3 py-1.5 sm:px-6 sm:py-2 mr-0 bg-black hover:shadow-md hover:shadow-green-400 rounded-full font-semibold text-white text-xs sm:text-sm shadow-md shadow-black/80 transition-all duration-200 hover:scale-105 group cursor-pointer whitespace-nowrap"
         >
-          Calculate Savings
+          <span className="hidden sm:inline">Calculate Savings</span>
+          <span className="sm:hidden">Calculate</span>
         </a>
         <div className="relative">
           <button

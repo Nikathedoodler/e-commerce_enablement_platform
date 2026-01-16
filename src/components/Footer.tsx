@@ -70,9 +70,9 @@ const Footer = () => {
   return (
     <footer
       id="contact"
-      className="w-full min-h-[100vh] bg-[#2d2d2d] flex items-center justify-center p-6"
+      className="w-full min-h-[100vh] bg-[#2d2d2d] flex items-center justify-center p-4 sm:p-6"
     >
-      <div className="w-full xl:max-w-7xl bg-white rounded-4xl md:rounded-[2.5rem] min-h-[40vh] xl:min-h-[60vh] flex flex-col items-center justify-evenly md:items-stretch md:justify-between relative px-8  md:p-16">
+      <div className="w-full xl:max-w-7xl bg-white rounded-3xl sm:rounded-4xl md:rounded-[2.5rem] min-h-[50vh] sm:min-h-[40vh] xl:min-h-[60vh] flex flex-col items-center justify-evenly md:items-stretch md:justify-between relative px-6 py-8 sm:px-8 sm:py-10 md:p-16">
         {/* Top Row */}
         <motion.div
           initial={{ scale: 0 }}
@@ -89,20 +89,20 @@ const Footer = () => {
               height={16}
             />
           </div> */}
-          <span className="font-semibold text-sm md:text-xl text-gray-800">
+          <span className="font-semibold text-xs sm:text-sm md:text-xl text-gray-800 text-center">
             3PL Fulfillment Made Simple & Profitable
           </span>
         </motion.div>
         {/* Main Content */}
-        <div>
-          <div className="flex flex-col md:flex-row w-full flex-1">
+        <div className="w-full">
+          <div className="flex flex-col md:flex-row w-full flex-1 gap-6 md:gap-0">
             {/* Left Side */}
-            <div className="flex-1 flex flex-col justify-center items-center md:items-start md:justify-start gap-4">
+            <div className="flex-1 flex flex-col justify-center items-center md:items-start md:justify-start gap-3 sm:gap-4">
               <motion.span
                 initial={{ y: -20, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 1 }}
-                className="font-semibold text-xl text-gray-800 mb-2"
+                className="font-semibold text-base sm:text-lg md:text-xl text-gray-800 mb-1 sm:mb-2 text-center md:text-left"
               >
                 Want To Try Demo?
               </motion.span>
@@ -110,9 +110,9 @@ const Footer = () => {
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
                 transition={{ duration: 0.8, type: "string", stiffness: 100 }}
-                className="text-5xl md:text-6xl xl:text-8xl font-extrabold text-gray-800 leading-none mb-6"
+                className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-8xl font-extrabold text-gray-800 leading-tight sm:leading-tight md:leading-none mb-3 sm:mb-4 md:mb-6 text-center md:text-left"
               >
-                LET’S WORK
+                LET'S WORK
                 <br />
                 TOGETHER
               </motion.h1>
@@ -121,18 +121,22 @@ const Footer = () => {
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 1 }}
                 onSubmit={handleSubmit(onSubmit)}
-                className="relative flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden w-full max-w-md  shadow-sm"
+                className="relative flex flex-col sm:flex-row items-stretch sm:items-center w-full max-w-md gap-3 sm:gap-0 sm:bg-white sm:border sm:border-gray-200 sm:rounded-xl sm:overflow-hidden sm:shadow-sm"
               >
-                <EmailLogo />
-                <input
-                  type="email"
-                  {...register("email")}
-                  placeholder="Enter your email..."
-                  className="flex-1 py-3 bg-transparent outline-none text-gray-700 placeholder-gray-400 text-base pr-32"
-                />
+                <div className="flex items-center flex-1 min-w-0 bg-white border border-gray-200 rounded-lg sm:border-0 sm:rounded-none sm:bg-transparent">
+                  <div className="pl-3 sm:pl-4 flex-shrink-0">
+                    <EmailLogo />
+                  </div>
+                  <input
+                    type="email"
+                    {...register("email")}
+                    placeholder="Enter your email..."
+                    className="flex-1 py-2.5 sm:py-3 bg-transparent outline-none text-gray-700 placeholder-gray-400 text-sm sm:text-base pr-2 sm:pr-24 md:pr-28 min-w-0"
+                  />
+                </div>
                 <button
                   type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#23262F] text-white px-3 py-1.5 font-semibold rounded-xl shadow-xs shadow-black/80 hover:shadow-md hover:shadow-green-400 cursor-pointer transition-all duration-200 hover:scale-105"
+                  className="w-full sm:w-auto sm:absolute sm:right-3 sm:top-1/2 sm:-translate-y-1/2 bg-[#23262F] text-white px-3 py-2 sm:px-2.5 sm:py-1.5 md:px-3 font-semibold rounded-lg sm:rounded-xl shadow-xs shadow-black/80 hover:shadow-md hover:shadow-green-400 cursor-pointer transition-all duration-200 hover:scale-105 text-xs sm:text-sm md:text-base whitespace-nowrap"
                 >
                   REGISTER
                 </button>
@@ -176,29 +180,29 @@ const Footer = () => {
             initial={{ scale: 0 }}
             whileInView={{ scale: 1 }}
             transition={{ duration: 0.8, type: "string", stiffness: 100 }}
-            className="flex md:hidden flex-row justify-center gap-6 mt-10"
+            className="flex md:hidden flex-row justify-center gap-4 sm:gap-6 mt-6 sm:mt-8 md:mt-10"
           >
             <a
               href="#"
-              className="text-base text-gray-800 hover:text-black transition hover:scale-120"
+              className="text-sm sm:text-base text-gray-800 hover:text-black transition hover:scale-120"
             >
               X
             </a>
             <a
               href="#"
-              className="text-base text-gray-800 hover:text-black transition hover:scale-120"
+              className="text-sm sm:text-base text-gray-800 hover:text-black transition hover:scale-120"
             >
               Instagram
             </a>
             <a
               href="#"
-              className="text-base text-gray-800 hover:text-black transition hover:scale-120"
+              className="text-sm sm:text-base text-gray-800 hover:text-black transition hover:scale-120"
             >
               Behance
             </a>
             <a
               href="#"
-              className="text-base text-gray-800 hover:text-black transition hover:scale-120"
+              className="text-sm sm:text-base text-gray-800 hover:text-black transition hover:scale-120"
             >
               Portfolio
             </a>
