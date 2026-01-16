@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { InventoryTable } from "@/components/dashboard/inventory-table";
+import { InventoryTableSkeleton } from "@/components/dashboard/inventory-table-skeleton";
 
 export default function LowStockPage() {
   return (
@@ -9,7 +11,9 @@ export default function LowStockPage() {
           Items that need restocking
         </p>
       </div>
-      <InventoryTable lowStockOnly={true} />
+      <Suspense fallback={<InventoryTableSkeleton />}>
+        <InventoryTable lowStockOnly={true} />
+      </Suspense>
     </div>
   );
 }

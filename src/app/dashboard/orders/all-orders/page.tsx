@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { OrdersTable } from "@/components/dashboard/orders-table";
+import { OrdersTableSkeleton } from "@/components/dashboard/orders-table-skeleton";
 
 export default function AllOrdersPage() {
   return (
@@ -8,7 +10,9 @@ export default function AllOrdersPage() {
         <p className="text-muted-foreground">View and manage all your orders</p>
       </div>
       <div className="rounded-lg border bg-card p-6">
-        <OrdersTable defaultStatus="" />
+        <Suspense fallback={<OrdersTableSkeleton />}>
+          <OrdersTable defaultStatus="" />
+        </Suspense>
       </div>
     </div>
   );

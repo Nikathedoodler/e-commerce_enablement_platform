@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { OrdersTable } from "@/components/dashboard/orders-table";
+import { OrdersTableSkeleton } from "@/components/dashboard/orders-table-skeleton";
 
 export default function FulfilledOrdersPage() {
   return (
@@ -8,7 +10,9 @@ export default function FulfilledOrdersPage() {
         <p className="text-muted-foreground">Completed and shipped orders</p>
       </div>
       <div className="rounded-lg border bg-card p-6">
-        <OrdersTable defaultStatus="fulfilled" />
+        <Suspense fallback={<OrdersTableSkeleton />}>
+          <OrdersTable defaultStatus="fulfilled" />
+        </Suspense>
       </div>
     </div>
   );

@@ -9,14 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { InventoryTableSkeleton } from "./inventory-table-skeleton";
 import { InventoryItem } from "@/types/inventory";
 import { useDebounce } from "@/hooks/use-debounce";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { InventoryDeleteDialog } from "./inventory-delete-dialog";
 import { InventoryDetailDialog } from "./inventory-detail-dialog";
 import { Pagination } from "@/components/ui/pagination";
@@ -48,21 +48,65 @@ interface InventoryTableProps {
 }
 
 export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
-  const [search, setSearch] = useState<string>("");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Read filter state from URL query parameters with defaults
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
+  const sortBy = searchParams.get("sortBy") || "created_at";
+  const sortOrder = (searchParams.get("sortOrder") as "asc" | "desc") || "desc";
+  const searchFromURL = searchParams.get("search") || "";
+
+  // Local state for search input (debounced before updating URL)
+  const [searchInput, setSearchInput] = useState<string>(searchFromURL);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
-  const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [sortBy, setSortBy] = useState<string>("created_at");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const debouncedSearch = useDebounce(search, 300);
-  const router = useRouter();
+  const debouncedSearch = useDebounce(searchInput, 300);
 
-  // Build filters object
+  // Update URL query parameters
+  const updateURL = useCallback(
+    (updates: Record<string, string | number | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === null || value === "" || value === undefined) {
+          params.delete(key);
+        } else {
+          params.set(key, String(value));
+        }
+      });
+
+      // Reset to page 1 when filters change (except when explicitly setting page)
+      if (!updates.page && Object.keys(updates).some((k) => k !== "page")) {
+        params.set("page", "1");
+      }
+
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [searchParams, pathname, router]
+  );
+
+  // Sync debounced search to URL (only update if it actually changed)
+  useEffect(() => {
+    if (debouncedSearch !== searchFromURL) {
+      updateURL({ search: debouncedSearch || null });
+    }
+  }, [debouncedSearch, searchFromURL, updateURL]);
+
+  // Sync URL search param to local input when URL changes externally
+  useEffect(() => {
+    if (searchFromURL !== searchInput) {
+      setSearchInput(searchFromURL);
+    }
+  }, [searchFromURL]);
+
+  // Build filters object from URL params
   const filters = {
-    search: debouncedSearch || undefined,
+    search: searchFromURL || undefined,
     // Convert boolean to string "true" if lowStockOnly is true
     // The query helper expects a string or undefined
     lowStockOnly: lowStockOnly ? "true" : undefined,
@@ -76,19 +120,20 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
   const items = itemsResult?.data || [];
   const pagination = itemsResult?.pagination;
 
-  // Reset to page 1 when search or sort changes
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch, sortBy, sortOrder]);
-
   const handleSort = (column: string) => {
     if (sortBy === column) {
       // Toggle sort order if clicking the same column
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      updateURL({
+        sortOrder: sortOrder === "asc" ? "desc" : "asc",
+        page: 1, // Reset to page 1 when sorting changes
+      });
     } else {
       // Set new column and default to descending
-      setSortBy(column);
-      setSortOrder("desc");
+      updateURL({
+        sortBy: column,
+        sortOrder: "desc",
+        page: 1, // Reset to page 1 when sorting changes
+      });
     }
   };
 
@@ -109,8 +154,8 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
         <div className="flex gap-4 items-center">
           <Input
             placeholder="Search by SKU or name..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="max-w-sm"
           />
         </div>
@@ -149,7 +194,7 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
               ? "No low stock items found"
               : "No inventory items found"}
           </p>
-          {debouncedSearch ? (
+          {searchFromURL ? (
             <p className="text-sm text-muted-foreground mt-2">
               Try adjusting your search
             </p>
@@ -276,12 +321,11 @@ export function InventoryTable({ lowStockOnly = false }: InventoryTableProps) {
             pageSize={pagination.pageSize}
             totalItems={pagination.totalItems}
             onPageChange={(newPage) => {
-              setPage(newPage);
+              updateURL({ page: newPage });
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             onPageSizeChange={(newPageSize) => {
-              setPageSize(newPageSize);
-              setPage(1); // Reset to first page when changing page size
+              updateURL({ pageSize: newPageSize, page: 1 });
             }}
           />
         </div>

@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
@@ -17,9 +17,8 @@ import { OrdersTableSkeleton } from "./orders-table-skeleton";
 import { OrderDetailDialog } from "./order-detail-dialog";
 import { Order } from "@/types/orders";
 import { useDebounce } from "@/hooks/use-debounce";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { OrderDeleteDialog } from "./order-delete-dialog";
-import { useRouter } from "next/navigation";
 import { Pagination } from "@/components/ui/pagination";
 
 function getStatusColor(status: string) {
@@ -43,24 +42,70 @@ interface OrdersTableProps {
 
 export function OrdersTable({ defaultStatus }: OrdersTableProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const isAllOrdersPage = pathname?.includes("/all-orders");
 
-  const [search, setSearch] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>(defaultStatus);
+  // Read filter state from URL query parameters with defaults
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
+  const sortBy = searchParams.get("sortBy") || "created_at";
+  const sortOrder = (searchParams.get("sortOrder") as "asc" | "desc") || "desc";
+  const searchFromURL = searchParams.get("search") || "";
+  // For status filter, use URL param if on all-orders page, otherwise use defaultStatus prop
+  const statusFromURL = searchParams.get("status") || "";
+  const statusFilter = isAllOrdersPage
+    ? statusFromURL || ""
+    : defaultStatus || "";
+
+  // Local state for search input (debounced before updating URL)
+  const [searchInput, setSearchInput] = useState<string>(searchFromURL);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [sortBy, setSortBy] = useState<string>("created_at");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const debouncedSearch = useDebounce(search, 300);
+  const debouncedSearch = useDebounce(searchInput, 300);
 
-  const router = useRouter();
+  // Update URL query parameters
+  const updateURL = useCallback(
+    (updates: Record<string, string | number | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
 
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === null || value === "" || value === undefined) {
+          params.delete(key);
+        } else {
+          params.set(key, String(value));
+        }
+      });
+
+      // Reset to page 1 when filters change (except when explicitly setting page)
+      if (!updates.page && Object.keys(updates).some((k) => k !== "page")) {
+        params.set("page", "1");
+      }
+
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [searchParams, pathname, router]
+  );
+
+  // Sync debounced search to URL (only update if it actually changed)
+  useEffect(() => {
+    if (debouncedSearch !== searchFromURL) {
+      updateURL({ search: debouncedSearch || null });
+    }
+  }, [debouncedSearch, searchFromURL, updateURL]);
+
+  // Sync URL search param to local input when URL changes externally
+  useEffect(() => {
+    if (searchFromURL !== searchInput) {
+      setSearchInput(searchFromURL);
+    }
+  }, [searchFromURL]);
+
+  // Build filters object from URL params
   const filters = {
-    search: debouncedSearch || undefined,
+    search: searchFromURL || undefined,
     status: statusFilter || undefined,
     page,
     pageSize,
@@ -72,19 +117,20 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
   const orders = ordersResult?.data || [];
   const pagination = ordersResult?.pagination;
 
-  // Reset to page 1 when search, status filter, or sort changes
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch, statusFilter, sortBy, sortOrder]);
-
   const handleSort = (column: string) => {
     if (sortBy === column) {
       // Toggle sort order if clicking the same column
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      updateURL({
+        sortOrder: sortOrder === "asc" ? "desc" : "asc",
+        page: 1, // Reset to page 1 when sorting changes
+      });
     } else {
       // Set new column and default to descending
-      setSortBy(column);
-      setSortOrder("desc");
+      updateURL({
+        sortBy: column,
+        sortOrder: "desc",
+        page: 1, // Reset to page 1 when sorting changes
+      });
     }
   };
 
@@ -105,14 +151,14 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
         <div className="flex gap-4 items-center justify-between w-full md:w-auto">
           <Input
             placeholder="Search orders or email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="hidden md:block md:max-w-sm"
           />
           {isAllOrdersPage && (
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => updateURL({ status: e.target.value || null, page: 1 })}
               className="h-9 rounded-md border border-input bg-transparent px-3"
             >
               <option value="">All Statuses</option>
@@ -139,8 +185,8 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
       <div className="md:hidden">
         <Input
           placeholder="Search orders or email..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           className="w-full"
         />
       </div>
@@ -166,7 +212,7 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
           <p className="text-lg font-medium text-muted-foreground">
             No orders found
           </p>
-          {debouncedSearch || statusFilter ? (
+          {searchFromURL || statusFilter ? (
             <p className="text-sm text-muted-foreground mt-2">
               Try adjusting your filters
             </p>
@@ -290,12 +336,11 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
             pageSize={pagination.pageSize}
             totalItems={pagination.totalItems}
             onPageChange={(newPage) => {
-              setPage(newPage);
+              updateURL({ page: newPage });
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             onPageSizeChange={(newPageSize) => {
-              setPageSize(newPageSize);
-              setPage(1); // Reset to first page when changing page size
+              updateURL({ pageSize: newPageSize, page: 1 });
             }}
           />
         </div>

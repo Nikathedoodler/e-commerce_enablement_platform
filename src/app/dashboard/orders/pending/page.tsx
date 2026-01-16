@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { OrdersTable } from "@/components/dashboard/orders-table";
+import { OrdersTableSkeleton } from "@/components/dashboard/orders-table-skeleton";
 
 export default function PendingOrdersPage() {
   return (
@@ -8,7 +10,9 @@ export default function PendingOrdersPage() {
         <p className="text-muted-foreground">Orders awaiting fulfillment</p>
       </div>
       <div className="rounded-lg border bg-card p-6">
-        <OrdersTable defaultStatus="pending" />
+        <Suspense fallback={<OrdersTableSkeleton />}>
+          <OrdersTable defaultStatus="pending" />
+        </Suspense>
       </div>
     </div>
   );
