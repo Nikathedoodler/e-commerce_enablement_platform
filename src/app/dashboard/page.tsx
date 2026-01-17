@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import {
   useOrderAnalyticsBatched,

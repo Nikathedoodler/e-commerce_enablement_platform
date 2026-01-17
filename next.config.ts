@@ -25,8 +25,6 @@ const nextConfig: NextConfig = {
   // Production optimizations
   compress: true, // Enable gzip compression
   poweredByHeader: false, // Remove X-Powered-By header
-  // Optimize production builds
-  swcMinify: true, // Use SWC minifier (faster than Terser)
   // Reduce JavaScript execution time
   compiler: {
     removeConsole:
@@ -79,12 +77,16 @@ export default withSentryConfig(nextConfig, {
   // Hides source maps from generated client bundles
   // Note: Source maps are uploaded to Sentry but not included in client bundles by default
 
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
-
-  // Enables automatic instrumentation of Vercel Cron Monitors.
-  // See the following for more information:
-  // https://docs.sentry.io/product/crons/
-  // https://vercel.com/docs/cron-jobs
-  automaticVercelMonitors: true,
+  // Webpack configuration for Sentry
+  webpack: {
+    // Automatically tree-shake Sentry logger statements to reduce bundle size
+    treeshake: {
+      removeDebugLogging: true,
+    },
+    // Enables automatic instrumentation of Vercel Cron Monitors.
+    // See the following for more information:
+    // https://docs.sentry.io/product/crons/
+    // https://vercel.com/docs/cron-jobs
+    automaticVercelMonitors: true,
+  },
 });
