@@ -1,7 +1,7 @@
 # Project Progress Summary
 
 **Last Updated:** 2025-01-XX (Current Session)
-**Latest:** Shipping Label Automation & Audit Log System - ✅ Complete
+**Latest:** Email Notifications System - ✅ Complete
 **Project:** E-Commerce Enablement Platform (3PL Fulfillment Platform)
 
 ## 🎓 Development Approach
@@ -511,11 +511,13 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ Create order form with full validation
 - ✅ Delete order with confirmation dialog
 - ✅ Pending and Fulfilled pages integrated
+- ✅ **Pagination** - Full pagination with page size options (10, 20, 50, 100), URL-based state management, scroll-to-top on page change
+- ✅ **Sorting** - Sortable columns (order_number, customer_email, status, total, created_at) with ascending/descending toggle, visual sort indicators, URL-based state management
 
 **Optional Enhancements (Future):**
 
-- ⏳ Pagination (optional - currently shows all orders)
-- ⏳ Sorting (optional - currently sorted by created_at DESC)
+- ⏳ Advanced filtering (by date range, financial status)
+- ⏳ Bulk operations (export to CSV, bulk status updates)
 
 ### 2. Inventory Management UI (Phase 2 Continuation) - ✅ COMPLETE
 
@@ -535,10 +537,11 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ Low stock alerts/indicators (color-coded badges)
 - ✅ Delete inventory item functionality with confirmation dialog
 - ✅ All route pages integrated and working
+- ✅ **Pagination** - Full pagination with page size options (10, 20, 50, 100), URL-based state management, scroll-to-top on page change
+- ✅ **Sorting** - Sortable columns (sku, name, quantity, reorder_threshold, location, created_at) with ascending/descending toggle, visual sort indicators, URL-based state management
 
 **Optional Enhancements (Future):**
 
-- ⏳ Pagination (optional - currently shows all items)
 - ⏳ Bulk operations (import/export CSV)
 - ⏳ Advanced filtering (by location, date range)
 
@@ -589,7 +592,7 @@ This project follows a **collaborative, learning-focused development methodology
 
 **Optional Enhancements (Future):**
 
-- ⏳ Email notifications when new orders arrive (Resend/SendGrid)
+- ✅ Email notifications when new orders arrive - **COMPLETE**
 - ⏳ Real-time dashboard toast notifications for incoming orders
 - ⏳ Webhook registration via API (currently manual setup)
 - ⏳ Order status updates back to Shopify
@@ -737,12 +740,131 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ Error tracking and logging
 - ✅ Manual generation still available
 
-### 7. Future Phases (Phase 7+)
+### 7. Analytics Dashboard (Phase 7) - ✅ COMPLETE
 
-- Advanced analytics and reporting
-- Email notifications for label generation
+**Status:** Fully implemented and optimized
+
+**Completed:**
+
+- ✅ Comprehensive analytics dashboard (`/dashboard/analytics`)
+- ✅ Key metrics cards: Total Orders, Total Revenue, Pending Shipments, Low Stock Items
+- ✅ Order volume trends chart (line/area chart with date grouping)
+- ✅ Order status breakdown (pie chart)
+- ✅ Order source breakdown (bar chart - Shopify vs Manual)
+- ✅ Revenue trends chart (area chart)
+- ✅ Receiving trends chart
+- ✅ Label generation trends chart
+- ✅ Top SKUs table with pagination
+- ✅ Date range selector (7d, 30d, 90d, 180d, 1y presets)
+- ✅ Performance optimizations: Batched queries, progressive loading, database-level aggregations
+- ✅ Responsive design with loading states and error handling
+
+**Key Files:**
+- Analytics page: `src/app/dashboard/analytics/page.tsx`
+- Analytics hooks: `src/hooks/use-analytics.ts`
+- Chart components: `src/components/dashboard/analytics/`
+- Optimization docs: `docs/analytics-optimizations.md`
+
+**Optional Enhancements (Future):**
+
+- ⏳ Export reports to PDF/CSV
+- ⏳ Email scheduled reports
+- ⏳ Comparison mode (compare two periods)
+- ⏳ Drill-down capabilities (click chart → see details)
+- ⏳ Real-time updates (WebSocket/SSE)
+- ⏳ Advanced filters (by location, SKU, customer)
+- ⏳ Forecasting/predictions
+
+### 8. Email Notifications System - ✅ COMPLETE
+
+**Status:** Fully implemented and integrated
+
+**Completed:**
+
+- ✅ Reusable email service utility (`src/lib/email/service.ts`)
+  - Uses Resend for email delivery
+  - Handles HTML and plain text emails
+  - Error handling and logging
+- ✅ Email templates for all notification types
+  - New Shopify order notifications (`src/lib/email/templates/new-order.ts`)
+  - Label generation success/failure (`src/lib/email/templates/label-generation.ts`)
+  - Low stock alerts (`src/lib/email/templates/low-stock.ts`)
+- ✅ **New Shopify Order Emails** - Integrated into webhook handler
+  - Sends email when order is successfully synced from Shopify
+  - Includes order details, customer info, and dashboard link
+  - Non-blocking (doesn't fail webhook if email fails)
+- ✅ **Label Generation Emails** - Integrated into label generation
+  - Success email: Sent when label is generated successfully
+  - Failure email: Sent when label generation fails
+  - Includes tracking number, carrier, cost, and order link
+- ✅ **Low Stock Alerts** - Integrated into inventory updates
+  - Detects when inventory quantity falls at or below reorder threshold
+  - Only sends email when crossing threshold (avoids duplicates)
+  - Integrated into receiving module and inventory updates
+  - Includes SKU, item name, current quantity, threshold, and inventory link
+- ✅ Helper functions for user email lookup and URL generation
+  - `getUserEmail()` - Gets user email from user_id using service role
+  - `getOrderUrl()` - Builds dashboard order URL
+  - `getInventoryUrl()` - Builds dashboard inventory URL
+
+**Key Features:**
+- **Non-blocking:** Email failures don't break core functionality
+- **Professional templates:** HTML emails with responsive design
+- **Smart notifications:** Low stock only alerts when crossing threshold
+- **Error handling:** Comprehensive logging and error recovery
+- **User-friendly:** All emails include direct links to relevant dashboard pages
+
+**Files Created:**
+- `src/lib/email/service.ts` - Email service utility
+- `src/lib/email/helpers.ts` - Helper functions
+- `src/lib/email/low-stock.ts` - Low stock detection logic
+- `src/lib/email/templates/new-order.ts` - New order email template
+- `src/lib/email/templates/label-generation.ts` - Label generation email templates
+- `src/lib/email/templates/low-stock.ts` - Low stock email template
+
+**Files Modified:**
+- `src/app/api/webhooks/shopify/orders/route.ts` - Added new order email notification
+- `src/lib/shipping/generate-label-server.ts` - Added label generation email notifications
+- `src/lib/supabase/queries/receiving.ts` - Added low stock detection
+- `src/lib/supabase/queries/inventory.ts` - Added low stock detection
+
+**Additional Features Completed:**
+
+- ✅ **Subscription Change Emails** - Integrated into Stripe webhook handler
+  - Subscription activated email (when checkout completes)
+  - Subscription updated email (when plan changes - upgrade/downgrade)
+  - Subscription canceled email (when subscription is deleted)
+  - Includes plan details, order limits, billing period, and billing dashboard link
+- ✅ **Real-time Dashboard Toast Notifications** - Integrated into dashboard page
+  - Uses Supabase Realtime for instant, event-driven notifications (no polling overhead)
+  - Falls back to 30-second polling if Realtime is unavailable
+  - Shows toast notification when new order arrives
+  - Includes order number, customer email, total
+  - "View" button to open order directly
+  - Non-intrusive, only shows when new orders detected
+  - **Performance**: Zero database queries unless data changes (vs 6 queries/min with polling)
+  - See `docs/technical/realtime-optimization.md` for setup instructions
+- ✅ **Scheduled Analytics Reports** - Weekly email reports
+  - Vercel Cron job runs every Monday at 9 AM
+  - Sends analytics report to all users with active subscriptions
+  - Includes: Total orders, revenue, average order value, pending shipments, low stock items
+  - Shows growth percentages vs previous period
+  - Professional email template with dashboard link
+  - Can be manually triggered via API: `/api/analytics/report?userId=xxx&period=7d`
+
+**Optional Enhancements (Future):**
+
+- ⏳ Email preferences/settings (opt-in/opt-out per notification type)
+- ⏳ Custom report schedules (daily, monthly, custom intervals)
+- ⏳ Email templates customization
+- ⏳ Multiple recipient support (team notifications)
+- ⏳ Report export (PDF/CSV attachments)
+
+### 9. Future Phases (Phase 9+)
+
 - Batch label generation for multiple orders
 - Retry logic for failed generations
+- Additional storefront integrations (WooCommerce, BigCommerce)
 
 ---
 
@@ -751,6 +873,7 @@ This project follows a **collaborative, learning-focused development methodology
 - `docs/technical-plan.md` - Full technical plan with all phases
 - `docs/orders-mvp-plan.md` - Detailed implementation plan for Orders MVP
 - `docs/migrations/` - Database migration files
+- `docs/deployment/custom-domain-checklist.md` - ⚠️ **Important:** Checklist for custom domain migration
 
 ---
 
@@ -774,7 +897,9 @@ This project follows a **collaborative, learning-focused development methodology
 - Sidebar is collapsible and responsive (icon-only mode on mobile)
 - Logout uses Supabase client-side signOut and Next.js router for navigation
 - Orders MVP data layer complete: database, queries, hooks all implemented
-- Orders table component ready with filtering, search, status badges
+- Orders table component ready with filtering, search, status badges, pagination, and sorting
+- Pagination: URL-based state management, configurable page sizes (10, 20, 50, 100), scroll-to-top on page change
+- Sorting: Clickable column headers with visual indicators (ArrowUpDown/ArrowUp/ArrowDown), supports all major columns
 - Order detail dialog complete with full order info and status update functionality
 - Create order form complete with React Hook Form + Zod validation
 - Delete order functionality with confirmation dialog
@@ -782,7 +907,9 @@ This project follows a **collaborative, learning-focused development methodology
 - TanStack Query handles caching, loading states, and error handling
 - All order operations use Server Actions with RLS policy enforcement
 - Order number auto-generation handled in backend Server Action
-- Inventory MVP complete: All CRUD operations, view/edit dialog, low stock indicators
+- Inventory MVP complete: All CRUD operations, view/edit dialog, low stock indicators, pagination, and sorting
+- Inventory pagination: Same URL-based approach as orders, works with search and low-stock filters
+- Inventory sorting: Sortable columns for sku, name, quantity, reorder_threshold, location, created_at
 - Inventory detail dialog allows inline editing of all fields with automatic cache updates
 - Receiving module complete: Form, history table, automatic inventory updates
 - Receiving form supports optional item_name for new SKUs (creates inventory with proper name)
@@ -823,5 +950,14 @@ This project follows a **collaborative, learning-focused development methodology
 - ✅ Audit Log System: Complete history tracking with real-time updates
 - ✅ Label Generation: Both manual and automatic generation working
 - ✅ Error Handling: Failed attempts logged with error messages
+
+**Phase 7 Status: ✅ COMPLETE**
+
+- ✅ Analytics Dashboard: Comprehensive reporting with charts and metrics
+- ✅ Order Analytics: Volume trends, status breakdown, source breakdown, revenue trends
+- ✅ Inventory Analytics: Low stock tracking, top SKUs table
+- ✅ Receiving Analytics: Receiving trends and condition breakdown
+- ✅ Label Analytics: Generation trends and success rates
+- ✅ Performance Optimizations: Batched queries, progressive loading, database aggregations
 
 **Next: Phase 7 - Advanced Features & Analytics**

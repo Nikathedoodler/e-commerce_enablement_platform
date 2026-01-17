@@ -1,6 +1,6 @@
 "use client";
 
-import { useOrders } from "@/hooks/use-orders";
+import { useOrders, useOrder } from "@/hooks/use-orders";
 import {
   Table,
   TableBody,
@@ -64,6 +64,17 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
+  // Check for orderId in URL (for email links)
+  const orderIdFromURL = searchParams.get("orderId") || "";
+
+  // Fetch the specific order if orderId is in URL
+  const {
+    data: orderFromURL,
+    isLoading: isLoadingOrderFromURL,
+  } = useOrder(orderIdFromURL, {
+    enabled: !!orderIdFromURL, // Only fetch if orderId exists
+  });
+
   const debouncedSearch = useDebounce(searchInput, 300);
 
   // Update URL query parameters
@@ -116,6 +127,47 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
   const { data: ordersResult, isLoading, error } = useOrders(filters);
   const orders = ordersResult?.data || [];
   const pagination = ordersResult?.pagination;
+
+  // Auto-open order dialog when orderId is in URL (from email links)
+  // This must be after orders is declared
+  useEffect(() => {
+    if (orderIdFromURL && orderFromURL && !isLoadingOrderFromURL) {
+      // Check if order is already in the current page results
+      const orderInResults = orders.find((o) => o.id === orderIdFromURL);
+      
+      if (orderInResults) {
+        // Order is in current results, open dialog
+        setSelectedOrder(orderInResults);
+        setIsViewDialogOpen(true);
+      } else if (orderFromURL) {
+        // Order not in current page, use the fetched order and optionally search for it
+        // Search by order number to show it in the table
+        if (orderFromURL.order_number && !searchFromURL) {
+          updateURL({ search: orderFromURL.order_number, page: 1 });
+        }
+        setSelectedOrder(orderFromURL);
+        setIsViewDialogOpen(true);
+      }
+      
+      // Remove orderId from URL after opening (clean URL, but keep other params)
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("orderId");
+      const newUrl = params.toString() 
+        ? `${pathname}?${params.toString()}`
+        : pathname;
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [
+    orderIdFromURL,
+    orderFromURL,
+    isLoadingOrderFromURL,
+    orders,
+    searchParams,
+    pathname,
+    router,
+    searchFromURL,
+    updateURL,
+  ]);
 
   const handleSort = (column: string) => {
     if (sortBy === column) {
@@ -346,6 +398,7 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
         </div>
       )}
       <OrderDetailDialog
+        key={selectedOrder?.id || "dialog"} // Force re-render when order changes
         orderItem={selectedOrder}
         open={isViewDialogOpen}
         onOpenChange={setIsViewDialogOpen}

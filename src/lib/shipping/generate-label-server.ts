@@ -8,6 +8,13 @@ import {
   updateLabelAuditLogEntry,
 } from "@/lib/supabase/queries/label-audit-log";
 import type { DHLLabelRequest } from "@/types/shipping";
+import { EmailService } from "@/lib/email/service";
+import {
+  getLabelSuccessEmailTemplate,
+  getLabelFailureEmailTemplate,
+} from "@/lib/email/templates/label-generation";
+import { getUserEmail } from "@/lib/email/helpers";
+import { getOrderUrl } from "@/lib/email/url-helpers";
 
 /**
  * Server-side function to generate a shipping label
@@ -34,10 +41,10 @@ export async function generateLabelServer(
       return { success: false, error: "Unauthorized" };
     }
 
-    // Verify the order belongs to the user
+    // Verify the order belongs to the user and get order details for email
     const { data: order, error: orderError } = await supabase
       .from("orders")
-      .select("id, user_id, tracking_number")
+      .select("id, user_id, order_number, tracking_number")
       .eq("id", labelRequest.orderId)
       .eq("user_id", user.id)
       .single();
@@ -75,6 +82,35 @@ export async function generateLabelServer(
           error_message: labelError,
         });
       }
+
+      // Send failure email notification (non-blocking)
+      try {
+        const userEmail = await getUserEmail(user.id);
+        if (userEmail) {
+          const orderUrl = getOrderUrl(order.id);
+          const emailTemplate = getLabelFailureEmailTemplate({
+            orderNumber: order.order_number,
+            errorMessage: labelError,
+            orderUrl,
+          });
+
+          EmailService.sendEmail({
+            to: userEmail,
+            subject: emailTemplate.subject,
+            html: emailTemplate.html,
+            text: emailTemplate.text,
+          }).then((result) => {
+            if (result.success) {
+              console.log(`Failure email sent for order ${order.order_number}`);
+            } else {
+              console.error(`Failed to send failure email: ${result.error}`);
+            }
+          });
+        }
+      } catch (emailError) {
+        console.error("Error sending failure email:", emailError);
+      }
+
       return { success: false, error: labelError, auditLogId };
     }
 
@@ -127,6 +163,36 @@ export async function generateLabelServer(
         .from("orders")
         .update({ tracking_number: label.trackingNumber })
         .eq("id", labelRequest.orderId);
+    }
+
+    // Send success email notification (non-blocking)
+    try {
+      const userEmail = await getUserEmail(user.id);
+      if (userEmail) {
+        const orderUrl = getOrderUrl(order.id);
+        const emailTemplate = getLabelSuccessEmailTemplate({
+          orderNumber: order.order_number,
+          trackingNumber: label.trackingNumber,
+          carrier: "DHL",
+          cost: label.cost,
+          orderUrl,
+        });
+
+        EmailService.sendEmail({
+          to: userEmail,
+          subject: emailTemplate.subject,
+          html: emailTemplate.html,
+          text: emailTemplate.text,
+        }).then((result) => {
+          if (result.success) {
+            console.log(`Success email sent for order ${order.order_number}`);
+          } else {
+            console.error(`Failed to send success email: ${result.error}`);
+          }
+        });
+      }
+    } catch (emailError) {
+      console.error("Error sending success email:", emailError);
     }
 
     return { success: true, trackingNumber: label.trackingNumber, auditLogId };

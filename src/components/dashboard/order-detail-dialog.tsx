@@ -52,7 +52,8 @@ export function OrderDetailDialog({
     refetch: refetchLabels,
   } = useShippingLabelsByOrderId(orderItem?.id || "");
 
-  if (!orderItem) return null;
+  // Don't render if orderItem is not set yet (prevents queries from running with empty orderId)
+  if (!orderItem || !orderItem.id) return null;
 
   const handleStatusUpdate = async () => {
     if (!selectedStatus || selectedStatus === orderItem.status) return;

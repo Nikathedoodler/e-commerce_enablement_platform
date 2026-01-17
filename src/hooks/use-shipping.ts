@@ -67,6 +67,7 @@ export function useShippingLabelsByOrderId(orderId: string) {
       }
       return result.data;
     },
+    enabled: !!orderId, // Only fetch when orderId is provided
     // Refetch every 2 seconds when dialog is open (for auto-generated labels)
     refetchInterval: (query) => {
       // Only refetch if we have an orderId and no labels yet (waiting for auto-generation)

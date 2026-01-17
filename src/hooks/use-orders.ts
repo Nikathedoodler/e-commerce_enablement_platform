@@ -19,7 +19,10 @@ type OrdersFilters = {
   sortOrder?: "asc" | "desc";
 };
 
-export function useOrders(filters?: OrdersFilters) {
+export function useOrders(
+  filters?: OrdersFilters,
+  options?: { refetchInterval?: number | undefined }
+) {
   return useQuery({
     queryKey: ["orders", filters],
     queryFn: async () => {
@@ -32,10 +35,12 @@ export function useOrders(filters?: OrdersFilters) {
         pagination: result.pagination,
       };
     },
+    refetchInterval: options?.refetchInterval,
+    refetchOnWindowFocus: true,
   });
 }
 
-export function useOrder(id: string) {
+export function useOrder(id: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["order", id],
     queryFn: async () => {
@@ -46,6 +51,7 @@ export function useOrder(id: string) {
       }
       return result.data;
     },
+    enabled: options?.enabled !== false && !!id, // Only fetch if enabled and id exists
   });
 }
 

@@ -141,7 +141,17 @@ SENTRY_PROJECT=your-project-name
 RESEND_API_KEY=re_xxxxxxxxxxxxx
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 SUPPORT_EMAIL=support@yourdomain.com
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
 ```
+
+**Description:**
+- `RESEND_API_KEY`: Resend API key for sending emails
+- `RESEND_FROM_EMAIL`: Email address to send from (must be verified in Resend)
+- `SUPPORT_EMAIL`: Email address where support requests are sent
+- `NEXT_PUBLIC_APP_URL`: Base URL of your application (for email links)
+  - **Optional but recommended** for production
+  - If not set, Vercel deployments will use `VERCEL_URL` automatically
+  - Format: `https://yourdomain.com` (no trailing slash)
 
 **Description:**
 - `RESEND_API_KEY`: Resend API key for sending emails
@@ -260,6 +270,11 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-...
 NEXT_PUBLIC_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
 SENTRY_ORG=your-org-name
 SENTRY_PROJECT=your-project-name
+
+# App URL (Optional - for email links)
+# If not set, Vercel will automatically use VERCEL_URL
+# Only set this if you have a custom domain
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
 ```
 
 ### Webhook URLs

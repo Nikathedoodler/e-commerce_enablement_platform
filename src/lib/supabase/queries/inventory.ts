@@ -6,6 +6,7 @@ import {
   InventoryInput,
   InventoryUpdate,
 } from "@/types/inventory";
+import { checkAndNotifyLowStock } from "@/lib/email/low-stock";
 
 export async function getInventoryItems(filters?: {
   lowStockOnly?: string;
@@ -197,6 +198,16 @@ export async function createInventoryItem(inventoryData: InventoryInput) {
       data: null,
     };
 
+  // Check for low stock on new item (non-blocking)
+  if (data) {
+    checkAndNotifyLowStock({
+      currentItem: data as InventoryItem,
+      // No previous quantity for new items
+    }).catch((error) => {
+      console.error("Error checking low stock:", error);
+    });
+  }
+
   return { data: data as InventoryItem, error: null };
 }
 
@@ -212,6 +223,17 @@ export async function updateInventoryItem(
 
   if (userError || !user) return { error: "Not Authenticated", data: null };
 
+  // Get previous quantity if quantity is being updated
+  let previousQuantity: number | undefined;
+  if (updates.quantity !== undefined) {
+    const { data: previousItem } = await supabase
+      .from("inventory")
+      .select("quantity")
+      .eq("id", id)
+      .single();
+    previousQuantity = previousItem?.quantity;
+  }
+
   const { data, error } = await supabase
     .from("inventory")
     .update(updates)
@@ -225,6 +247,17 @@ export async function updateInventoryItem(
       details: error.message,
       data: null,
     };
+
+  // Check for low stock after update (non-blocking)
+  // Only check if quantity was updated
+  if (updates.quantity !== undefined && data) {
+    checkAndNotifyLowStock({
+      currentItem: data as InventoryItem,
+      previousQuantity,
+    }).catch((error) => {
+      console.error("Error checking low stock:", error);
+    });
+  }
 
   return { data: data as InventoryItem, error: null };
 }

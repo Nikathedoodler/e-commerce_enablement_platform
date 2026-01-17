@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   useOrderAnalyticsBatched,
   useInventoryStats,
 } from "@/hooks/use-analytics";
 import { useOrders } from "@/hooks/use-orders";
+import { useRealtimeOrders } from "@/hooks/use-realtime-orders";
 import type { DateRange } from "@/types/analytics";
 import {
   Card,
@@ -63,14 +64,25 @@ export default function DashboardPage() {
   // Fetch inventory stats for low stock items
   const inventoryStats = useInventoryStats();
 
-  // Fetch recent orders (last 5)
+  // Use Supabase Realtime for instant order notifications (event-driven, no polling)
+  // Falls back to adaptive polling if Realtime is unavailable
+  const { realtimeAvailable } = useRealtimeOrders();
+
+  // Fetch recent orders (last 5) - only poll if Realtime is unavailable
+  // Falls back to 30-second polling if Realtime subscription fails
   const { data: recentOrdersData, isLoading: isLoadingRecentOrders } =
-    useOrders({
-      page: 1,
-      pageSize: 5,
-      sortBy: "created_at",
-      sortOrder: "desc",
-    });
+    useOrders(
+      {
+        page: 1,
+        pageSize: 5,
+        sortBy: "created_at",
+        sortOrder: "desc",
+      },
+      {
+        // Only poll if Realtime is unavailable
+        refetchInterval: realtimeAvailable ? undefined : 30000, // 30s fallback polling
+      }
+    );
 
   // Extract metrics
   const ordersToday = todayOrderAnalytics.data?.data?.stats?.totalOrders || 0;

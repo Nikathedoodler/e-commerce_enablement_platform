@@ -8,6 +8,10 @@ import type {
   ShopifyLineItem,
 } from "@/types/shopify";
 import type { OrderInput, ShippingAddress, OrderItem } from "@/types/orders";
+import { EmailService } from "@/lib/email/service";
+import { getNewOrderEmailTemplate } from "@/lib/email/templates/new-order";
+import { getUserEmail } from "@/lib/email/helpers";
+import { getOrderUrl } from "@/lib/email/url-helpers";
 
 /**
  * Verifies the HMAC signature from Shopify webhook
@@ -295,6 +299,41 @@ export async function POST(req: NextRequest) {
     console.log(
       `Successfully created order ${shopifyOrder.name} from ${shopDomain}`
     );
+
+    // Send email notification (non-blocking - don't fail webhook if email fails)
+    try {
+      const userEmail = await getUserEmail(shop.user_id);
+      if (userEmail) {
+        const orderUrl = getOrderUrl(order.id);
+        const itemCount = orderInput.items?.length || 0;
+        const emailTemplate = getNewOrderEmailTemplate({
+          orderNumber: orderInput.order_number,
+          customerEmail: orderInput.customer_email,
+          total: orderInput.total,
+          itemCount,
+          orderUrl,
+        });
+
+        // Send email asynchronously (don't await - fire and forget)
+        EmailService.sendEmail({
+          to: userEmail,
+          subject: emailTemplate.subject,
+          html: emailTemplate.html,
+          text: emailTemplate.text,
+        }).then((result) => {
+          if (result.success) {
+            console.log(`Email notification sent for order ${orderInput.order_number}`);
+          } else {
+            console.error(`Failed to send email notification: ${result.error}`);
+          }
+        });
+      } else {
+        console.warn(`Could not get user email for user_id: ${shop.user_id}`);
+      }
+    } catch (emailError) {
+      // Log but don't fail the webhook if email fails
+      console.error("Error sending email notification:", emailError);
+    }
 
     // Return 200 OK to Shopify
     return NextResponse.json(

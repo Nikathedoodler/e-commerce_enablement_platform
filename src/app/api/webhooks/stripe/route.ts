@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import type { PlanTier, SubscriptionStatus } from "@/types/stripe";
+import { EmailService } from "@/lib/email/service";
+import {
+  getSubscriptionActivatedEmailTemplate,
+  getSubscriptionUpdatedEmailTemplate,
+  getSubscriptionCanceledEmailTemplate,
+} from "@/lib/email/templates/subscription";
+import { getUserEmail, getBillingUrl } from "@/lib/email/helpers";
+import { getPlanLimit } from "@/lib/constants/plans";
 
 /**
  * Verifies the Stripe webhook signature
@@ -192,6 +200,37 @@ async function handleCheckoutSessionCompleted(
     }
 
     console.log(`Subscription created/updated for user ${userId}`);
+
+    // Send subscription activated email (non-blocking)
+    try {
+      const userEmail = await getUserEmail(userId);
+      if (userEmail) {
+        const billingUrl = getBillingUrl();
+        const orderLimit = getPlanLimit(planTier);
+        const emailTemplate = getSubscriptionActivatedEmailTemplate({
+          planTier,
+          billingPeriodEnd: currentPeriodEnd,
+          orderLimit: orderLimit === 999999 ? "unlimited" : orderLimit,
+          billingUrl,
+        });
+
+        EmailService.sendEmail({
+          to: userEmail,
+          subject: emailTemplate.subject,
+          html: emailTemplate.html,
+          text: emailTemplate.text,
+        }).then((result) => {
+          if (result.success) {
+            console.log(`Subscription activated email sent for user ${userId}`);
+          } else {
+            console.error(`Failed to send subscription email: ${result.error}`);
+          }
+        });
+      }
+    } catch (emailError) {
+      console.error("Error sending subscription activated email:", emailError);
+    }
+
     return { success: true };
   } catch (error) {
     console.error("Error handling checkout.session.completed:", error);
@@ -213,6 +252,13 @@ async function handleSubscriptionUpdated(
   try {
     const subscriptionId = subscription.id;
 
+    // Get existing subscription to compare plan tier
+    const { data: existingSubscription } = await supabase
+      .from("subscriptions")
+      .select("user_id, plan_tier")
+      .eq("stripe_subscription_id", subscriptionId)
+      .single();
+
     // Get plan tier from price ID
     const priceId = subscription.items.data[0]?.price.id;
     if (!priceId) {
@@ -222,6 +268,7 @@ async function handleSubscriptionUpdated(
 
     const planTier = mapPriceIdToPlanTier(priceId);
     const status = mapSubscriptionStatus(subscription.status);
+    const oldPlanTier = existingSubscription?.plan_tier;
 
     // Convert Unix timestamps to ISO strings
     // Type assertion needed because Stripe Response type may not expose these directly
@@ -254,6 +301,40 @@ async function handleSubscriptionUpdated(
     }
 
     console.log(`Subscription updated: ${subscriptionId}`);
+
+    // Send subscription updated email if plan tier changed (non-blocking)
+    if (existingSubscription?.user_id && oldPlanTier && oldPlanTier !== planTier) {
+      try {
+        const userEmail = await getUserEmail(existingSubscription.user_id);
+        if (userEmail) {
+          const billingUrl = getBillingUrl();
+          const orderLimit = getPlanLimit(planTier);
+          const emailTemplate = getSubscriptionUpdatedEmailTemplate({
+            oldPlanTier,
+            newPlanTier: planTier,
+            billingPeriodEnd: currentPeriodEnd,
+            orderLimit: orderLimit === 999999 ? "unlimited" : orderLimit,
+            billingUrl,
+          });
+
+          EmailService.sendEmail({
+            to: userEmail,
+            subject: emailTemplate.subject,
+            html: emailTemplate.html,
+            text: emailTemplate.text,
+          }).then((result) => {
+            if (result.success) {
+              console.log(`Subscription updated email sent for user ${existingSubscription.user_id}`);
+            } else {
+              console.error(`Failed to send subscription updated email: ${result.error}`);
+            }
+          });
+        }
+      } catch (emailError) {
+        console.error("Error sending subscription updated email:", emailError);
+      }
+    }
+
     return { success: true };
   } catch (error) {
     console.error("Error handling subscription.updated:", error);
@@ -275,6 +356,13 @@ async function handleSubscriptionDeleted(
   try {
     const subscriptionId = subscription.id;
 
+    // Get subscription details before updating (for email)
+    const { data: existingSubscription } = await supabase
+      .from("subscriptions")
+      .select("user_id, plan_tier, current_period_end")
+      .eq("stripe_subscription_id", subscriptionId)
+      .single();
+
     // Update subscription status to canceled
     const { error } = await supabase
       .from("subscriptions")
@@ -290,6 +378,38 @@ async function handleSubscriptionDeleted(
     }
 
     console.log(`Subscription marked as canceled: ${subscriptionId}`);
+
+    // Send subscription canceled email (non-blocking)
+    if (existingSubscription?.user_id) {
+      try {
+        const userEmail = await getUserEmail(existingSubscription.user_id);
+        if (userEmail) {
+          const billingUrl = getBillingUrl();
+          const billingPeriodEnd = existingSubscription.current_period_end || new Date().toISOString();
+          const emailTemplate = getSubscriptionCanceledEmailTemplate({
+            planTier: existingSubscription.plan_tier,
+            billingPeriodEnd,
+            billingUrl,
+          });
+
+          EmailService.sendEmail({
+            to: userEmail,
+            subject: emailTemplate.subject,
+            html: emailTemplate.html,
+            text: emailTemplate.text,
+          }).then((result) => {
+            if (result.success) {
+              console.log(`Subscription canceled email sent for user ${existingSubscription.user_id}`);
+            } else {
+              console.error(`Failed to send subscription canceled email: ${result.error}`);
+            }
+          });
+        }
+      } catch (emailError) {
+        console.error("Error sending subscription canceled email:", emailError);
+      }
+    }
+
     return { success: true };
   } catch (error) {
     console.error("Error handling subscription.deleted:", error);

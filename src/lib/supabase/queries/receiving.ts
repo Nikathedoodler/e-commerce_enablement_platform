@@ -6,6 +6,8 @@ import {
   ReceivingLogInput,
   ReceivingLogUpdate,
 } from "@/types/receiving";
+import { checkAndNotifyLowStock } from "@/lib/email/low-stock";
+import type { InventoryItem } from "@/types/inventory";
 
 export async function getReceivingLogs(filters?: {
   search?: string;
@@ -185,11 +187,14 @@ export async function createReceivingLog(receivingData: ReceivingLogInput) {
 
     if (inventoryItem) {
       // Update existing inventory item
+      const previousQuantity = inventoryItem.quantity;
       const newQuantity = inventoryItem.quantity + receivingData.quantity;
-      const { error: updateError } = await supabase
+      const { data: updatedItem, error: updateError } = await supabase
         .from("inventory")
         .update({ quantity: newQuantity })
-        .eq("id", inventoryItem.id);
+        .eq("id", inventoryItem.id)
+        .select()
+        .single();
 
       if (updateError) {
         return {
@@ -197,6 +202,16 @@ export async function createReceivingLog(receivingData: ReceivingLogInput) {
           details: updateError.message,
           data: null,
         };
+      }
+
+      // Check for low stock after update (non-blocking)
+      if (updatedItem) {
+        checkAndNotifyLowStock({
+          currentItem: updatedItem as InventoryItem,
+          previousQuantity,
+        }).catch((error) => {
+          console.error("Error checking low stock:", error);
+        });
       }
     } else {
       // Create new inventory item if it doesn't exist
