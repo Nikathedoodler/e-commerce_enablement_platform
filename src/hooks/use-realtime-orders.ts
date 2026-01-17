@@ -31,7 +31,9 @@ function useUserId(): string | undefined {
 export function useRealtimeOrders(onNewOrder?: (order: Order) => void) {
   const userId = useUserId();
   const lastOrderIdRef = useRef<string | null>(null);
-  const channelRef = useRef<ReturnType<typeof createClient>["channel"] | null>(null);
+  type SupabaseClient = ReturnType<typeof createClient>;
+  type RealtimeChannel = ReturnType<SupabaseClient["channel"]>;
+  const channelRef = useRef<RealtimeChannel | null>(null);
   const [realtimeAvailable, setRealtimeAvailable] = useState(true);
 
   useEffect(() => {
