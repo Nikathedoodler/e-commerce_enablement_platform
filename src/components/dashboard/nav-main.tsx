@@ -125,7 +125,7 @@ export function NavMain({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title} asChild>
                 <Link
-                  href={`/dashboard/${slugify(item.title)}`}
+                  href={item.url && item.url !== "#" ? item.url : `/dashboard/${slugify(item.title)}`}
                   onClick={() => {
                     setOpenMobile(false);
                   }}
