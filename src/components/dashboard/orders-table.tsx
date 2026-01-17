@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
@@ -125,7 +125,7 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
   };
 
   const { data: ordersResult, isLoading, error } = useOrders(filters);
-  const orders = useMemo(() => ordersResult?.data || [], [ordersResult?.data]);
+  const orders = ordersResult?.data || [];
   const pagination = ordersResult?.pagination;
 
   // Auto-open order dialog when orderId is in URL (from email links)
