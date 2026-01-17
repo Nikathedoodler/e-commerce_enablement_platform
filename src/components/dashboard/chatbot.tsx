@@ -129,13 +129,18 @@ function ChatContent({ initialMessages }: { initialMessages: ChatMessage[] }) {
           const response = await fetch("/api/chat/messages", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ messages }),
           });
           if (!response.ok) {
-            console.error(
-              "Failed to save chat messages:",
-              await response.text()
-            );
+            if (response.status === 401) {
+              console.warn("User not authenticated, messages not saved");
+            } else {
+              console.error(
+                "Failed to save chat messages:",
+                await response.text()
+              );
+            }
           }
         } catch (error) {
           console.error("Failed to save chat messages:", error);
@@ -186,7 +191,7 @@ function ChatContent({ initialMessages }: { initialMessages: ChatMessage[] }) {
               parts?: Array<{ type: string; text?: string; content?: string }>;
               text?: string;
             };
-            
+
             let content = "";
             if (typeof msg.content === "string") {
               content = msg.content;
@@ -309,20 +314,30 @@ export function Chatbot({
   sizeControls,
   noCard = false,
 }: ChatbotProps) {
-  const [initialMessages, setInitialMessages] = useState<ChatMessage[] | null>(null);
+  const [initialMessages, setInitialMessages] = useState<ChatMessage[] | null>(
+    null
+  );
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
 
   // Load messages from database on mount
   useEffect(() => {
     async function loadMessages() {
       try {
-        const response = await fetch("/api/chat/messages");
+        const response = await fetch("/api/chat/messages", {
+          credentials: "include",
+        });
         if (response.ok) {
           const data = await response.json();
           console.log("Fetched messages from API:", data.messages);
           setInitialMessages(data.messages || []);
         } else {
-          console.error("Failed to fetch messages, status:", response.status);
+          if (response.status === 401) {
+            console.warn(
+              "User not authenticated, starting with empty chat history"
+            );
+          } else {
+            console.error("Failed to fetch messages, status:", response.status);
+          }
           setInitialMessages([]);
         }
       } catch (error) {

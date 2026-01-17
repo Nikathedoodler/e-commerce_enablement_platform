@@ -8,6 +8,7 @@ import {
   Package,
   HelpCircle,
   BarChart3,
+  LayoutDashboard,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
@@ -30,6 +31,11 @@ import {
 
 const data = {
   navMain: [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: LayoutDashboard,
+    },
     {
       title: "Orders",
       url: "#",
