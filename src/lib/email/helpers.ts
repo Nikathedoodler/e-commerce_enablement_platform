@@ -1,6 +1,7 @@
 "use server";
 
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { getBillingUrl } from "./url-helpers";
 
 /**
  * Get user email address from user_id
@@ -24,3 +25,6 @@ export async function getUserEmail(userId: string): Promise<string | null> {
     return null;
   }
 }
+
+// Re-export getBillingUrl from url-helpers for convenience
+export { getBillingUrl };
