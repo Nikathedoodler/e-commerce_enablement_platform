@@ -52,15 +52,6 @@ const Navigation = () => {
       </a>
       {/* Center: Links */}
       <div className="hidden xl:flex items-center space-x-8 text-gray-700 font-medium">
-        <a href="admin" className="hover:text-black transition hover:scale-120">
-          Product
-        </a>
-        <a
-          href="dashboard"
-          className="hover:text-black transition hover:scale-120"
-        >
-          How It Works
-        </a>
         <a
           href="#features"
           className="hover:text-black transition hover:scale-120"
@@ -84,11 +75,10 @@ const Navigation = () => {
       {/* Right: Language, Login */}
       <div className="flex items-center space-x-2 sm:space-x-4">
         <a
-          href="#contact"
+          href="dashboard"
           className="px-3 py-1.5 sm:px-6 sm:py-2 mr-0 bg-black hover:shadow-md hover:shadow-green-400 rounded-full font-semibold text-white text-xs sm:text-sm shadow-md shadow-black/80 transition-all duration-200 hover:scale-105 group cursor-pointer whitespace-nowrap"
         >
-          <span className="hidden sm:inline">Calculate Savings</span>
-          <span className="sm:hidden">Calculate</span>
+          Dashboard
         </a>
         <div className="relative">
           <button
@@ -120,22 +110,7 @@ const Navigation = () => {
                   height={8}
                 />
                 <a
-                  href="#dashboard"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                >
-                  Admin
-                </a>
-              </div>
-              <div className="flex items-center hover:bg-gray-100">
-                <Image
-                  src="/images/features.png"
-                  alt="pricing"
-                  className="h-7 w-auto"
-                  width={24}
-                  height={8}
-                />
-                <a
-                  href="#dashboard"
+                  href="dashboard"
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Dashboard

@@ -77,7 +77,8 @@ const Hero = () => {
         ship faster with our all-in-one logistics platform.
       </motion.p>
       <div className="flex space-x-4">
-        <motion.button
+        <motion.a
+          href="#contact"
           className={`flex items-center gap-2 px-4 py-3 bg-black text-white text-sm rounded-full font-semibold shadow-black/80 hover:shadow-md cursor-pointer relative md hover:shadow-green-400 transition-all hover:scale-105 group ${
             isPulseUp ? "shadow-md shadow-green-400" : ""
           }`}
@@ -94,11 +95,12 @@ const Hero = () => {
             width={64}
             height={32}
           />
-          Request a Quote
+          <span className="hidden sm:inline">Calculate Savings</span>
+          <span className="sm:hidden">Calculate</span>
           <span className="transition-transform duration-200 group-hover:translate-x-1">
             →
           </span>
-        </motion.button>
+        </motion.a>
 
         {/* <button className="px-6 py-2 bg-gray-50 border border-gray-300 rounded-2xl font-semibold text-gray-900 text-sm hover:bg-gray-100 transition cursor-pointer">
         Sign Up
