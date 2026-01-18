@@ -62,7 +62,7 @@ const PRICING_PLANS = [
   },
   {
     name: "Scale Pro",
-    monthlyFee: 0, // Custom pricing - estimate based on volume
+    monthlyFee: 2000, // €2,000/mo base fee
     fulfillmentCostPerOrder: 3.2,
     maxOrders: Infinity,
   },
@@ -119,20 +119,8 @@ export function SavingsCalculator({
 
     // Calculate costs for each plan
     const allPlans = PRICING_PLANS.map((plan) => {
-      // For Scale Pro, use a realistic minimum estimate based on volume
-      // Scale Pro is enterprise/custom pricing, so it should have a higher base cost
-      let monthlyFee = plan.monthlyFee;
-      if (plan.name === "Scale Pro") {
-        // Estimate based on volume: higher base fee for enterprise tier
-        // This ensures Scale Pro isn't always the cheapest option
-        if (monthlyOrderVolume >= 2000) {
-          monthlyFee = 2000; // Base for high volume
-        } else if (monthlyOrderVolume >= 1000) {
-          monthlyFee = 1500; // Base for medium-high volume
-        } else {
-          monthlyFee = 1200; // Minimum base for Scale Pro tier
-        }
-      }
+      // Use the plan's monthly fee directly
+      const monthlyFee = plan.monthlyFee;
 
       const newMonthlyCost =
         monthlyFee + plan.fulfillmentCostPerOrder * monthlyOrderVolume;

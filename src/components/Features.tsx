@@ -164,8 +164,8 @@ const Features = () => {
               </div>
               <h3 className="font-semibold text-base mb-2 text-white">Kutaisi FIZ Warehouse</h3>
               <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-                Centralized fulfillment from our strategic EU location in
-                Kutaisi, Georgia for cost-efficient operations.
+                Centralized fulfillment from our strategic location in
+                Kutaisi, Georgia for cost-efficient EU operations.
               </p>
             </div>
           </motion.div>
