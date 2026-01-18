@@ -12,7 +12,7 @@ import { trackFormSubmit } from "@/lib/analytics";
 const emailSchema = z.string().email({ message: "invalid email format" });
 
 const Footer = () => {
-  const { register, handleSubmit, reset } = useForm<{ email: string }>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<{ email: string }>({
     resolver: zodResolver(
       z.object({
         email: emailSchema,
@@ -21,7 +21,7 @@ const Footer = () => {
   });
 
   const onSubmit: SubmitHandler<{ email: string }> = async (data) => {
-    const toastId = toast.loading("Registering");
+    const toastId = toast.loading("Getting you started...");
 
     // Track form submission attempt
     trackFormSubmit("email_signup", "footer", {
@@ -104,7 +104,7 @@ const Footer = () => {
                 transition={{ duration: 0.6, delay: 1 }}
                 className="font-semibold text-base sm:text-lg md:text-xl text-gray-800 mb-1 sm:mb-2 text-center md:text-left"
               >
-                Want To Try Demo?
+                Ready to Get Started?
               </motion.span>
               <motion.h1
                 initial={{ scale: 0 }}
@@ -116,60 +116,92 @@ const Footer = () => {
                 <br />
                 TOGETHER
               </motion.h1>
-              <motion.form
+              <motion.div
                 initial={{ y: -20, opacity: 0 }}
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 1 }}
-                onSubmit={handleSubmit(onSubmit)}
-                className="relative flex flex-col sm:flex-row items-stretch sm:items-center w-full max-w-md gap-3 sm:gap-0 sm:bg-white sm:border sm:border-gray-200 sm:rounded-xl sm:overflow-hidden sm:shadow-sm"
+                className="w-full max-w-md"
               >
-                <div className="flex items-center flex-1 min-w-0 bg-white border border-gray-200 rounded-lg sm:border-0 sm:rounded-none sm:bg-transparent">
-                  <div className="pl-3 sm:pl-4 flex-shrink-0">
-                    <EmailLogo />
-                  </div>
-                  <input
-                    type="email"
-                    {...register("email")}
-                    placeholder="Enter your email..."
-                    className="flex-1 py-2.5 sm:py-3 bg-transparent outline-none text-gray-700 placeholder-gray-400 text-sm sm:text-base pr-2 sm:pr-24 md:pr-28 min-w-0"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto sm:absolute sm:right-3 sm:top-1/2 sm:-translate-y-1/2 bg-[#23262F] text-white px-3 py-2 sm:px-2.5 sm:py-1.5 md:px-3 font-semibold rounded-lg sm:rounded-xl shadow-xs shadow-black/80 hover:shadow-md hover:shadow-green-400 cursor-pointer transition-all duration-200 hover:scale-105 text-xs sm:text-sm md:text-base whitespace-nowrap"
+                <p className="text-sm text-gray-600 mb-3 text-center md:text-left">
+                  Enter your email and we&apos;ll send you early access to our platform.
+                </p>
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="relative flex flex-col sm:flex-row items-stretch sm:items-center w-full gap-3 sm:gap-0 sm:bg-white sm:border sm:border-gray-200 sm:rounded-xl sm:overflow-hidden sm:shadow-sm"
                 >
-                  REGISTER
-                </button>
-              </motion.form>
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <div className="flex items-center flex-1 min-w-0 bg-white border border-gray-200 rounded-lg sm:border-0 sm:rounded-none sm:bg-transparent">
+                      <label htmlFor="footer-email" className="sr-only">
+                        Email address
+                      </label>
+                      <div className="pl-3 sm:pl-4 flex-shrink-0">
+                        <EmailLogo />
+                      </div>
+                      <input
+                        id="footer-email"
+                        type="email"
+                        {...register("email")}
+                        placeholder="Enter your email..."
+                        aria-invalid={errors.email ? "true" : "false"}
+                        aria-describedby={errors.email ? "email-error" : undefined}
+                        className="flex-1 py-2.5 sm:py-3 bg-transparent outline-none text-gray-700 placeholder-gray-400 text-sm sm:text-base pr-2 sm:pr-24 md:pr-28 min-w-0"
+                      />
+                    </div>
+                    {errors.email && (
+                      <p id="email-error" className="mt-1 text-sm text-red-600 text-left pl-3 sm:pl-4">
+                        {errors.email.message || "Please enter a valid email address"}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto sm:absolute sm:right-3 sm:top-1/2 sm:-translate-y-1/2 bg-[#23262F] text-white px-3 py-2 sm:px-2.5 sm:py-1.5 md:px-3 font-semibold rounded-lg sm:rounded-xl shadow-xs shadow-black/80 hover:shadow-md hover:shadow-green-400 cursor-pointer transition-all duration-200 hover:scale-105 text-xs sm:text-sm md:text-base whitespace-nowrap"
+                  >
+                    Get Started
+                  </button>
+                </form>
+              </motion.div>
             </div>
             {/* Right Side: Social Links */}
             <motion.div
               initial={{ scale: 0 }}
               whileInView={{ scale: 1 }}
               transition={{ duration: 0.8, type: "string", stiffness: 100 }}
-              className="hidden md:flex flex-col justify-center items-end gap-8 ml-auto mt-8 md:mt-0"
+              className="hidden"
             >
               <a
-                href="#"
+                href="https://x.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-lg mx-auto text-gray-800 hover:text-black transition hover:scale-120"
+                aria-label="Follow us on X (Twitter)"
               >
                 X
               </a>
               <a
-                href="#"
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-lg text-gray-800 hover:text-black transition hover:scale-120"
+                aria-label="Follow us on Instagram"
               >
                 Instagram
               </a>
               <a
-                href="#"
+                href="https://behance.net"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-lg text-gray-800 hover:text-black transition hover:scale-120"
+                aria-label="View our Behance portfolio"
               >
                 Behance
               </a>
               <a
-                href="#"
+                href="https://portfolio.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-lg text-gray-800 hover:text-black transition hover:scale-120"
+                aria-label="View our portfolio"
               >
                 Portfolio
               </a>
@@ -180,29 +212,41 @@ const Footer = () => {
             initial={{ scale: 0 }}
             whileInView={{ scale: 1 }}
             transition={{ duration: 0.8, type: "string", stiffness: 100 }}
-            className="flex md:hidden flex-row justify-center gap-4 sm:gap-6 mt-6 sm:mt-8 md:mt-10"
+            className="hidden"
           >
             <a
-              href="#"
+              href="https://x.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm sm:text-base text-gray-800 hover:text-black transition hover:scale-120"
+              aria-label="Follow us on X (Twitter)"
             >
               X
             </a>
             <a
-              href="#"
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm sm:text-base text-gray-800 hover:text-black transition hover:scale-120"
+              aria-label="Follow us on Instagram"
             >
               Instagram
             </a>
             <a
-              href="#"
+              href="https://behance.net"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm sm:text-base text-gray-800 hover:text-black transition hover:scale-120"
+              aria-label="View our Behance portfolio"
             >
               Behance
             </a>
             <a
-              href="#"
+              href="https://portfolio.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm sm:text-base text-gray-800 hover:text-black transition hover:scale-120"
+              aria-label="View our portfolio"
             >
               Portfolio
             </a>
