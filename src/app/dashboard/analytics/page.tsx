@@ -2,6 +2,7 @@
 
 import { useState, useMemo, Suspense } from "react";
 import dynamic from "next/dynamic";
+import { motion, useReducedMotion } from "motion/react";
 import { Pagination } from "@/components/ui/pagination";
 import {
   DateRangeSelector,
@@ -55,6 +56,7 @@ export default function AnalyticsPage() {
   const [topSKUsPage, setTopSKUsPage] = useState<number>(1);
   const [topSKUsPageSize, setTopSKUsPageSize] = useState<number>(10);
   const dateRange = getDateRangeFromPreset(dateRangePreset);
+  const shouldReduceMotion = useReducedMotion();
 
   // Priority 1: Critical metrics (load immediately)
   // Use batched query for order analytics (combines stats, status breakdown, source breakdown)
@@ -112,11 +114,59 @@ export default function AnalyticsPage() {
     pageSize: topSKUsPageSize,
   });
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: shouldReduceMotion
+        ? { duration: 0 }
+        : {
+            staggerChildren: 0.1,
+            delayChildren: 0.1,
+          },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: shouldReduceMotion
+        ? { duration: 0 }
+        : {
+            duration: 0.5,
+            ease: [0.22, 1, 0.36, 1],
+          },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: shouldReduceMotion
+        ? { duration: 0 }
+        : {
+            duration: 0.6,
+            ease: [0.22, 1, 0.36, 1],
+          },
+    },
+  };
+
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
       <div className="flex flex-col gap-4 py-4 sm:gap-6 sm:py-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 px-4 sm:flex-row sm:items-center sm:justify-between lg:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={
+            shouldReduceMotion ? { duration: 0 } : { duration: 0.4 }
+          }
+          className="flex flex-col gap-4 px-4 sm:flex-row sm:items-center sm:justify-between lg:px-6"
+        >
           <div>
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
               Analytics
@@ -129,56 +179,74 @@ export default function AnalyticsPage() {
             value={dateRangePreset}
             onChange={setDateRangePreset}
           />
-        </div>
+        </motion.div>
 
         {/* Overview Cards */}
-        <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs sm:grid-cols-2 lg:grid-cols-4 lg:px-6">
-          <MetricCard
-            title="Total Orders"
-            value={orderStats.data?.data?.totalOrders || 0}
-            change={orderStats.data?.data?.ordersChangePercent}
-            subtitle="Orders in selected period"
-            trend={getTrend(orderStats.data?.data?.ordersChangePercent || 0)}
-            isLoading={orderStats.isLoading}
-          />
-          <MetricCard
-            title="Total Revenue"
-            value={`$${
-              orderStats.data?.data?.totalRevenue.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }) || "0.00"
-            }`}
-            change={orderStats.data?.data?.revenueChangePercent}
-            subtitle="Revenue in selected period"
-            trend={getTrend(orderStats.data?.data?.revenueChangePercent || 0)}
-            isLoading={orderStats.isLoading}
-          />
-          <MetricCard
-            title="Pending Shipments"
-            value={
-              (orderStats.data?.data?.pendingCount || 0) +
-              (orderStats.data?.data?.processingCount || 0)
-            }
-            subtitle="Orders awaiting fulfillment"
-            isLoading={orderStats.isLoading}
-          />
-          <MetricCard
-            title="Low Stock Items"
-            value={inventoryStats.data?.data?.lowStockCount || 0}
-            change={inventoryStats.data?.data?.lowStockChange}
-            subtitle="Items needing restock"
-            trend={
-              inventoryStats.data?.data?.lowStockChange
-                ? getTrend(inventoryStats.data.data.lowStockChange)
-                : "neutral"
-            }
-            isLoading={inventoryStats.isLoading}
-          />
-        </div>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs sm:grid-cols-2 lg:grid-cols-4 lg:px-6"
+        >
+          <motion.div variants={itemVariants}>
+            <MetricCard
+              title="Total Orders"
+              value={orderStats.data?.data?.totalOrders || 0}
+              change={orderStats.data?.data?.ordersChangePercent}
+              subtitle="Orders in selected period"
+              trend={getTrend(orderStats.data?.data?.ordersChangePercent || 0)}
+              isLoading={orderStats.isLoading}
+            />
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <MetricCard
+              title="Total Revenue"
+              value={`$${
+                orderStats.data?.data?.totalRevenue.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }) || "0.00"
+              }`}
+              change={orderStats.data?.data?.revenueChangePercent}
+              subtitle="Revenue in selected period"
+              trend={getTrend(orderStats.data?.data?.revenueChangePercent || 0)}
+              isLoading={orderStats.isLoading}
+            />
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <MetricCard
+              title="Pending Shipments"
+              value={
+                (orderStats.data?.data?.pendingCount || 0) +
+                (orderStats.data?.data?.processingCount || 0)
+              }
+              subtitle="Orders awaiting fulfillment"
+              isLoading={orderStats.isLoading}
+            />
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <MetricCard
+              title="Low Stock Items"
+              value={inventoryStats.data?.data?.lowStockCount || 0}
+              change={inventoryStats.data?.data?.lowStockChange}
+              subtitle="Items needing restock"
+              trend={
+                inventoryStats.data?.data?.lowStockChange
+                  ? getTrend(inventoryStats.data.data.lowStockChange)
+                  : "neutral"
+              }
+              isLoading={inventoryStats.isLoading}
+            />
+          </motion.div>
+        </motion.div>
 
         {/* Order Analytics */}
-        <div className="px-4 lg:px-6">
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          className="px-4 lg:px-6"
+        >
           <Suspense
             fallback={
               <ChartSkeleton
@@ -196,9 +264,14 @@ export default function AnalyticsPage() {
               defaultTimeRange="30d"
             />
           </Suspense>
-        </div>
+        </motion.div>
 
-        <div className="px-4 lg:px-6">
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          className="px-4 lg:px-6"
+        >
           <Suspense
             fallback={
               <ChartSkeleton title="Revenue" description="Revenue trends" />
@@ -214,13 +287,18 @@ export default function AnalyticsPage() {
               defaultTimeRange="30d"
             />
           </Suspense>
-        </div>
+        </motion.div>
 
         {/* Inventory Analytics */}
-        <Card className="mx-4 lg:mx-6">
-          <CardHeader>
-            <CardTitle>Inventory Analytics</CardTitle>
-          </CardHeader>
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <Card className="mx-4 lg:mx-6">
+            <CardHeader>
+              <CardTitle>Inventory Analytics</CardTitle>
+            </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-6">
               <div>
@@ -285,8 +363,22 @@ export default function AnalyticsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {topSKUs.data.data.map((sku) => (
-                        <TableRow key={sku.sku} className="hover:bg-muted/50">
+                      {topSKUs.data.data.map((sku, index) => (
+                        <motion.tr
+                          key={sku.sku}
+                          initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={
+                            shouldReduceMotion
+                              ? { duration: 0 }
+                              : {
+                                  duration: 0.3,
+                                  delay: index * 0.05,
+                                  ease: [0.22, 1, 0.36, 1],
+                                }
+                          }
+                          className="hover:bg-muted/50 border-b transition-colors"
+                        >
                           <TableCell className="font-mono text-xs sm:text-sm">
                             {sku.sku}
                           </TableCell>
@@ -309,7 +401,7 @@ export default function AnalyticsPage() {
                               {sku.isLowStock ? "Low Stock" : "In Stock"}
                             </Badge>
                           </TableCell>
-                        </TableRow>
+                        </motion.tr>
                       ))}
                     </TableBody>
                   </Table>
@@ -337,9 +429,15 @@ export default function AnalyticsPage() {
             )}
           </CardContent>
         </Card>
+        </motion.div>
 
         {/* Receiving Analytics */}
-        <div className="px-4 lg:px-6">
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          className="px-4 lg:px-6"
+        >
           <Suspense
             fallback={
               <ChartSkeleton
@@ -357,13 +455,18 @@ export default function AnalyticsPage() {
               defaultTimeRange="30d"
             />
           </Suspense>
-        </div>
+        </motion.div>
 
         {/* Shipping & Label Analytics */}
-        <Card className="mx-4 lg:mx-6">
-          <CardHeader>
-            <CardTitle>Shipping & Label Analytics</CardTitle>
-          </CardHeader>
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <Card className="mx-4 lg:mx-6">
+            <CardHeader>
+              <CardTitle>Shipping & Label Analytics</CardTitle>
+            </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-6">
               <div>
@@ -430,6 +533,7 @@ export default function AnalyticsPage() {
             </Suspense>
           </CardContent>
         </Card>
+        </motion.div>
       </div>
     </div>
   );

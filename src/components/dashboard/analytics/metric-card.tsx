@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "motion/react";
 import {
   Card,
   CardAction,
@@ -28,6 +29,8 @@ export function MetricCard({
   trend,
   isLoading,
 }: MetricCardProps) {
+  const shouldReduceMotion = useReducedMotion();
+
   const formatValue = (val: string | number): string => {
     if (typeof val === "number") {
       return val.toLocaleString();
@@ -74,30 +77,59 @@ export function MetricCard({
   }
 
   return (
-    <Card className="@container/card">
-      <CardHeader>
-        <CardDescription className="text-xs sm:text-sm">
-          {title}
-        </CardDescription>
-        <CardTitle className="text-xl font-semibold tabular-nums sm:text-2xl @[250px]/card:text-3xl">
-          {formatValue(value)}
-        </CardTitle>
-        {change !== undefined && change !== null && (
-          <CardAction>
-            <Badge variant="outline" className="gap-1 text-xs">
-              {getTrendIcon()}
-              {formatChange(change)}
-            </Badge>
-          </CardAction>
+    <motion.div
+      whileHover={
+        shouldReduceMotion
+          ? {}
+          : { y: -4, transition: { duration: 0.2 } }
+      }
+      transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
+    >
+      <Card className="@container/card">
+        <CardHeader>
+          <CardDescription className="text-xs sm:text-sm">
+            {title}
+          </CardDescription>
+          <motion.div
+            initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={
+              shouldReduceMotion
+                ? { duration: 0 }
+                : { duration: 0.3, delay: 0.1 }
+            }
+          >
+            <CardTitle className="text-xl font-semibold tabular-nums sm:text-2xl @[250px]/card:text-3xl">
+              {formatValue(value)}
+            </CardTitle>
+          </motion.div>
+          {change !== undefined && change !== null && (
+            <CardAction>
+              <motion.div
+                initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={
+                  shouldReduceMotion
+                    ? { duration: 0 }
+                    : { duration: 0.3, delay: 0.2 }
+                }
+              >
+                <Badge variant="outline" className="gap-1 text-xs">
+                  {getTrendIcon()}
+                  {formatChange(change)}
+                </Badge>
+              </motion.div>
+            </CardAction>
+          )}
+        </CardHeader>
+        {subtitle && (
+          <CardFooter className="flex-col items-start gap-1.5 text-xs sm:text-sm">
+            <div className="line-clamp-1 flex gap-2 font-medium">
+              {subtitle} {trend && trend !== "neutral" && getTrendIcon()}
+            </div>
+          </CardFooter>
         )}
-      </CardHeader>
-      {subtitle && (
-        <CardFooter className="flex-col items-start gap-1.5 text-xs sm:text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            {subtitle} {trend && trend !== "neutral" && getTrendIcon()}
-          </div>
-        </CardFooter>
-      )}
-    </Card>
+      </Card>
+    </motion.div>
   );
 }
