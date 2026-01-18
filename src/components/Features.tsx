@@ -202,7 +202,7 @@ const Features = () => {
               Real-time order tracking
             </h3>
             <p className="hidden xl:block text-sm text-gray-600 leading-relaxed">
-              Instant updates on your order's status and location, giving full
+              Instant updates on your order&apos;s status and location, giving full
               transparency through every step of fulfillment.
             </p>
           </motion.div>
