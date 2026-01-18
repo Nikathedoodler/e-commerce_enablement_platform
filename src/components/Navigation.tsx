@@ -44,11 +44,11 @@ const Navigation = () => {
       <a href="#top" className="flex items-center space-x-2">
         <Image
           src="/images/logo.png"
-          alt="Cuckoo Logo"
+          alt="Platform Logo"
           width={32}
           height={32}
         />
-        <span className="font-bold text-lg">Doo</span>
+        <span className="font-bold text-lg">Fulfill</span>
       </a>
       {/* Center: Links */}
       <div className="hidden xl:flex items-center space-x-8 text-gray-700 font-medium">

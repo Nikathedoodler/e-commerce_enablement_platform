@@ -106,7 +106,7 @@ const Hero = () => {
         Sign Up
         </button> */}
       </div>
-      <motion.div
+      {/* <motion.div
         initial={{ y: 30, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, delay: 1 }}
@@ -114,66 +114,66 @@ const Hero = () => {
       >
         <span className="inline-block w-4 h-4 rounded-full bg-green-400 shadow-inner mr-1 border-3 border-green-200"></span>
         <p>2 SPOTS AVAILABLE</p>
-      </motion.div>
+      </motion.div> */}
       <motion.div
         initial={{ y: 0, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 1.5 }}
-        className="overflow-hidden w-full sm:w-4/5 md:w-3/4"
+        className="overflow-hidden w-full flex items-center"
       >
-        <div className="flex gap-4 lg:gap-14 xl:gap-28 mt-6 mb-10 animate-marquee min-w-max">
+        <div className="flex gap-10 lg:gap-14 xl:gap-20 mt-6 mb-10 animate-marquee min-w-max">
           <Image
-            src="/images/DataGrail_Logo.svg"
-            alt="Window"
+            src="/images/dhl-logo-1.svg"
+            alt="DHL"
+            className="h-6 md:h-8 xl:h-10 w-auto grayscale opacity-30"
+            width={60}
+            height={20}
+          />
+          <Image
+            src="/images/WooCommerce_logo.png"
+            alt="WooCommerce"
+            className="h-8 md:h-10 xl:h-12 w-auto grayscale opacity-30"
+            width={80}
+            height={24}
+          />
+          <Image
+            src="/images/ups.png"
+            alt="UPS"
             className="h-10 md:h-13 xl:h-14 w-auto grayscale opacity-30"
             width={80}
             height={32}
           />
           <Image
-            src="/images/TrustArc_Logo.svg"
-            alt="TrustArc Logo"
+            src="/images/Shopify_logo.svg.png"
+            alt="Shopify"
             className="h-10 md:h-13 xl:h-14 w-auto grayscale opacity-30"
             width={80}
             height={32}
           />
           <Image
-            src="/images/mine_Logo.svg"
-            alt="TrustArc Logo"
+            src="/images/dhl-logo-1.svg"
+            alt="DHL"
+            className="h-6 md:h-8 xl:h-10 w-auto grayscale opacity-30"
+            width={60}
+            height={20}
+          />
+          <Image
+            src="/images/WooCommerce_logo.png"
+            alt="WooCommerce"
+            className="h-8 md:h-10 xl:h-12 w-auto grayscale opacity-30"
+            width={80}
+            height={24}
+          />
+          <Image
+            src="/images/ups.png"
+            alt="UPS"
             className="h-10 md:h-13 xl:h-14 w-auto grayscale opacity-30"
             width={80}
             height={32}
           />
           <Image
-            src="/images/DataGrail_Logo.svg"
-            alt="Window"
-            className="h-10 md:h-13 xl:h-14 w-auto grayscale opacity-30"
-            width={80}
-            height={32}
-          />
-          <Image
-            src="/images/DataGrail_Logo.svg"
-            alt="Window"
-            className="h-10 md:h-13 xl:h-14 w-auto grayscale opacity-30"
-            width={80}
-            height={32}
-          />
-          <Image
-            src="/images/TrustArc_Logo.svg"
-            alt="TrustArc Logo"
-            className="h-10 md:h-13 xl:h-14 w-auto grayscale opacity-30"
-            width={80}
-            height={32}
-          />
-          <Image
-            src="/images/mine_Logo.svg"
-            alt="TrustArc Logo"
-            className="h-10 md:h-13 xl:h-14 w-auto grayscale opacity-30"
-            width={80}
-            height={32}
-          />
-          <Image
-            src="/images/DataGrail_Logo.svg"
-            alt="Window"
+            src="/images/Shopify_logo.svg.png"
+            alt="Shopify"
             className="h-10 md:h-13 xl:h-14 w-auto grayscale opacity-30"
             width={80}
             height={32}

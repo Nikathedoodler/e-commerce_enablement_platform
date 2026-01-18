@@ -83,7 +83,7 @@ const Footer = () => {
           {/* <div className="flex items-center space-x-2">
             <Image
               src="/images/logo.png"
-              alt="Cuckoo Logo"
+              alt="Platform Logo"
               className="h-8 w-auto"
               width={32}
               height={16}

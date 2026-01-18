@@ -55,13 +55,13 @@ const Features = () => {
         <div className="flex-1 w-full flex flex-col sm:flex-row gap-4">
           <div className="flex-1 min-w-[180px] bg-white/10 rounded-xl p-4 flex flex-col justify-between shadow items-center sm:items-start text-center sm:text-left">
             <div>
-              <div className="w-10 h-10 mb-2 rounded-lg bg-white/20 flex items-center justify-center mx-auto sm:mx-0">
-                {/* Google AI logo */}
+              <div className="w-10 h-10 mb-2 rounded-lg bg-white/20 flex items-center justify-center mx-auto sm:mx-0 p-1.5">
                 <Image
-                  src="/images/TrustArc_Logo.svg"
-                  alt="Google AI"
+                  src="/images/Shopify_logo.svg.png"
+                  alt="Shopify"
                   width={32}
                   height={32}
+                  className="w-full h-full object-contain"
                 />
               </div>
               <div className="font-semibold">Shopify Integration</div>
@@ -73,13 +73,13 @@ const Features = () => {
           </div>
           <div className="flex-1 min-w-[180px] bg-white/10 rounded-xl p-4 flex flex-col justify-between shadow items-center sm:items-start text-center sm:text-left">
             <div>
-              <div className="w-10 h-10 mb-2 rounded-lg bg-white/20 flex items-center justify-center mx-auto sm:mx-0">
-                {/* Anthropic logo */}
+              <div className="w-10 h-10 mb-2 rounded-lg bg-white/20 flex items-center justify-center mx-auto sm:mx-0 p-1.5">
                 <Image
-                  src="/images/Mine_Logo.svg"
-                  alt="Anthropic"
+                  src="/images/dhl.png"
+                  alt="DHL"
                   width={32}
                   height={32}
+                  className="w-full h-full object-contain"
                 />
               </div>
               <div className="font-semibold">DHL/Carrier Network</div>
@@ -92,18 +92,24 @@ const Features = () => {
           <div className="flex-1 min-w-[180px] bg-white/10 rounded-xl p-4 flex flex-col justify-between shadow items-center sm:items-start text-center sm:text-left fade-right">
             <div>
               <div className="w-10 h-10 mb-2 rounded-lg bg-white/20 flex items-center justify-center mx-auto sm:mx-0">
-                {/* Perplexity logo */}
-                <Image
-                  src="/images/DataGrail_Logo.svg"
-                  alt="Perplexity"
-                  width={32}
-                  height={32}
-                />
+                {/* Warehouse icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-6 h-6 text-white"
+                >
+                  <path d="M22 10v6M2 10l10-5 10 5M2 10l10 5 10-5M2 10v6c0 1.1.9 2 2 2h4M22 10v6c0 1.1-.9 2-2 2h-4M12 22V12" />
+                </svg>
               </div>
-              <div className="font-semibold">Multi-Warehouse Management</div>
+              <div className="font-semibold">Kutaisi FIZ Warehouse</div>
               <div className="text-xs opacity-80">
-                Distribute stock and manage fulfillment from multiple strategic
-                EU locations.
+                Centralized fulfillment from our strategic EU location in
+                Kutaisi, Georgia for cost-efficient operations.
               </div>
             </div>
           </div>
@@ -168,54 +174,6 @@ const Features = () => {
               cost-efficiency from tax-advantaged warehouses.
             </p>
           </div>
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
-            <Image
-              alt="logo"
-              src="/images/ai-prediction.png"
-              className="h-8 sm:h-10 lg:h-8 w-auto"
-              width={32}
-              height={16}
-            />
-            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
-              AI-based cost prediction
-            </h1>
-            <p className="hidden xl:block text-sm xl:text-xs">
-              Smart forecasts of fulfillment expenses based on historical data
-              help you optimize operations and pricing.
-            </p>
-          </div>
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
-            <Image
-              alt="logo"
-              src="/images/routing.jpg"
-              className="h-8 sm:h-10 lg:h-8 w-auto"
-              width={32}
-              height={16}
-            />
-            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
-              Automated Order Routing
-            </h1>
-            <p className="hidden xl:block text-sm xl:text-xs">
-              Instantly direct each order to the optimal warehouse and carrier
-              for the fastest, lowest-cost delivery
-            </p>
-          </div>
-          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
-            <Image
-              alt="logo"
-              src="/images/return_management.png"
-              className="h-8 sm:h-10 lg:h-10 w-auto"
-              width={32}
-              height={16}
-            />
-            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
-              Returns Management
-            </h1>
-            <p className="hidden xl:block text-sm xl:text-xs">
-              Streamlined process for handling EU returns, including automated
-              labels and real-time status tracking
-            </p>
-          </div>
           <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
             <Image
               alt="logo"
@@ -233,6 +191,70 @@ const Features = () => {
             </p>
           </div>
           <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-8 sm:h-10 lg:h-10 w-8 sm:w-10 lg:w-10 text-gray-700"
+            >
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
+              AI Assistant
+            </h1>
+            <p className="hidden xl:block text-sm xl:text-xs">
+              Get instant help with your fulfillment operations, order management,
+              and platform features through our intelligent AI assistant.
+            </p>
+          </div>
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-8 sm:h-10 lg:h-10 w-8 sm:w-10 lg:w-10 text-gray-700"
+            >
+              <path d="M20 7h-4M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M4 7h16M4 7v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
+              Receiving & Warehouse Intake
+            </h1>
+            <p className="hidden xl:block text-sm xl:text-xs">
+              Streamlined receiving workflow with barcode scanning support to
+              log incoming inventory and automatically update stock levels.
+            </p>
+          </div>
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-8 sm:h-10 lg:h-10 w-8 sm:w-10 lg:w-10 text-gray-700"
+            >
+              <path d="M3 3v18h18M7 16l4-4 4 4 6-6" />
+              <path d="M7 12h10" />
+            </svg>
+            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
+              Advanced Analytics & Reporting
+            </h1>
+            <p className="hidden xl:block text-sm xl:text-xs">
+              Comprehensive dashboards with order trends, revenue analytics,
+              inventory insights, and shipping performance metrics.
+            </p>
+          </div>
+          <div className="flex flex-col items-center lg:items-start space-y-2 bg-gray-100 rounded-xl p-3 sm:p-4 md:p-6 shadow-xl hover:-translate-y-2 hover:-translate-x-2 duration-500 hover:shadow-lg hover:bg-pink-100 cursor-pointer relative">
             <Image
               alt="logo"
               src="/images/package.png"
@@ -240,9 +262,14 @@ const Features = () => {
               width={32}
               height={16}
             />
-            <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
-              Custom Packing Solutions
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xs sm:text-sm md:text-md font-semibold text-center lg:text-start">
+                Custom Packing Solutions
+              </h1>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                Coming Soon
+              </span>
+            </div>
             <p className="hidden xl:block text-sm xl:text-xs">
               Choose branded, sustainable, or protective packaging for your
               products, tailored per SKU and order type
