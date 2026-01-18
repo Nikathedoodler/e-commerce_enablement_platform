@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import * as motion from "motion/react-client";
 import { trackPricingInteraction } from "@/lib/analytics";
+import { SavingsCalculator } from "./SavingsCalculator";
 
 const plans = [
   {
@@ -85,6 +86,7 @@ const pricingRows = [
 
 const Pricing = () => {
   const [isTableOpen, setIsTableOpen] = useState(false);
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
   return (
     <div
@@ -168,18 +170,18 @@ const Pricing = () => {
 
       <div className="w-[90%] max-w-4xl mt-12 space-y-4 text-center text-gray-300 text-sm md:text-base">
         <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-6">
-          <a
-            href="#contact"
+          <button
+            onClick={() => setIsCalculatorOpen(true)}
             className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-lime-300 text-black font-semibold hover:bg-lime-200 transition"
           >
             Calculate Your Savings
-          </a>
-          <a
+          </button>
+          <button
             className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 text-white font-semibold hover:bg-white/10 transition cursor-pointer"
             onClick={() => setIsTableOpen(!isTableOpen)}
           >
             {isTableOpen ? "Hide All Features" : "Compare All Features"}
-          </a>
+          </button>
         </div>
       </div>
 
@@ -236,6 +238,10 @@ const Pricing = () => {
           </table>
         </motion.div>
       )}
+      <SavingsCalculator
+        open={isCalculatorOpen}
+        onOpenChange={setIsCalculatorOpen}
+      />
     </div>
   );
 };
