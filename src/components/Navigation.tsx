@@ -4,10 +4,12 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import Image from "next/image";
 import * as motion from "motion/react-client";
+import { createClient } from "@/lib/supabase/client";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -27,6 +29,16 @@ const Navigation = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
+  }, []);
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+    };
+    checkAuth();
   }, []);
 
   return (
@@ -75,7 +87,7 @@ const Navigation = () => {
       {/* Right: Language, Login */}
       <div className="flex items-center space-x-2 sm:space-x-4">
         <a
-          href="dashboard"
+          href={isAuthenticated ? "/dashboard" : "/demo"}
           className="px-3 py-1.5 sm:px-6 sm:py-2 mr-0 bg-black hover:shadow-md hover:shadow-green-400 rounded-full font-semibold text-white text-xs sm:text-sm shadow-md shadow-black/80 transition-all duration-200 hover:scale-105 group cursor-pointer whitespace-nowrap"
         >
           Dashboard
@@ -110,7 +122,7 @@ const Navigation = () => {
                   height={8}
                 />
                 <a
-                  href="dashboard"
+                  href={isAuthenticated ? "/dashboard" : "/demo"}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Dashboard

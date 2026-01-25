@@ -354,7 +354,6 @@ export function OrdersTable({ defaultStatus }: OrdersTableProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        console.log("View order:", order);
                         setSelectedOrder(order);
                         setIsViewDialogOpen(true);
                       }}

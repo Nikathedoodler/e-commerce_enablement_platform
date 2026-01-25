@@ -19,7 +19,8 @@ type SignupFormWithImageProps = Omit<React.ComponentProps<"div">, "onSubmit"> & 
     password: string,
     confirmPassword: string,
     fullName: string,
-    companyName?: string
+    companyName?: string,
+    inviteCode?: string
   ) => void | Promise<void>;
   loading: boolean;
   errorMessage?: string;
@@ -108,7 +109,8 @@ export function SignupFormWithImage({
                 formData.get("password") as string,
                 formData.get("confirm-password") as string,
                 formData.get("fullName") as string,
-                (formData.get("companyName") as string) || undefined
+                (formData.get("companyName") as string) || undefined,
+                (formData.get("inviteCode") as string) || undefined
               );
             }}
             className="space-y-4"
@@ -147,6 +149,22 @@ export function SignupFormWithImage({
                   placeholder="Acme Inc."
                 />
                 <FieldDescription>Your company name (optional)</FieldDescription>
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="inviteCode">Invite Code</FieldLabel>
+                <Input
+                  id="inviteCode"
+                  type="text"
+                  name="inviteCode"
+                  placeholder="ABC123"
+                  required
+                  className="uppercase"
+                  style={{ textTransform: "uppercase" }}
+                />
+                <FieldDescription>
+                  Enter your invite code to register
+                </FieldDescription>
               </Field>
 
               <Field>

@@ -136,13 +136,34 @@ export function AppSidebar({
   profile?: Profile;
   user?: User | null;
 }) {
+  // Add Admin item to Settings if user is admin
+  const isAdmin = profile?.role === "admin";
+  const settingsItems = [...(data.navMain.find((item) => item.title === "Settings")?.items || [])];
+  
+  if (isAdmin) {
+    settingsItems.push({
+      title: "Admin",
+      url: "#",
+    });
+  }
+
+  const navItems = data.navMain.map((item) => {
+    if (item.title === "Settings") {
+      return {
+        ...item,
+        items: settingsItems,
+      };
+    }
+    return item;
+  });
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher companyName={profile?.company_name} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} onSelect={onNavSelect} />
+        <NavMain items={navItems} onSelect={onNavSelect} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser

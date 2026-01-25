@@ -46,8 +46,6 @@ function getStatusBadgeColor(status: ShopifyStore["status"]) {
  * Formats the connected date for display
  */
 function formatConnectedDate(dateString: string): string {
-  // TODO: Format the date string (e.g., "Jan 15, 2024")
-  // You can use date-fns, Intl.DateTimeFormat, or similar
   const date = new Date(dateString);
   return date.toLocaleDateString("en-US", {
     year: "numeric",
@@ -58,10 +56,9 @@ function formatConnectedDate(dateString: string): string {
 
 /**
  * Formats scopes for display (comma-separated list)
+ * Converts "read_orders, write_orders" -> "Read Orders, Write Orders"
  */
 function formatScopes(scopes: string): string {
-  // TODO: Format scopes nicely (e.g., "read_orders, write_orders" -> "Read Orders, Write Orders")
-  // Or just return as-is if you prefer
   return scopes
     .split(",")
     .map((scope) =>

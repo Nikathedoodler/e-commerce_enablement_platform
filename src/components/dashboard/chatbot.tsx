@@ -66,15 +66,6 @@ function ChatContent({ initialMessages }: { initialMessages: ChatMessage[] }) {
     return Array.from(messageMap.values());
   }, [initialMessages]);
 
-  // Debug: Log initial messages to verify they're being passed correctly
-  useEffect(() => {
-    console.log(
-      "ChatContent initialized with messages:",
-      formattedInitialMessages
-    );
-    console.log("Formatted messages count:", formattedInitialMessages.length);
-  }, [formattedInitialMessages]);
-
   const { messages, sendMessage, status, error, setMessages } = useChat({
     // @ts-expect-error - api property exists in runtime but types may be outdated
     api: "/api/chat",
@@ -84,16 +75,10 @@ function ChatContent({ initialMessages }: { initialMessages: ChatMessage[] }) {
   // Manually set messages if useChat didn't pick them up from initialMessages
   // This is a workaround for cases where initialMessages aren't properly initialized
   useEffect(() => {
-    console.log("useChat hook initialized");
-    console.log("useChat initialMessages prop:", formattedInitialMessages);
-    console.log("useChat current messages:", messages);
-
     // If formattedInitialMessages exist but useChat messages are empty, set them manually
     // Only do this once on mount (when messages are empty but we have initialMessages)
     if (formattedInitialMessages.length > 0 && messages.length === 0) {
-      console.log("Attempting to set messages manually");
       if (setMessages) {
-        console.log("Using setMessages function");
         // Deduplicate messages by id before setting
         const uniqueMessages = formattedInitialMessages.filter(
           (msg, index, self) => index === self.findIndex((m) => m.id === msg.id)
@@ -114,12 +99,6 @@ function ChatContent({ initialMessages }: { initialMessages: ChatMessage[] }) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isLoading]);
-
-  // Debug: Log messages from useChat hook
-  useEffect(() => {
-    console.log("useChat messages:", messages);
-    console.log("useChat messages length:", messages.length);
-  }, [messages]);
 
   // Save messages to database whenever they change (debounced)
   useEffect(() => {
@@ -328,7 +307,6 @@ export function Chatbot({
         });
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched messages from API:", data.messages);
           setInitialMessages(data.messages || []);
         } else {
           if (response.status === 401) {
