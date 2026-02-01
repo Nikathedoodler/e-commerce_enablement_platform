@@ -25,14 +25,12 @@ import {
   Plus,
   Package,
   Warehouse,
-  ArrowRight,
   TrendingUp,
   Lock,
   ShoppingCart,
   BarChart3,
   ArrowDownToLine,
   Truck,
-  Settings2,
   CheckCircle2,
   AlertCircle,
   Clock,
@@ -766,7 +764,7 @@ export default function DemoDashboardPage() {
               <CardContent className="space-y-2">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  <span className="text-sm">Automatic inventory updates for "good" condition items</span>
+                  <span className="text-sm">Automatic inventory updates for &quot;good&quot; condition items</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-green-600" />

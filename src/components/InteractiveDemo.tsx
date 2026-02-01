@@ -4,7 +4,7 @@ import * as motion from "motion/react-client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackButtonClick } from "@/lib/analytics";
 import { DemoModal } from "@/components/DemoModal";
-import { Package, Warehouse, ArrowDownToLine, Truck, Settings2, BarChart3, ShoppingCart } from "lucide-react";
+import { Package, Warehouse, ArrowDownToLine, Truck, BarChart3, ShoppingCart } from "lucide-react";
 
 // Sample data for previews
 const dashboardMetrics = [
@@ -175,7 +175,7 @@ const InteractiveDemo = () => {
                 {/* Quick Stats Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                    <div className="text-xs text-gray-600 mb-1">Today's Orders</div>
+                    <div className="text-xs text-gray-600 mb-1">Today&apos;s Orders</div>
                     <div className="text-xl font-bold text-gray-900">23</div>
                   </div>
                   <div className="bg-green-50 rounded-lg p-3 border border-green-200">
@@ -493,7 +493,7 @@ const InteractiveDemo = () => {
                 <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
                   <h3 className="font-semibold text-gray-900 mb-2">Automated Workflow</h3>
                   <ul className="text-sm text-gray-700 space-y-1">
-                    <li>✅ Automatic inventory updates for "good" condition items</li>
+                    <li>✅ Automatic inventory updates for &quot;good&quot; condition items</li>
                     <li>✅ Create new SKUs automatically when receiving</li>
                     <li>✅ Track damaged, defective, and returned items separately</li>
                     <li>✅ Complete audit trail of all receiving operations</li>
