@@ -15,6 +15,25 @@ const Navigation = () => {
     setIsOpen(!isOpen);
   };
 
+  // Smooth scroll handler for anchor links
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith("#")) {
+      e.preventDefault();
+      const element = document.querySelector(href);
+      if (element) {
+        const offset = 80; // Account for sticky nav
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
+      }
+      setIsOpen(false);
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 0) {
@@ -53,7 +72,14 @@ const Navigation = () => {
       } sticky top-6 mt-6 max-w-5xl flex items-center justify-between xl:mx-auto py-2 px-6 mx-6 rounded-full transition-all duration-200 z-50`}
     >
       {/* Left: Logo */}
-      <a href="#top" className="flex items-center space-x-2">
+      <a
+        href="#top"
+        onClick={(e) => {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+      >
         <Image
           src="/images/logo.png"
           alt="Platform Logo"
@@ -63,26 +89,35 @@ const Navigation = () => {
         <span className="font-bold text-lg">Fulfill</span>
       </a>
       {/* Center: Links */}
-      <div className="hidden xl:flex items-center space-x-8 text-gray-700 font-medium">
+      <div className="hidden xl:flex items-center space-x-6 text-gray-700 font-medium">
         <a
           href="#features"
-          className="hover:text-black transition hover:scale-120"
+          onClick={(e) => handleSmoothScroll(e, "#features")}
+          className="hover:text-black transition-all duration-200 hover:scale-105"
         >
-          Integrations
+          Features
+        </a>
+        <a
+          href="#interactive-demo"
+          onClick={(e) => handleSmoothScroll(e, "#interactive-demo")}
+          className="hover:text-black transition-all duration-200 hover:scale-105"
+        >
+          Demo
         </a>
         <a
           href="#pricing"
-          className="hover:text-black transition hover:scale-120"
+          onClick={(e) => handleSmoothScroll(e, "#pricing")}
+          className="hover:text-black transition-all duration-200 hover:scale-105"
         >
           Pricing
         </a>
         <a
           href="#contact"
-          className="hover:text-black transition hover:scale-120"
+          onClick={(e) => handleSmoothScroll(e, "#contact")}
+          className="hover:text-black transition-all duration-200 hover:scale-105"
         >
           Contact
         </a>
-        {/* <SignIn /> */}
       </div>
       {/* Right: Language, Login */}
       <div className="flex items-center space-x-2 sm:space-x-4">
@@ -113,37 +148,61 @@ const Navigation = () => {
                     : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
                 }`}
             >
-              <div className="flex items-center hover:bg-gray-100">
+              <div className="flex items-center hover:bg-gray-100 rounded-lg">
                 <Image
                   src="/images/features.png"
-                  alt="pricing"
+                  alt="dashboard"
                   className="h-7 w-auto"
                   width={24}
                   height={8}
                 />
                 <a
                   href={isAuthenticated ? "/dashboard" : "/demo"}
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  className="block px-4 py-2 text-gray-700"
+                  onClick={() => setIsOpen(false)}
                 >
                   Dashboard
                 </a>
               </div>
-              <div className="flex items-center hover:bg-gray-100">
+              <div className="flex items-center hover:bg-gray-100 rounded-lg">
                 <Image
                   src="/images/features.png"
-                  alt="pricing"
+                  alt="features"
                   className="h-7 w-auto"
                   width={24}
                   height={8}
                 />
                 <a
                   href="#features"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  className="block px-4 py-2 text-gray-700"
+                  onClick={(e) => {
+                    handleSmoothScroll(e, "#features");
+                    setIsOpen(false);
+                  }}
                 >
                   Features
                 </a>
               </div>
-              <div className="flex items-center hover:bg-gray-100">
+              <div className="flex items-center hover:bg-gray-100 rounded-lg">
+                <Image
+                  src="/images/features.png"
+                  alt="demo"
+                  className="h-7 w-auto"
+                  width={24}
+                  height={8}
+                />
+                <a
+                  href="#interactive-demo"
+                  className="block px-4 py-2 text-gray-700"
+                  onClick={(e) => {
+                    handleSmoothScroll(e, "#interactive-demo");
+                    setIsOpen(false);
+                  }}
+                >
+                  Demo
+                </a>
+              </div>
+              <div className="flex items-center hover:bg-gray-100 rounded-lg">
                 <Image
                   src="/images/pricing.svg"
                   alt="pricing"
@@ -153,37 +212,46 @@ const Navigation = () => {
                 />
                 <a
                   href="#pricing"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  className="block px-4 py-2 text-gray-700"
+                  onClick={(e) => {
+                    handleSmoothScroll(e, "#pricing");
+                    setIsOpen(false);
+                  }}
                 >
                   Pricing
                 </a>
               </div>
-              <div className="flex items-center hover:bg-gray-100">
+              <div className="flex items-center hover:bg-gray-100 rounded-lg">
                 <Image
                   src="/images/contact.png"
-                  alt="pricing"
+                  alt="contact"
                   className="h-7 w-auto"
                   width={24}
                   height={8}
                 />
                 <a
                   href="#contact"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  className="block px-4 py-2 text-gray-700"
+                  onClick={(e) => {
+                    handleSmoothScroll(e, "#contact");
+                    setIsOpen(false);
+                  }}
                 >
                   Contact
                 </a>
               </div>
-              <div className="flex items-center hover:bg-gray-100">
+              <div className="flex items-center hover:bg-gray-100 rounded-lg border-t border-gray-200 mt-2 pt-2">
                 <Image
                   src="/images/contact.png"
-                  alt="pricing"
+                  alt="sign in"
                   className="h-7 w-auto"
                   width={24}
                   height={8}
                 />
                 <a
-                  href="#contact"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  href="/auth/login"
+                  className="block px-4 py-2 text-gray-700 font-semibold"
+                  onClick={() => setIsOpen(false)}
                 >
                   Sign In
                 </a>
