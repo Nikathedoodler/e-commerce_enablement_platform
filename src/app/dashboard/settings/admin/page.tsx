@@ -22,7 +22,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { createClient } from "@/lib/supabase/client";
 
 type InviteCode = {
   code: string;
@@ -113,7 +112,7 @@ export default function AdminPage() {
       setCopiedCode(code);
       toast.success("Copied to clipboard!");
       setTimeout(() => setCopiedCode(null), 2000);
-    } catch (error) {
+    } catch {
       toast.error("Failed to copy");
     }
   };

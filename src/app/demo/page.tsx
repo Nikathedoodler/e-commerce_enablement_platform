@@ -333,7 +333,7 @@ export default function DemoDashboardPage() {
                 <h2 className="text-2xl font-bold">Ready to get started?</h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
                   This demo shows a preview of your dashboard. To access the full platform with real data,
-                  order management, inventory tracking, and integrations, you'll need an invite code.
+                  order management, inventory tracking, and integrations, you&apos;ll need an invite code.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button asChild size="lg">
