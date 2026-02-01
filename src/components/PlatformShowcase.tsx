@@ -438,22 +438,6 @@ const PlatformShowcase = () => {
           ))}
         </motion.div>
 
-        {/* CTA Section */}
-        <motion.div
-          initial={{ y: 30, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-16 text-center"
-        >
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-full font-semibold text-lg hover:bg-gray-800 transition-all hover:scale-105 shadow-lg group"
-          >
-            <span>See Platform in Action</span>
-            <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-          </a>
-        </motion.div>
       </div>
     </section>
   );

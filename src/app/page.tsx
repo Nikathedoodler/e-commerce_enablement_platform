@@ -9,6 +9,7 @@ import BenefitsSection from "@/components/BenefitsSection";
 import UseCases from "@/components/UseCases";
 import ComparisonSection from "@/components/ComparisonSection";
 import TrustIndicators from "@/components/TrustIndicators";
+import InteractiveDemo from "@/components/InteractiveDemo";
 
 export default function Home() {
   return (
@@ -17,6 +18,8 @@ export default function Home() {
       <Hero />
       {/* Platform Showcase - Dashboard & Analytics Features */}
       <PlatformShowcase />
+      {/* Interactive Demo - Try It Out */}
+      <InteractiveDemo />
       {/* Key Metrics - Impressive Numbers */}
       <KeyMetrics />
       {/* Benefits - Why Choose Us */}
